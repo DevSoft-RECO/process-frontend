@@ -41,79 +41,75 @@
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white">Detalles del Cliente</h3>
         </div>
-        <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
             <div class="space-y-1">
-                <span class="text-xs text-gray-500 uppercase font-semibold">Código</span>
+                <span class="text-xs text-gray-500 uppercase font-semibold">Código Cliente</span>
                 <p class="text-gray-900 dark:text-gray-200">{{ client.codigo_cliente }}</p>
             </div>
             
             <div class="space-y-1">
                 <span class="text-xs text-gray-500 uppercase font-semibold">Nombre Completo</span>
                 <p class="text-gray-900 dark:text-gray-200 font-medium">
-                    {{ [client.nombre1, client.nombre2, client.apellido1, client.apellido2].filter(Boolean).join(' ') }}
+                    {{ [client.nombre1, client.apellido1].filter(Boolean).join(' ') }}
                 </p>
             </div>
 
             <div class="space-y-1">
-                <span class="text-xs text-gray-500 uppercase font-semibold">DPI</span>
+                <span class="text-xs text-gray-500 uppercase font-semibold">Nombre Corto</span>
+                <p class="text-gray-900 dark:text-gray-200 text-sm">
+                    {{ client.nombre_corto || 'N/A' }}
+                </p>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-xs text-gray-500 uppercase font-semibold">DPI / CUI</span>
                 <p class="text-gray-900 dark:text-gray-200 bg-yellow-100 dark:bg-yellow-900/30 px-2 py-0.5 rounded inline-block">
                     {{ client.dpi }}
                 </p>
             </div>
 
             <div class="space-y-1">
-                <span class="text-xs text-gray-500 uppercase font-semibold">NIT</span>
-                <p class="text-gray-900 dark:text-gray-200">{{ client.nit || 'N/A' }}</p>
+                <span class="text-xs text-gray-500 uppercase font-semibold">Empresa</span>
+                <p class="text-gray-900 dark:text-gray-200 font-medium">{{ client.empresa || 'N/A' }}</p>
             </div>
 
             <div class="space-y-1">
-                <span class="text-xs text-gray-500 uppercase font-semibold">Teléfono</span>
-                <p class="text-gray-900 dark:text-gray-200">{{ client.telefono || client.celular || 'N/A' }}</p>
+                <span class="text-xs text-gray-500 uppercase font-semibold">Documento</span>
+                <div class="text-sm">
+                    <p class="text-gray-900 dark:text-gray-200">{{ client.tipo_documento }}</p>
+                    <p class="text-xs text-gray-500">{{ client.numero_documento }}</p>
+                </div>
             </div>
 
             <div class="space-y-1">
-                <span class="text-xs text-gray-500 uppercase font-semibold">Dirección</span>
-                <p class="text-gray-900 dark:text-gray-200 truncate" :title="client.direccion">
-                    {{ client.direccion || 'N/A' }}
-                </p>
+                <span class="text-xs text-gray-500 uppercase font-semibold">Tipo Garantía</span>
+                <p class="text-gray-900 dark:text-gray-200">{{ client.tipo_garantia || 'N/A' }}</p>
             </div>
 
             <div class="space-y-1">
-                <span class="text-xs text-gray-500 uppercase font-semibold">Fecha Nacimiento</span>
-                <p class="text-gray-900 dark:text-gray-200">{{ formatDate(client.fecha_nacimiento) }}</p>
+                <span class="text-xs text-gray-500 uppercase font-semibold">Fecha Inicio</span>
+                <p class="text-gray-900 dark:text-gray-200">{{ formatDate(client.fecha_inicio) }}</p>
             </div>
 
              <div class="space-y-1">
-                <span class="text-xs text-gray-500 uppercase font-semibold">Actividad Económica</span>
-                <p class="text-gray-900 dark:text-gray-200 text-sm">{{ client.actividad_economica_ive || 'N/A' }}</p>
+                <span class="text-xs text-gray-500 uppercase font-semibold">Tasa Interés</span>
+                <p class="text-gray-900 dark:text-gray-200">{{ client.tasa_interes ? client.tasa_interes + '%' : 'N/A' }}</p>
             </div>
 
             <div class="space-y-1">
-                <span class="text-xs text-gray-500 uppercase font-semibold">Estado Civil</span>
-                <p class="text-gray-900 dark:text-gray-200">{{ client.estado_civil || 'N/A' }}</p>
-            </div>
-
-            <div class="space-y-1">
-                <span class="text-xs text-gray-500 uppercase font-semibold">Puesto / Ocupación</span>
-                <p class="text-gray-900 dark:text-gray-200">{{ client.puesto || client.ocupacion || 'N/A' }}</p>
-            </div>
-
-            <div class="space-y-1">
-                <span class="text-xs text-gray-500 uppercase font-semibold">Profesión</span>
-                <p class="text-gray-900 dark:text-gray-200">{{ client.profesion || 'N/A' }}</p>
-            </div>
-
-            <div class="space-y-1">
-                <span class="text-xs text-gray-500 uppercase font-semibold">Ingresos Laborales</span>
-                <p class="text-gray-900 dark:text-gray-200 font-mono text-sm">
-                    {{ formatCurrency(client.ingresos_laborales, client.moneda_ingreso_laboral) }}
+                <span class="text-xs text-gray-500 uppercase font-semibold">Monto Documento</span>
+                <p class="text-gray-900 dark:text-gray-200 font-mono text-lg text-verde-cope">
+                    {{ formatCurrency(client.monto_documento) }}
                 </p>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-xs text-gray-500 uppercase font-semibold">Usuario Asesor</span>
+                <p class="text-gray-900 dark:text-gray-200 text-sm">{{ client.usuario_asesor || 'N/A' }}</p>
             </div>
 
         </div>
     </div>
-  </div>
+ 
 </template>
 
 <script setup lang="ts">
@@ -123,22 +119,17 @@ import axios from 'axios'
 interface Client {
     codigo_cliente: number
     nombre1: string
-    nombre2: string
     apellido1: string
-    apellido2: string
+    nombre_corto: string
     dpi: string
-    nit: string
-    telefono: string
-    celular: string
-    direccion: string
-    fecha_nacimiento: string
-    actividad_economica_ive: string
-    estado_civil: string
-    puesto: string
-    ocupacion: string
-    profesion: string
-    ingresos_laborales: number
-    moneda_ingreso_laboral: string
+    empresa: string
+    tipo_documento: string
+    numero_documento: string
+    tipo_garantia: string
+    fecha_inicio: string
+    tasa_interes: number
+    monto_documento: number
+    usuario_asesor: string
 }
 
 const dpi = ref('')
@@ -154,8 +145,8 @@ const handleSearch = async () => {
     client.value = null
 
     try {
-        // Hardcoded URL as per previous store patterns, ideally environment var
-        const response = await axios.post('http://localhost:8004/api/clientes/search', {
+        // Use environment variable
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/clientes/search`, {
             dpi: dpi.value
         })
         
@@ -179,7 +170,7 @@ const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('es-GT', { timeZone: 'UTC' })
 }
 
-const formatCurrency = (amount: number, currency: string) => {
+const formatCurrency = (amount: number, currency?: string) => {
     if (!amount) return 'N/A'
     return new Intl.NumberFormat('es-GT', { 
         style: 'currency', 

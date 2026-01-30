@@ -24,7 +24,7 @@
                         <li class="mb-2 ml-4">
                             <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -left-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
                             <h4 class="text-sm font-semibold text-gray-900 dark:text-white">1. Prepara tu Archivo</h4>
-                            <p class="text-xs text-gray-500 mt-1">Asegúrate que sea <strong>CSV</strong>, separado por pipes (<code>|</code>) y las fechas en formato <code>YYYYMMDD</code>.</p>
+                            <p class="text-xs text-gray-500 mt-1">Asegúrate que sea <strong>CSV</strong>, separado por punto y coma (<code>;</code>) y las fechas en formato <code>DD/MM/YYYY</code>.</p>
                         </li>
                         <li class="mb-2 ml-4">
                             <div class="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -left-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>

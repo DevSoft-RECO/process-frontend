@@ -2,9 +2,8 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 
-// Define URL base. Ideally this comes from env or a common config
-// Assuming standard Laravel API path
-const API_BASE = 'http://localhost:8004/api/import'
+// Define URL base.
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/import`
 
 interface ImportState {
   activeJobId: string | null
