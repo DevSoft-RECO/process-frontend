@@ -68,6 +68,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'catalogos/tipo-documentos',
+                name: 'admin-catalogos-tipo-documentos',
+                component: () => import('@/views/catalogos/TipoDocumentosView.vue'),
+                meta: {
+                    title: 'Catálogo de Tipo Documentos'
+                }
+            },
+            {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,

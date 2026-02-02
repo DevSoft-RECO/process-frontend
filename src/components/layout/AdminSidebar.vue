@@ -292,6 +292,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Garantías',
                     route: '/admin/catalogos/garantias'
+                },
+                {
+                    label: 'Tipo Documentos',
+                    route: '/admin/catalogos/tipo-documentos'
                 }
             ]
         },
