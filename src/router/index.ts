@@ -60,6 +60,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'catalogos/garantias',
+                name: 'admin-catalogos-garantias',
+                component: () => import('@/views/catalogos/GarantiasView.vue'),
+                meta: {
+                    title: 'Catálogo de Garantías'
+                }
+            },
+            {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,

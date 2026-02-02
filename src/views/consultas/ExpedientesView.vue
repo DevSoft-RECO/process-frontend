@@ -103,7 +103,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import api from '@/api/axios'
 
 interface Expediente {
     codigo_cliente: number
@@ -123,10 +123,11 @@ const nextPageUrl = ref<string | null>(null)
 
 const fetchExpedientes = async (url: string | null = null) => {
     loading.value = true
-    const endpoint = url || `${import.meta.env.VITE_API_URL}/api/expedientes`
+    // Use relative URL for default, or pass full URL (api instance handles it)
+    const endpoint = url || '/expedientes'
     
     try {
-        const response = await axios.get(endpoint)
+        const response = await api.get(endpoint)
         if (response.data.success) {
             const pagination = response.data.data
             // If it's the first page (no url provided), replace data. If loading more, append.
