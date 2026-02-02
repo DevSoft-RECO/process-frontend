@@ -275,6 +275,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Buscar Usuario',
                     route: '/admin/consultas/busqueda-cliente'
+                },
+                {
+                    label: 'Listado Expedientes',
+                    route: '/admin/consultas/expedientes'
                 }
             ]
         },

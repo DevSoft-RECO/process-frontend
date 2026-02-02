@@ -52,6 +52,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'consultas/expedientes',
+                name: 'admin-consultas-expedientes',
+                component: () => import('@/views/consultas/ExpedientesView.vue'),
+                meta: {
+                    title: 'Listado de Expedientes'
+                }
+            },
+            {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,

@@ -68,8 +68,8 @@
             </div>
 
             <div class="space-y-1">
-                <span class="text-xs text-gray-500 uppercase font-semibold">Empresa</span>
-                <p class="text-gray-900 dark:text-gray-200 font-medium">{{ client.empresa || 'N/A' }}</p>
+                <span class="text-xs text-gray-500 uppercase font-semibold">Agencia</span>
+                <p class="text-gray-900 dark:text-gray-200 font-medium">{{ client.agencia || client.empresa || 'N/A' }}</p>
             </div>
 
             <div class="space-y-1">
@@ -107,6 +107,32 @@
                 <p class="text-gray-900 dark:text-gray-200 text-sm">{{ client.usuario_asesor || 'N/A' }}</p>
             </div>
 
+            <div v-if="client.nombre_asociado" class="space-y-1 md:col-span-2">
+                <span class="text-xs text-gray-500 uppercase font-semibold">Nombre Asociado</span>
+                <p class="text-gray-900 dark:text-gray-200 text-sm">{{ client.nombre_asociado }}</p>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-xs text-gray-500 uppercase font-semibold">Contrato</span>
+                <p class="text-gray-900 dark:text-gray-200 text-sm">{{ client.contrato || 'N/A' }}</p>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-xs text-gray-500 uppercase font-semibold">Estado</span>
+                <p class="text-gray-900 dark:text-gray-200 text-sm">
+                    <span :class="{'bg-green-100 text-green-800 px-2 py-0.5 rounded': client.estado === 'COMPLETO', 'bg-gray-100 text-gray-800 px-2 py-0.5 rounded': client.estado !== 'COMPLETO'}">
+                        {{ client.estado || 'N/A' }}
+                    </span>
+                </p>
+            </div>
+
+            <div v-if="client.observacion" class="space-y-1 md:col-span-3">
+                <span class="text-xs text-gray-500 uppercase font-semibold">Observaciones</span>
+                <p class="text-gray-700 dark:text-gray-300 text-sm bg-gray-50 dark:bg-gray-900/50 p-3 rounded border border-gray-100 dark:border-gray-800">
+                    {{ client.observacion }}
+                </p>
+            </div>
+
         </div>
     </div>
  
@@ -130,6 +156,11 @@ interface Client {
     tasa_interes: number
     monto_documento: number
     usuario_asesor: string
+    agencia?: string
+    nombre_asociado?: string
+    contrato?: string
+    observacion?: string
+    estado?: string
 }
 
 const dpi = ref('')
