@@ -296,6 +296,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Tipo Documentos',
                     route: '/admin/catalogos/tipo-documentos'
+                },
+                {
+                    label: 'Agencias',
+                    route: '/admin/catalogos/agencias'
                 }
             ]
         },
