@@ -92,6 +92,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'catalogos/registros-propiedad',
+                name: 'admin-catalogos-registros-propiedad',
+                component: () => import('@/views/catalogos/RegistrosPropiedadView.vue'),
+                meta: {
+                    title: 'Registros de Propiedad'
+                }
+            },
+            {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,

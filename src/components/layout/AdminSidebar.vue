@@ -304,6 +304,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Bufetes',
                     route: '/admin/catalogos/bufetes'
+                },
+                {
+                    label: 'Registros Propiedad',
+                    route: '/admin/catalogos/registros-propiedad'
                 }
             ]
         },
