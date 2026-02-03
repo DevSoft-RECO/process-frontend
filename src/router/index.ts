@@ -84,6 +84,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'catalogos/bufetes',
+                name: 'admin-catalogos-bufetes',
+                component: () => import('@/views/catalogos/BufetesView.vue'),
+                meta: {
+                    title: 'Catálogo de Bufetes'
+                }
+            },
+            {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,

@@ -300,6 +300,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Agencias',
                     route: '/admin/catalogos/agencias'
+                },
+                {
+                    label: 'Bufetes',
+                    route: '/admin/catalogos/bufetes'
                 }
             ]
         },
