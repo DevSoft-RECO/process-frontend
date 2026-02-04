@@ -1,9 +1,6 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import axios from '@/api/axios'
 import Swal from 'sweetalert2'
-
-// Define URL base.
-const API_BASE = `${import.meta.env.VITE_API_URL}/api/import`
 
 interface ImportState {
   activeJobId: string | null
@@ -30,7 +27,7 @@ export const useImportStore = defineStore('import', {
     status: 'idle',
     message: '',
     isWidgetMinimized: false,
-    isWidgetVisible: false, // New state
+    isWidgetVisible: false,
     pollingInterval: null
   }),
 
@@ -51,20 +48,9 @@ export const useImportStore = defineStore('import', {
       if (dates.full) formData.append('full', '1')
 
       try {
-        const response = await axios.post(`${API_BASE}/upload`, formData, {
+        const response = await axios.post('/import/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
-          },
-          onUploadProgress: (progressEvent) => {
-            if (progressEvent.total) {
-              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-              this.progress = percentCompleted
-              if (percentCompleted === 100) {
-                this.message = 'Verificando archivo...'
-              } else {
-                this.message = `Subiendo archivo: ${percentCompleted}%`
-              }
-            }
           }
         })
 
@@ -90,7 +76,7 @@ export const useImportStore = defineStore('import', {
         if (!this.activeJobId) return
 
         try {
-          const response = await axios.get(`${API_BASE}/status/${this.activeJobId}`)
+          const response = await axios.get(`/import/status/${this.activeJobId}`)
           const data = response.data
 
           if (data.status === 'not_found') {
@@ -111,17 +97,12 @@ export const useImportStore = defineStore('import', {
             this.stopPolling()
             this.isProcessing = false
 
-            // Only show notification if widget is hidden (closed by user)
-            if (!this.isWidgetVisible && data.status === 'completed') {
-              Swal.fire({
-                icon: 'success',
-                title: '¡Importación Completada!',
-                text: `${this.processedCount} registros actualizados.`,
-                toast: true,
-                position: 'bottom-end',
-                showConfirmButton: true,
-                timer: 5000
-              })
+            if (data.status === 'completed') {
+              // Auto-close after 10 seconds
+              setTimeout(() => {
+                this.isWidgetVisible = false
+                this.resetState()
+              }, 10000)
             }
           }
 
