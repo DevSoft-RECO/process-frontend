@@ -100,6 +100,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'catalogos/tipo-estados',
+                name: 'admin-catalogos-tipo-estados',
+                component: () => import('@/views/catalogos/TipoEstadosView.vue'),
+                meta: {
+                    title: 'Tipos de Estado'
+                }
+            },
+            {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,

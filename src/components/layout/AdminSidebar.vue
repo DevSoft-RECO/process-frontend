@@ -308,6 +308,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Registros Propiedad',
                     route: '/admin/catalogos/registros-propiedad'
+                },
+                {
+                    label: 'Tipos de Estado',
+                    route: '/admin/catalogos/tipo-estados'
                 }
             ]
         },
