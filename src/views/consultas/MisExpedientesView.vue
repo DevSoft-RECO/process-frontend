@@ -174,7 +174,10 @@
                     </div>
                     
                     <!-- Search Button -->
-                    <div class="md:col-span-2 flex justify-end" v-if="docSearchStep">
+                    <div class="md:col-span-2 flex justify-end gap-3" v-if="docSearchStep">
+                        <button type="button" @click="closeDocModal" class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 transition">
+                            Cancelar
+                        </button>
                         <button type="button" @click="checkDocumento" :disabled="checkingDoc || !docForm.numero || !docForm.fecha" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2">
                              <svg v-if="checkingDoc" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
