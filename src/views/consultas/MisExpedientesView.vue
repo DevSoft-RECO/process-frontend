@@ -185,8 +185,70 @@
                     </div>
                 </div>
 
+                <!-- Step 1.5: Selection List (If matches found) -->
+                <div v-if="docSelectionStep" class="animate-fade-in-down">
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800 mb-6">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 bg-yellow-100 dark:bg-yellow-800 rounded-full text-yellow-600 dark:text-yellow-300 shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-yellow-800 dark:text-yellow-300">Coincidencias Encontradas</h3>
+                                <p class="text-sm text-yellow-700 dark:text-yellow-400 mt-1">
+                                    Se encontraron uno o más documentos con el número <strong>{{ docForm.numero }}</strong> y fecha <strong>{{ docForm.fecha }}</strong>.
+                                    <br>Seleccione uno de la lista para vincularlo, o registre uno nuevo si ninguno coincide.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- List of Matches -->
+                    <div class="grid gap-4 mb-6 max-h-[400px] overflow-y-auto p-1">
+                        <div v-for="doc in foundDocs" :key="doc.id" class="relative group p-4 bg-white dark:bg-gray-700 border rounded-lg shadow-sm hover:ring-2 hover:ring-blue-500 transition-all cursor-pointer" :class="doc.already_linked ? 'border-red-300 bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-gray-600'">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                         <h4 class="font-bold text-gray-900 dark:text-white">{{ doc.tipo_documento?.nombre || 'Sin Tipo' }}</h4>
+                                         <span v-if="doc.already_linked" class="px-2 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300">
+                                            YA VINCULADO
+                                         </span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                        <span class="font-semibold">Finca:</span> {{ doc.no_finca }} | 
+                                        <span class="font-semibold">Folio:</span> {{ doc.folio }} | 
+                                        <span class="font-semibold">Libro:</span> {{ doc.libro }}
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Propietario: {{ doc.propietario || 'N/A' }} | Registro: {{ doc.registro_propiedad?.nombre || 'N/A' }}
+                                    </p>
+                                </div>
+                                <button type="button" @click="selectExistingDoc(doc)" class="px-3 py-1.5 text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 transition">
+                                    {{ doc.already_linked ? 'Vincular de nuevo' : 'Seleccionar' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between pt-4 border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 z-10 sticky bottom-0">
+                         <button type="button" @click="docSearchStep = true; docSelectionStep = false" class="text-sm text-blue-600 hover:underline">
+                            &larr; Volver a búsqueda
+                        </button>
+                        <div class="flex gap-3 ml-auto">
+                            <!-- Option to create NEW despite matches -->
+                            <button type="button" @click="proceedToCreate" class="px-4 py-2 text-white bg-verde-cope rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                                Ninguno de estos - Registrar Nuevo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Step 2: Full Form (If checking passed) -->
-                <div v-if="!docSearchStep" class="animate-fade-in-down">
+                <div v-else-if="!docSearchStep" class="animate-fade-in-down">
                     
                     <div v-if="existingDocFound" :class="isDuplicate ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'" class="p-4 rounded-lg border mb-6 flex items-start gap-4">
                         <div :class="isDuplicate ? 'bg-red-100 dark:bg-red-800 text-red-600 dark:text-red-300' : 'bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-300'" class="p-2 rounded-full shrink-0">
@@ -292,15 +354,16 @@
                     </div>
                 </div>
 
-                <div class="flex justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
-                     <button type="button" v-if="!docSearchStep" @click="docSearchStep = true" class="text-sm text-blue-600 hover:underline">
+                <!-- Step 2 Footer (Form Actions) -->
+                <div v-if="!docSearchStep && !docSelectionStep" class="flex justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                     <button type="button" @click="docSearchStep = true" class="text-sm text-blue-600 hover:underline">
                         &larr; Volver a búsqueda
                     </button>
                     <div class="flex gap-3 ml-auto">
                         <button type="button" @click="closeDocModal" class="px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 transition">
-                            {{ docSearchStep ? 'Cancelar' : 'Cerrar' }}
+                            Cancelar
                         </button>
-                        <button v-if="!docSearchStep" type="submit" :disabled="submitting" class="px-5 py-2.5 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition flex items-center gap-2">
+                        <button type="submit" :disabled="submitting" class="px-5 py-2.5 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition flex items-center gap-2">
                             <svg v-if="submitting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -351,8 +414,12 @@ const form = reactive({
 
 // --- Documento Modal State ---
 const showDocModal = ref(false)
-const docSearchStep = ref(true) // Start at search step
+const docSearchStep = ref(true) // Step 1: Search
+const docSelectionStep = ref(false) // Step 1.5: Select from list
 const checkingDoc = ref(false)
+const foundDocs = ref<any[]>([]) 
+
+// Valid types for existingDocFound and ID
 const existingDocFound = ref(false)
 const existingDocId = ref<number | null>(null)
 
@@ -464,25 +531,26 @@ const submitGarantia = async () => {
 const openDocModal = async (exp: NuevoExpediente) => {
     selectedExpediente.value = exp
     resetDocForm()
-    docSearchStep.value = true // Reset to search
+    docSearchStep.value = true
+    docSelectionStep.value = false
     existingDocFound.value = false
     existingDocId.value = null
+    foundDocs.value = []
 
-    // Fetch catalogs lazily
+    // Show immediately
+    showDocModal.value = true
+
+    // Fetch catalogs in background (non-blocking)
     if (tiposDocumentoList.value.length === 0) {
-        try {
-            const res = await api.get('/tipo-documentos')
+        api.get('/tipo-documentos').then(res => {
             if (res.data.success) tiposDocumentoList.value = res.data.data.data || res.data.data
-        } catch(e){ console.error(e) }
+        }).catch(e => console.error(e))
     }
     if (registrosList.value.length === 0) {
-        try {
-            const res = await api.get('/registros-propiedad')
+        api.get('/registros-propiedad').then(res => {
             if (res.data.success) registrosList.value = res.data.data.data || res.data.data
-        } catch(e){ console.error(e) }
+        }).catch(e => console.error(e))
     }
-
-    showDocModal.value = true
 }
 
 const closeDocModal = () => {
@@ -511,7 +579,8 @@ const isDuplicate = ref(false)
 const checkDocumento = async () => {
     if (!docForm.numero || !docForm.fecha) return
     checkingDoc.value = true
-    isDuplicate.value = false
+    isDuplicate.value = false // Although no longer used for single warning, keeping state clean
+    foundDocs.value = []
     
     try {
         const res = await api.post('/documentos/check', {
@@ -520,32 +589,14 @@ const checkDocumento = async () => {
             nuevo_expediente_id: selectedExpediente.value?.codigo_cliente
         })
         
-        if (res.data.found) {
-            existingDocFound.value = true
-            existingDocId.value = res.data.data.id
-            isDuplicate.value = res.data.already_linked || false // Capture the flag
-
-            const d = res.data.data
-            // Populate form with existing data
-            docForm.tipo_documento_id = d.tipo_documento_id
-            docForm.registro_propiedad_id = d.registro_propiedad_id
-            docForm.propietario = d.propietario
-            docForm.autorizador = d.autorizador
-            docForm.no_finca = d.no_finca
-            docForm.folio = d.folio
-            docForm.libro = d.libro
-            docForm.no_dominio = d.no_dominio
-            docForm.referencia = d.referencia
-            docForm.monto_poliza = d.monto_poliza
-            docForm.observacion = d.observacion
+        if (res.data.found && Array.isArray(res.data.data) && res.data.data.length > 0) {
+            foundDocs.value = res.data.data
+            docSearchStep.value = false
+            docSelectionStep.value = true // Go to selection list
         } else {
-            existingDocFound.value = false
-            existingDocId.value = null
-            // Keep numero and fecha, clear others? Or just let user fill them.
-            // Keeping them as user entered allows filling the rest.
+            // No docs found, go directly to creation
+            proceedToCreate()
         }
-        
-        docSearchStep.value = false // Determine to move to next step regardless
     } catch (e: any) {
         console.error(e)
         Swal.fire('Error', 'No se pudo verificar el documento', 'error')
@@ -553,6 +604,40 @@ const checkDocumento = async () => {
         checkingDoc.value = false
     }
 }
+
+const selectExistingDoc = (doc: any) => {
+    existingDocFound.value = true
+    existingDocId.value = doc.id
+    
+    // Check if it's a duplicate (though backend sends flag, we can also check UI side if needed, but let's trust the item flag for UI hints)
+    isDuplicate.value = doc.already_linked
+
+    // Populate form
+    docForm.tipo_documento_id = doc.tipo_documento_id
+    docForm.registro_propiedad_id = doc.registro_propiedad_id
+    docForm.propietario = doc.propietario
+    docForm.autorizador = doc.autorizador
+    docForm.no_finca = doc.no_finca
+    docForm.folio = doc.folio
+    docForm.libro = doc.libro
+    docForm.no_dominio = doc.no_dominio
+    docForm.referencia = doc.referencia
+    docForm.monto_poliza = doc.monto_poliza
+    docForm.observacion = doc.observacion
+
+    docSelectionStep.value = false // Done selecting, show form (readonly)
+}
+
+const proceedToCreate = () => {
+    existingDocFound.value = false
+    existingDocId.value = null
+    isDuplicate.value = false
+    // Keep numero and fecha
+    docSearchStep.value = false
+    docSelectionStep.value = false
+}
+
+
 
 const submitDocumento = async () => {
     if (!selectedExpediente.value) return
