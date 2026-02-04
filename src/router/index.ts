@@ -68,6 +68,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'consultas/mis-expedientes',
+                name: 'admin-consultas-mis-expedientes',
+                component: () => import('@/views/consultas/MisExpedientesView.vue'),
+                meta: {
+                    title: 'Mis Expedientes (Nuevos)'
+                }
+            },
+            {
                 path: 'catalogos/garantias',
                 name: 'admin-catalogos-garantias',
                 component: () => import('@/views/catalogos/GarantiasView.vue'),

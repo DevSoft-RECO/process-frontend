@@ -283,6 +283,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Listado Expedientes Históricos',
                     route: '/admin/consultas/expedientes'
+                },
+                {
+                    label: 'Mis Expedientes',
+                    route: '/admin/consultas/mis-expedientes'
                 }
             ]
         },
