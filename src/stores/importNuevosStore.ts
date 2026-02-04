@@ -62,15 +62,17 @@ export const useImportNuevosStore = defineStore('importNuevos', () => {
                     stopPolling()
                     isProcessing.value = false
                     status.value = 'completed'
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Éxito',
-                        text: data.message,
-                        toast: true,
-                        timer: 3000,
-                        position: 'top-end',
-                        showConfirmButton: false
-                    })
+                    if (!isWidgetVisible.value) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: data.message,
+                            toast: true,
+                            timer: 3000,
+                            position: 'top-end',
+                            showConfirmButton: false
+                        })
+                    }
 
                     // Auto close widget after 10 seconds
                     setTimeout(() => {

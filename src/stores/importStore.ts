@@ -98,6 +98,17 @@ export const useImportStore = defineStore('import', {
             this.isProcessing = false
 
             if (data.status === 'completed') {
+              if (!this.isWidgetVisible) {
+                Swal.fire({
+                  icon: 'success',
+                  title: '¡Importación Completada!',
+                  text: `${this.processedCount} registros actualizados.`,
+                  toast: true,
+                  position: 'bottom-end',
+                  showConfirmButton: true,
+                  timer: 5000
+                })
+              }
               // Auto-close after 10 seconds
               setTimeout(() => {
                 this.isWidgetVisible = false
