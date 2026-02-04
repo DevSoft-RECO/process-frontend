@@ -44,6 +44,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'carga-datos/nuevos-expedientes',
+                name: 'admin-carga-nuevos-expedientes',
+                component: () => import('@/views/carga-datos/NuevosExpedientesImportView.vue'),
+                meta: {
+                    title: 'Carga Histórica / Nuevos'
+                }
+            },
+            {
                 path: 'consultas/busqueda-cliente',
                 name: 'admin-busqueda-cliente',
                 component: () => import('@/views/consultas/BusquedaClienteView.vue'),
