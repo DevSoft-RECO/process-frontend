@@ -3,14 +3,34 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Expedientes
+            Expedientes Históricos
         </h1>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Listado general de expedientes importados.
         </p>
       </div>
-      <div class="flex gap-2">
-         <button @click="resetFetch" class="px-4 py-2 bg-verde-cope text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 text-sm shadow-md">
+      <div class="flex flex-col md:flex-row gap-2">
+         <!-- Search Input -->
+         <div class="relative">
+            <input 
+                v-model="searchQuery" 
+                @keyup.enter="handleSearch"
+                type="text" 
+                placeholder="Buscar por Código Cliente..." 
+                class="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-verde-cope focus:border-transparent outline-none w-full md:w-64 transition-all"
+            />
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+         </div>
+
+         <button @click="handleSearch" class="px-4 py-2 bg-azul-cope text-white rounded-lg hover:bg-blue-900 transition flex items-center justify-center gap-2 text-sm shadow-md">
+            Buscar
+         </button>
+
+         <button @click="resetFetch" class="px-4 py-2 bg-verde-cope text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2 text-sm shadow-md">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
               <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
             </svg>
@@ -49,7 +69,7 @@
                     </tr>
                     <tr v-else-if="expedientes.length === 0" class="bg-white dark:bg-gray-800">
                         <td colspan="8" class="px-6 py-8 text-center text-gray-500">
-                            No hay expedientes disponibles.
+                            {{ message || 'No hay expedientes disponibles.' }}
                         </td>
                     </tr>
                     <tr v-for="exp in expedientes" :key="exp.codigo_cliente" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
@@ -87,7 +107,7 @@
             </table>
         </div>
         <!-- Pagination / Load More -->
-        <div v-if="nextPageUrl" class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-t border-gray-200 dark:border-gray-600 flex justify-center">
+        <div v-if="nextPageUrl && !isSearching" class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-t border-gray-200 dark:border-gray-600 flex justify-center">
             <button 
                 @click="loadMore" 
                 :disabled="loading"
@@ -104,6 +124,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
+import Swal from 'sweetalert2'
 
 interface Expediente {
     codigo_cliente: number
@@ -120,9 +141,13 @@ interface Expediente {
 const expedientes = ref<Expediente[]>([])
 const loading = ref(false)
 const nextPageUrl = ref<string | null>(null)
+const searchQuery = ref('')
+const isSearching = ref(false)
+const message = ref('')
 
 const fetchExpedientes = async (url: string | null = null) => {
     loading.value = true
+    message.value = ''
     // Use relative URL for default, or pass full URL (api instance handles it)
     const endpoint = url || '/expedientes'
     
@@ -146,7 +171,42 @@ const fetchExpedientes = async (url: string | null = null) => {
     }
 }
 
+const handleSearch = async () => {
+    if (!searchQuery.value.trim()) {
+        resetFetch()
+        return
+    }
+
+    loading.value = true
+    isSearching.value = true
+    expedientes.value = [] // Clear current list
+    message.value = ''
+    nextPageUrl.value = null // Disable pagination logic during search
+
+    try {
+        const response = await api.post('/expedientes/search-by-codigo', {
+            codigo_cliente: searchQuery.value
+        })
+
+        if (response.data.success) {
+            expedientes.value = [response.data.data] // Exact match returns single object, wrap in array
+        }
+    } catch (error: any) {
+        if (error.response && error.response.status === 404) {
+            message.value = 'No se encontró ningún expediente con ese código.'
+            Swal.fire('No encontrado', 'No existe un expediente con ese código.', 'info')
+        } else {
+            console.error("Search error", error)
+            Swal.fire('Error', 'Ocurrió un error al buscar.', 'error')
+        }
+    } finally {
+        loading.value = false
+    }
+}
+
 const resetFetch = () => {
+    searchQuery.value = ''
+    isSearching.value = false
     fetchExpedientes(null)
 }
 

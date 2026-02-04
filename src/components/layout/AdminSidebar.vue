@@ -261,8 +261,12 @@ const menuItems = computed(() => {
             show: true,
             children: [
                 {
-                    label: 'Clientes',
+                    label: 'Expedientes Históricos', // Antes Clientes
                     route: '/admin/carga-datos/clientes'
+                },
+                {
+                    label: 'Cargar Expedientes',
+                    route: '/admin/carga-datos/nuevos-expedientes'
                 }
             ]
         },
@@ -277,7 +281,7 @@ const menuItems = computed(() => {
                     route: '/admin/consultas/busqueda-cliente'
                 },
                 {
-                    label: 'Listado Expedientes',
+                    label: 'Listado Expedientes Históricos',
                     route: '/admin/consultas/expedientes'
                 }
             ]

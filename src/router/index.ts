@@ -38,9 +38,9 @@ const routes: RouteRecordRaw[] = [
             {
                 path: 'carga-datos/clientes',
                 name: 'admin-carga-clientes',
-                component: () => import('@/views/carga-datos/ClientesImportView.vue'),
+                component: () => import('@/views/carga-datos/ExpedientesHistoricosImportView.vue'),
                 meta: {
-                    title: 'Carga de Clientes'
+                    title: 'Carga de Expedientes Históricos'
                 }
             },
             {
@@ -62,9 +62,9 @@ const routes: RouteRecordRaw[] = [
             {
                 path: 'consultas/expedientes',
                 name: 'admin-consultas-expedientes',
-                component: () => import('@/views/consultas/ExpedientesView.vue'),
+                component: () => import('@/views/consultas/ExpedientesHistoricosView.vue'),
                 meta: {
-                    title: 'Listado de Expedientes'
+                    title: 'Listado de Expedientes Históricos'
                 }
             },
             {
