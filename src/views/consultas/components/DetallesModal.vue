@@ -141,12 +141,17 @@
                 </button>
                  <button 
                     @click="sendExpediente"
-                    class="px-5 py-2.5 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition flex items-center gap-2"
+                    :disabled="sending"
+                    class="px-5 py-2.5 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <svg v-if="sending" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                     </svg>
-                    Enviar Expediente
+                    {{ sending ? 'Enviando...' : 'Enviar Expediente' }}
                 </button>
             </div>
         </div>
@@ -191,13 +196,47 @@ const fetchDetalles = async () => {
     }
 }
 
-const sendExpediente = () => {
-    console.log('Enviar expediente:', props.expediente)
-    Swal.fire({
-        icon: 'info',
-        title: 'Próximamente',
-        text: 'Esta funcionalidad de envío estará disponible pronto.',
+const sending = ref(false)
+
+const sendExpediente = async () => {
+    const result = await Swal.fire({
+        title: '¿Enviar Expediente?',
+        text: "El expediente será enviado a secretaría para su revisión. Esta acción no se puede deshacer.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, enviar',
+        cancelButtonText: 'Cancelar'
     })
+
+    if (!result.isConfirmed) return
+
+    sending.value = true
+    try {
+        const res = await api.post('/seguimiento/enviar-secretaria', {
+            codigo_cliente: props.expediente.codigo_cliente
+        })
+
+        if (res.data.success) {
+             Swal.fire({
+                icon: 'success',
+                title: 'Enviado',
+                text: 'El expediente ha sido enviado a secretaría correctamente.',
+                timer: 2000,
+                showConfirmButton: false
+            })
+            emit('close')
+            // Optionally emit an event to refresh the parent list if needed, 
+            // but closing modal is usually enough as parent might refresh on its own or not need to.
+            // If parent needs refresh, emit('sent') and handle in parent.
+        }
+    } catch (error: any) {
+        console.error(error)
+        Swal.fire('Error', error.response?.data?.message || 'No se pudo enviar el expediente.', 'error')
+    } finally {
+        sending.value = false
+    }
 }
 
 // Formatters
