@@ -143,7 +143,8 @@
                     v-if="canSend"
                     @click="sendExpediente"
                     :disabled="sending"
-                    class="px-5 py-2.5 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    :class="sendButtonClass"
+                    class="px-5 py-2.5 text-white rounded-lg shadow-md transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <svg v-if="sending" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -152,7 +153,7 @@
                     <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                     </svg>
-                    {{ sending ? 'Enviando...' : 'Enviar Expediente' }}
+                    {{ sending ? 'Enviando...' : sendButtonText }}
                 </button>
             </div>
         </div>
@@ -198,6 +199,33 @@ const canSend = computed(() => {
     
     // Any other status (1=Enviado, etc) -> Cannot send
     return false;
+})
+
+const sendButtonText = computed(() => {
+    const ex = detallesData.value.expediente || props.expediente;
+    if (!ex) return 'Enviar Expediente';
+    
+    const seguimientos = ex.seguimientos;
+    if (seguimientos && seguimientos.length > 0) {
+        if (seguimientos[0].id_estado === 2) return 'Volver a enviar';
+    }
+    return 'Enviar Expediente';
+})
+
+const sendButtonClass = computed(() => {
+    const ex = detallesData.value.expediente || props.expediente;
+    if (!ex) return 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/30';
+    
+    // Check status for color
+    const seguimientos = ex.seguimientos;
+    if (seguimientos && seguimientos.length > 0) {
+        if (seguimientos[0].id_estado === 2) {
+            // "Volver a enviar" -> Orange/Amber
+            return 'bg-orange-600 hover:bg-orange-700 shadow-orange-500/30';
+        }
+    }
+    // Default "Enviar" -> Blue
+    return 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/30';
 })
 
 watch(() => props.show, (newVal) => {
