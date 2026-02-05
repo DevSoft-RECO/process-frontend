@@ -26,6 +26,7 @@
         :next-page-url="nextPageUrl"
         @open-adjuntar="openAdjuntarModal"
         @open-detalles="openDetallesModal"
+        @open-tracking="openTrackingModal"
         @load-more="loadMore"
     />
 
@@ -43,6 +44,12 @@
         @close="closeModals"
     />
 
+    <TrackingModal
+        :show="showTrackingModal"
+        :expediente="selectedExpediente"
+        @close="closeModals"
+    />
+
   </div>
 </template>
 
@@ -54,6 +61,7 @@ import api from '@/api/axios'
 import ExpedientesTable from './components/ExpedientesTable.vue'
 import AdjuntarModal from './components/AdjuntarModal.vue'
 import DetallesModal from './components/DetallesModal.vue'
+import TrackingModal from './components/TrackingModal.vue'
 
 // State
 const expedientes = ref<any[]>([])
@@ -63,6 +71,7 @@ const nextPageUrl = ref<string | null>(null)
 // Modal State
 const showAdjuntarModal = ref(false)
 const showDetallesModal = ref(false)
+const showTrackingModal = ref(false)
 const selectedExpediente = ref<any>(null)
 
 // Methods
@@ -110,9 +119,15 @@ const openDetallesModal = (exp: any) => {
     showDetallesModal.value = true
 }
 
+const openTrackingModal = (exp: any) => {
+    selectedExpediente.value = exp
+    showTrackingModal.value = true
+}
+
 const closeModals = () => {
     showAdjuntarModal.value = false
     showDetallesModal.value = false
+    showTrackingModal.value = false
     selectedExpediente.value = null
 }
 

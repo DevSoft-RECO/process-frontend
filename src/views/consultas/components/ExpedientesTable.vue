@@ -60,6 +60,16 @@
                                     </svg>
                                     Revisar y enviar
                                 </button>
+                                <button 
+                                    @click="$emit('open-tracking', exp)"
+                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-orange-600 bg-orange-100 hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+                                    title="Ver Seguimiento"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                    </svg>
+                                    Seguimiento
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -82,7 +92,7 @@ defineProps<{
     nextPageUrl: string | null
 }>()
 
-defineEmits(['open-adjuntar', 'open-detalles', 'load-more'])
+defineEmits(['open-adjuntar', 'open-detalles', 'open-tracking', 'load-more'])
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
