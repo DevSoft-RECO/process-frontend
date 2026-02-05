@@ -169,7 +169,7 @@ const props = defineProps<{
     expediente: any
 }>()
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'refresh'])
 
 const loadingDetalles = ref(false)
 const detallesData = ref<any>({})
@@ -197,16 +197,52 @@ const fetchDetalles = async () => {
     }
 }
 
-const handleAction = (action: string) => {
+const handleAction = async (action: string) => {
     console.log('Acción seleccionada:', action)
+    
+    if (action === 'rechazar') {
+        const result = await Swal.fire({
+            title: 'Rechazar / Regresar',
+            text: "Por favor ingrese el motivo del rechazo:",
+            input: 'textarea',
+            inputPlaceholder: 'Escriba la observación aquí...',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Regresar a Asesores',
+            cancelButtonText: 'Cancelar',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Debes escribir una observación'
+                }
+            }
+        })
+
+        if (result.isConfirmed) {
+            try {
+                const res = await api.post('/seguimiento/rechazar', {
+                    codigo_cliente: props.expediente.codigo_cliente,
+                    observacion: result.value
+                })
+
+                if (res.data.success) {
+                    Swal.fire('Regresado', 'El expediente ha sido regresado a asesores.', 'success')
+                    emit('refresh')
+                    emit('close')
+                }
+            } catch (error: any) {
+                console.error(error)
+                Swal.fire('Error', error.response?.data?.message || 'Error al rechazar expediente.', 'error')
+            }
+        }
+        return;
+    }
+
     let message = ''
     let icon: 'info' | 'warning' | 'success' | 'error' | 'question' = 'info'
 
     switch(action) {
-        case 'rechazar':
-            message = 'Funcionalidad para regresar el expediente (Rechazo).';
-             icon = 'warning'
-            break;
         case 'archivo':
             message = 'Funcionalidad para enviar a archivo. (Estado Final?)';
             break;
@@ -214,9 +250,6 @@ const handleAction = (action: string) => {
             message = 'Funcionalidad para aceptar y avanzar flujo.';
             icon = 'success'
             break;
-        case 'almacenar': // Not added in template but user mentioned
-             message = 'Funcionalidad para almacenar.';
-             break;
     }
 
     Swal.fire({
