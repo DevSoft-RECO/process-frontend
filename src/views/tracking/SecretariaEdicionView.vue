@@ -285,7 +285,7 @@ const openEditDocumento = (doc: any) => {
         Swal.fire({
             icon: 'warning',
             title: 'Edición Restringida',
-            text: 'Este documento está asociado a múltiples expedientes. Para corregirlo, debe comunicarse con Informática.',
+            text: 'Este documento está asociado a múltiples expedientes. Para corregirlo, debe comunicarse con Informática. Una vez corregido puede continuar con el proceso.',
             confirmButtonText: 'Entendido'
         })
         return
