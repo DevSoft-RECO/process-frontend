@@ -80,6 +80,13 @@
                                     "{{ secretariaState.observacion }}"
                                 </p>
                             </div>
+
+                            <div v-if="secretariaState.status === 'aceptado'" class="mt-2">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                    Aceptado / En Revisión Final
+                                </span>
+                                <p class="text-xs text-green-600 dark:text-green-400 mt-1">Listo para enviar a archivo.</p>
+                            </div>
                         </div>
                     </div>
 
@@ -147,6 +154,14 @@ const secretariaState = computed(() => {
             status: 'rechazado', 
             color: RED, 
             observacion: latest.observacion_rechazo 
+        }
+    }
+
+    if (latest.id_estado === 3) {
+        return {
+            status: 'aceptado',
+            color: 'bg-green-500',
+            observacion: null
         }
     }
 

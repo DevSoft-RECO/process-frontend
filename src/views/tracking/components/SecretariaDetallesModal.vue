@@ -166,24 +166,24 @@
 
                 <div class="w-full md:w-auto border-l border-gray-300 dark:border-gray-600 mx-2 hidden md:block"></div>
 
-                <!-- Acción: Rechazar / Regresar -->
-                <button @click="handleAction('rechazar')" class="px-5 py-2.5 text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-md transition flex items-center gap-2">
+                <!-- Acción: Rechazar / Regresar (Visible si no es 3) -->
+                <button v-if="currentState !== 3" @click="handleAction('rechazar')" class="px-5 py-2.5 text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                     Rechazar / Regresar
                 </button>
 
-                 <!-- Acción: Enviar a Archivo -->
-                <button @click="handleAction('archivo')" class="px-5 py-2.5 text-white bg-gray-600 rounded-lg hover:bg-gray-700 shadow-md transition flex items-center gap-2">
+                 <!-- Acción: Enviar a Archivo (Solo visible si estado 3) -->
+                <button v-if="currentState === 3" @click="handleAction('archivo')" class="px-5 py-2.5 text-white bg-gray-600 rounded-lg hover:bg-gray-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                     </svg>
                     Enviar a Archivo
                 </button>
 
-                 <!-- Acción: Aceptar / Validar -->
-                 <button @click="handleAction('aceptar')" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
+                 <!-- Acción: Aceptar / Validar (Visible si no es 3) -->
+                 <button v-if="currentState !== 3" @click="handleAction('aceptar')" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
@@ -286,25 +286,49 @@ const handleAction = async (action: string) => {
         return;
     }
 
-    let message = ''
-    let icon: 'info' | 'warning' | 'success' | 'error' | 'question' = 'info'
+    if (action === 'aceptar') {
+        const result = await Swal.fire({
+            title: '¿Aceptar Expediente?',
+            text: "El expediente pasará a estado Aceptado (Estado 3) y se habilitará el envío a archivo.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10B981', // green-500
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, Aceptar',
+            cancelButtonText: 'Cancelar'
+        })
 
-    switch(action) {
-        case 'archivo':
-            message = 'Funcionalidad para enviar a archivo. (Estado Final?)';
-            break;
-        case 'aceptar':
-            message = 'Funcionalidad para aceptar y avanzar flujo.';
-            icon = 'success'
-            break;
+        if (result.isConfirmed) {
+            try {
+                const res = await api.post('/seguimiento/aceptar', {
+                    codigo_cliente: props.expediente.codigo_cliente
+                })
+                if (res.data.success) {
+                    Swal.fire('Aceptado', 'El expediente ha sido aceptado correctamente.', 'success')
+                    emit('refresh')
+                    emit('close')
+                }
+            } catch (error: any) {
+                console.error(error)
+                Swal.fire('Error', error.response?.data?.message || 'Error al aceptar expediente.', 'error')
+            }
+        }
+        return;
     }
 
-    Swal.fire({
-        icon: icon,
-        title: 'Próximamente',
-        text: message,
-    })
+    if (action === 'archivo') {
+        Swal.fire({
+            icon: 'info',
+            title: 'Próximamente',
+            text: 'Funcionalidad para envío físico a archivo.',
+        })
+    }
 }
+
+const currentState = computed(() => {
+    if (!detallesData.value?.expediente?.seguimientos || detallesData.value.expediente.seguimientos.length === 0) return 0;
+    return detallesData.value.expediente.seguimientos[0].id_estado;
+})
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
