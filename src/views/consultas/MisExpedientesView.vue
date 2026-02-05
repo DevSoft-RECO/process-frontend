@@ -24,22 +24,14 @@
         :expedientes="expedientes"
         :loading="loading"
         :next-page-url="nextPageUrl"
-        @open-garantia="openGarantiaModal"
-        @open-documento="openDocModal"
+        @open-adjuntar="openAdjuntarModal"
         @open-detalles="openDetallesModal"
         @load-more="loadMore"
     />
 
     <!-- Modals -->
-    <GarantiaModal 
-        :show="showGarantiaModal"
-        :expediente="selectedExpediente"
-        @close="closeModals"
-        @saved="handleSaved"
-    />
-
-    <DocumentoModal 
-        :show="showDocModal"
+    <AdjuntarModal 
+        :show="showAdjuntarModal"
         :expediente="selectedExpediente"
         @close="closeModals"
         @saved="handleSaved"
@@ -60,8 +52,7 @@ import api from '@/api/axios'
 
 // Components
 import ExpedientesTable from './components/ExpedientesTable.vue'
-import GarantiaModal from './components/GarantiaModal.vue'
-import DocumentoModal from './components/DocumentoModal.vue'
+import AdjuntarModal from './components/AdjuntarModal.vue'
 import DetallesModal from './components/DetallesModal.vue'
 
 // State
@@ -70,8 +61,7 @@ const loading = ref(false)
 const nextPageUrl = ref<string | null>(null)
 
 // Modal State
-const showGarantiaModal = ref(false)
-const showDocModal = ref(false)
+const showAdjuntarModal = ref(false)
 const showDetallesModal = ref(false)
 const selectedExpediente = ref<any>(null)
 
@@ -105,21 +95,14 @@ const resetFetch = () => fetchExpedientes(null)
 
 const handleSaved = () => {
     // Refresh list to show updated status (e.g. guarantee added)
-    // We could preserve page, but easiest is to refresh current view or just reload
-    // In original code, it called fetchExpedientes()
     fetchExpedientes()
-    closeModals()
+    // closeModals() - Removed to keep modal open
 }
 
 // Modal Openers
-const openGarantiaModal = (exp: any) => {
+const openAdjuntarModal = (exp: any) => {
     selectedExpediente.value = exp
-    showGarantiaModal.value = true
-}
-
-const openDocModal = (exp: any) => {
-    selectedExpediente.value = exp
-    showDocModal.value = true
+    showAdjuntarModal.value = true
 }
 
 const openDetallesModal = (exp: any) => {
@@ -128,8 +111,7 @@ const openDetallesModal = (exp: any) => {
 }
 
 const closeModals = () => {
-    showGarantiaModal.value = false
-    showDocModal.value = false
+    showAdjuntarModal.value = false
     showDetallesModal.value = false
     selectedExpediente.value = null
 }

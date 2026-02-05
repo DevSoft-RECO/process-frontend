@@ -37,26 +37,16 @@
                         </td>
                         <td class="px-6 py-4 text-center">
                             <div class="flex justify-center gap-2">
-                                <!-- Old Buttons -->
+                                <!-- New Unified Button -->
                                 <button 
-                                    @click="$emit('open-garantia', exp)"
-                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-verde-cope bg-verde-cope/10 hover:bg-verde-cope/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-verde-cope transition-colors"
-                                    title="Agregar Garantía"
+                                    @click="$emit('open-adjuntar', exp)"
+                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                                    title="Adjuntar Información"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                     </svg>
-                                    Garantía
-                                </button>
-                                <button 
-                                    @click="$emit('open-documento', exp)"
-                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-blue-600 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                                    title="Agregar Documento"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    Documento
+                                    Adjuntar
                                 </button>
                                 <!-- New Buttons -->
                                 <button 
@@ -92,7 +82,7 @@ defineProps<{
     nextPageUrl: string | null
 }>()
 
-defineEmits(['open-garantia', 'open-documento', 'open-detalles', 'load-more'])
+defineEmits(['open-adjuntar', 'open-detalles', 'load-more'])
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
