@@ -25,7 +25,7 @@
             </div>
 
             <!-- Codeudores y Observaciones (Paired) -->
-            <div class="space-y-4">
+            <div class="space-y-4" v-if="shouldShowFields">
                     <div v-for="i in 4" :key="i" class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Codeudor Input -->
                     <div>
@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, onMounted } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 
@@ -74,6 +74,12 @@ const form = reactive({
     garantia_id: '',
     codeudor1: '', codeudor2: '', codeudor3: '', codeudor4: '',
     observacion1: '', observacion2: '', observacion3: '', observacion4: ''
+})
+
+const shouldShowFields = computed(() => {
+    if (!form.garantia_id) return false
+    const selected = garantiasList.value.find(g => g.id == form.garantia_id)
+    return selected ? Boolean(selected.desplegables) : false
 })
 
 const fetchGarantias = async () => {

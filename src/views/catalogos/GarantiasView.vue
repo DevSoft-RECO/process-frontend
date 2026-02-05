@@ -28,17 +28,18 @@
                     <tr>
                         <th scope="col" class="px-6 py-3 w-20">ID</th>
                         <th scope="col" class="px-6 py-3">Nombre</th>
+                        <th scope="col" class="px-6 py-3 text-center">Desplegables</th>
                         <th scope="col" class="px-6 py-3 text-right">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     <tr v-if="loading && garantias.length === 0" class="bg-white dark:bg-gray-800">
-                        <td colspan="3" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">
                             Cargando...
                         </td>
                     </tr>
                     <tr v-else-if="garantias.length === 0" class="bg-white dark:bg-gray-800">
-                        <td colspan="3" class="px-6 py-8 text-center text-gray-500">
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-500">
                             No hay garantías registradas.
                         </td>
                     </tr>
@@ -48,6 +49,18 @@
                         </td>
                         <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
                             {{ item.nombre }}
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span v-if="item.desplegables" class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </span>
+                            <span v-else class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </span>
                         </td>
                         <td class="px-6 py-4 text-right flex justify-end gap-2">
                             <button @click="openModal(item)" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
@@ -91,6 +104,18 @@
                     />
                 </div>
                 
+                 <div class="mb-6 flex items-center">
+                    <input 
+                        id="desplegables-check"
+                        v-model="form.desplegables" 
+                        type="checkbox" 
+                        class="h-4 w-4 text-verde-cope focus:ring-verde-cope border-gray-300 rounded"
+                    />
+                    <label for="desplegables-check" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+                        Tiene Desplegables <span class="text-xs text-gray-500">(Codeudores y Observaciones)</span>
+                    </label>
+                </div>
+                
                 <div class="flex justify-end gap-2">
                     <button type="button" @click="closeModal" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300">
                         Cancelar
@@ -114,6 +139,7 @@ import Swal from 'sweetalert2'
 interface Garantia {
     id: number
     nombre: string
+    desplegables: boolean
 }
 
 const garantias = ref<Garantia[]>([])
@@ -122,7 +148,7 @@ const nextPageUrl = ref<string | null>(null)
 
 const showModal = ref(false)
 const editingItem = ref<Garantia | null>(null)
-const form = reactive({ nombre: '' })
+const form = reactive({ nombre: '', desplegables: true })
 
 const fetchGarantias = async (url: string | null = null) => {
     loading.value = true
@@ -158,6 +184,7 @@ const loadMore = () => {
 const openModal = (item: Garantia | null = null) => {
     editingItem.value = item
     form.nombre = item ? item.nombre : ''
+    form.desplegables = item ? Boolean(item.desplegables) : true
     showModal.value = true
 }
 
@@ -165,6 +192,7 @@ const closeModal = () => {
     showModal.value = false
     editingItem.value = null
     form.nombre = ''
+    form.desplegables = true
 }
 
 const saveGarantia = async () => {
