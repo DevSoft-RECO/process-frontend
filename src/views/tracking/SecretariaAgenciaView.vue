@@ -44,6 +44,20 @@
                   </svg>
                   Regresados
               </button>
+              <button 
+                  @click="activeTab = 'aceptados'"
+                  :class="[
+                      activeTab === 'aceptados' 
+                          ? 'border-green-500 text-green-600' 
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                      'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2'
+                  ]"
+              >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Aceptados
+              </button>
           </nav>
       </div>
     </div>
@@ -58,7 +72,9 @@
                         <th scope="col" class="px-6 py-3">Asociado</th>
                         <th scope="col" class="px-6 py-3">Monto</th>
                         <th scope="col" class="px-6 py-3">
-                            {{ activeTab === 'buzon' ? 'Fecha Recibido' : 'Fecha Retorno' }}
+                            <span v-if="activeTab === 'buzon'">Fecha Recibido</span>
+                            <span v-else-if="activeTab === 'regresados'">Fecha Retorno</span>
+                            <span v-else>Fecha Aceptado</span>
                         </th>
                         <th scope="col" class="px-6 py-3 text-right">Acciones</th>
                     </tr>
@@ -71,7 +87,7 @@
                     </tr>
                     <tr v-else-if="expedientes.length === 0" class="bg-white dark:bg-gray-800">
                         <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                            No hay expedientes en {{ activeTab === 'buzon' ? 'buzón' : 'regresados' }}.
+                            No hay expedientes en {{ activeTab === 'buzon' ? 'buzón' : (activeTab === 'regresados' ? 'regresados' : 'aceptados') }}.
                         </td>
                     </tr>
                     <tr v-for="exp in expedientes" :key="exp.codigo_cliente" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
@@ -85,9 +101,13 @@
                             {{ formatCurrency(exp.monto_documento) }}
                         </td>
                         <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
-                            {{ activeTab === 'buzon' 
-                                ? (exp.fechas?.f_enviado_secretaria ? formatDate(exp.fechas.f_enviado_secretaria) : '-') 
-                                : (exp.fechas?.f_retorno_asesores ? formatDate(exp.fechas.f_retorno_asesores) : '-') 
+                            {{ 
+                                activeTab === 'buzon' 
+                                    ? (exp.fechas?.f_enviado_secretaria ? formatDate(exp.fechas.f_enviado_secretaria) : '-') 
+                                    : (activeTab === 'regresados' 
+                                        ? (exp.fechas?.f_retorno_asesores ? formatDate(exp.fechas.f_retorno_asesores) : '-')
+                                        : (exp.fechas?.f_aceptado_secretaria ? formatDate(exp.fechas.f_aceptado_secretaria) : '-')
+                                      )
                             }}
                         </td>
                         <td class="px-6 py-4 text-right">
@@ -129,13 +149,14 @@ interface Expediente {
     fechas: {
         f_enviado_secretaria: string | null
         f_retorno_asesores: string | null
+        f_aceptado_secretaria: string | null
     } | null
 }
 
 const expedientes = ref<Expediente[]>([])
 const loading = ref(false)
 const nextPageUrl = ref<string | null>(null)
-const activeTab = ref<'buzon' | 'regresados'>('buzon')
+const activeTab = ref<'buzon' | 'regresados' | 'aceptados'>('buzon')
 
 // Modal State
 const showModal = ref(false)
@@ -145,7 +166,9 @@ const fetchExpedientes = async (url: string | null = null) => {
     loading.value = true
     try {
         const endpoint = url || '/seguimiento/buzon-secretaria'
-        const status = activeTab.value === 'buzon' ? 1 : 2
+        let status = 1;
+        if (activeTab.value === 'regresados') status = 2;
+        if (activeTab.value === 'aceptados') status = 3;
         
         const res = await api.get(endpoint, {
             params: { status }
