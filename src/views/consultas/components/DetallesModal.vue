@@ -140,6 +140,7 @@
                     Cerrar
                 </button>
                 <button 
+                    v-if="canSend"
                     @click="sendExpediente"
                     :disabled="sending"
                     class="px-5 py-2.5 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -159,7 +160,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 
@@ -172,6 +173,32 @@ const emit = defineEmits(['close'])
 
 const loadingDetalles = ref(false)
 const detallesData = ref<any>({})
+
+const canSend = computed(() => {
+    // Determine if the send button should be visible
+    if (loadingDetalles.value) return false;
+    
+    // If we don't have detailed data yet, rely on prop if available or hide
+    const ex = detallesData.value.expediente || props.expediente;
+    
+    if (!ex) return false;
+    
+    // Check seguimientos
+    const seguimientos = ex.seguimientos;
+    
+    // If no tracking record, it's new -> Can send
+    if (!seguimientos || seguimientos.length === 0) return true;
+    
+    // If has tracking, check latest status
+    // Assuming ordered by desc (controller does this)
+    const latest = seguimientos[0];
+    
+    // Status 2 is "Rechazado" -> Can send again
+    if (latest.id_estado === 2) return true;
+    
+    // Any other status (1=Enviado, etc) -> Cannot send
+    return false;
+})
 
 watch(() => props.show, (newVal) => {
     if (newVal && props.expediente) {
