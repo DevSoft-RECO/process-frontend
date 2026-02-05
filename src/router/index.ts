@@ -124,6 +124,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'tracking/secretaria-agencia',
+                name: 'admin-tracking-secretaria',
+                component: () => import('@/views/tracking/SecretariaAgenciaView.vue'),
+                meta: {
+                    title: 'Buzón Secretaría Agencia'
+                }
+            },
+            {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,
