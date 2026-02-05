@@ -333,6 +333,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Secretaría Agencia',
                     route: '/admin/tracking/secretaria-agencia'
+                },
+                {
+                    label: 'Edición de Expedientes',
+                    route: '/admin/tracking/secretaria-edicion'
                 }
             ]
         },

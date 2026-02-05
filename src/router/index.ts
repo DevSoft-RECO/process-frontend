@@ -132,6 +132,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'tracking/secretaria-edicion',
+                name: 'admin-tracking-secretaria-edicion',
+                component: () => import('@/views/tracking/SecretariaEdicionView.vue'),
+                meta: {
+                    title: 'Edición de Expedientes'
+                }
+            },
+            {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,
