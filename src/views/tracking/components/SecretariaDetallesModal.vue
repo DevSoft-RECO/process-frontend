@@ -1,9 +1,13 @@
 <template>
     <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-5xl my-8">
-            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-700/50 rounded-t-xl">
                 <div>
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 mb-2">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        Revisión de Secretaría
+                    </span>
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         Detalles del Expediente
                     </h2>
                     <p class="text-sm text-gray-500 mt-1">
@@ -19,15 +23,14 @@
             </div>
             
             <div class="p-6 overflow-y-auto max-h-[70vh]">
-                <div v-if="loadingDetalles" class="flex justify-center p-8">
+                 <div v-if="loadingDetalles" class="flex justify-center p-8">
                      <svg class="animate-spin h-8 w-8 text-verde-cope" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                 </div>
                 <div v-else class="space-y-8">
-                    
-                    <!-- Garantías (Expanded) -->
+                     <!-- Garantías -->
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b pb-2 dark:border-gray-700">
                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-verde-cope" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -37,35 +40,18 @@
                         </h3>
                          <div v-if="detallesData.garantias && detallesData.garantias.length > 0" class="grid gap-4">
                              <div v-for="g in detallesData.garantias" :key="g.id" class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                                <div class="flex items-start justify-between">
-                                    <h4 class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                        {{ g.nombre }}
-                                        <span class="text-xs font-normal text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">ID: {{ g.id }}</span>
-                                    </h4>
-                                </div>
-                                
-                                <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" v-if="g.pivot">
-                                    <!-- Codeudores -->
-                                    <div class="bg-white dark:bg-gray-700/50 p-3 rounded-md">
-                                        <h5 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 border-b dark:border-gray-600 pb-1">Codeudores</h5>
-                                        <ul class="space-y-1">
-                                            <li v-if="g.pivot.codeudor1"><span class="text-gray-500 dark:text-gray-400">1.</span> {{ g.pivot.codeudor1 }}</li>
-                                            <li v-if="g.pivot.codeudor2"><span class="text-gray-500 dark:text-gray-400">2.</span> {{ g.pivot.codeudor2 }}</li>
-                                            <li v-if="g.pivot.codeudor3"><span class="text-gray-500 dark:text-gray-400">3.</span> {{ g.pivot.codeudor3 }}</li>
-                                            <li v-if="g.pivot.codeudor4"><span class="text-gray-500 dark:text-gray-400">4.</span> {{ g.pivot.codeudor4 }}</li>
-                                            <li v-if="!g.pivot.codeudor1 && !g.pivot.codeudor2 && !g.pivot.codeudor3 && !g.pivot.codeudor4" class="italic text-gray-400">Sin codeudores registrados</li>
+                                <h4 class="font-bold text-gray-900 dark:text-white">{{ g.nombre }}</h4>
+                                <div class="mt-2 text-sm text-gray-600 dark:text-gray-400" v-if="g.pivot">
+                                    <div v-if="g.pivot.codeudor1 || g.pivot.codeudor2" class="mb-2">
+                                        <span class="font-semibold block text-gray-700 dark:text-gray-300">Codeudores:</span>
+                                        <ul class="list-disc list-inside pl-2">
+                                            <li v-if="g.pivot.codeudor1">{{ g.pivot.codeudor1 }}</li>
+                                            <li v-if="g.pivot.codeudor2">{{ g.pivot.codeudor2 }}</li>
                                         </ul>
                                     </div>
-                                    <!-- Observaciones -->
-                                    <div class="bg-white dark:bg-gray-700/50 p-3 rounded-md">
-                                        <h5 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 border-b dark:border-gray-600 pb-1">Observaciones</h5>
-                                         <ul class="space-y-1">
-                                            <li v-if="g.pivot.observacion1"><span class="text-gray-500 dark:text-gray-400">1.</span> {{ g.pivot.observacion1 }}</li>
-                                            <li v-if="g.pivot.observacion2"><span class="text-gray-500 dark:text-gray-400">2.</span> {{ g.pivot.observacion2 }}</li>
-                                            <li v-if="g.pivot.observacion3"><span class="text-gray-500 dark:text-gray-400">3.</span> {{ g.pivot.observacion3 }}</li>
-                                            <li v-if="g.pivot.observacion4"><span class="text-gray-500 dark:text-gray-400">4.</span> {{ g.pivot.observacion4 }}</li>
-                                            <li v-if="!g.pivot.observacion1 && !g.pivot.observacion2 && !g.pivot.observacion3 && !g.pivot.observacion4" class="italic text-gray-400">Sin observaciones registradas</li>
-                                        </ul>
+                                    <div v-if="g.pivot.observacion1">
+                                        <span class="font-semibold block text-gray-700 dark:text-gray-300">Observaciones:</span>
+                                        <p class="pl-2">{{ g.pivot.observacion1 }}</p>
                                     </div>
                                 </div>
                              </div>
@@ -73,7 +59,7 @@
                         <p v-else class="text-sm text-gray-500 italic bg-gray-50 dark:bg-gray-800/50 p-3 rounded">No hay garantías asociadas.</p>
                     </div>
 
-                    <!-- Documentos (Expanded) -->
+                    <!-- Documentos -->
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b pb-2 dark:border-gray-700">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -132,27 +118,42 @@
                         </div>
                          <p v-else class="text-sm text-gray-500 italic bg-gray-50 dark:bg-gray-800/50 p-3 rounded">No hay documentos vinculados.</p>
                     </div>
-
                 </div>
             </div>
-            <div class="p-6 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3">
-                 <button @click="close" class="px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 transition">
+
+            <!-- Footer con Acciones de Secretaría -->
+            <div class="p-6 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl flex flex-col md:flex-row justify-end gap-3 flex-wrap">
+                 <!-- Botón Cerrar (Siempre visible) -->
+                 <button @click="close" class="px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-sm">
                     Cerrar
                 </button>
-                <button 
-                    @click="sendExpediente"
-                    :disabled="sending"
-                    class="px-5 py-2.5 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <svg v-if="sending" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+
+                <div class="w-full md:w-auto border-l border-gray-300 dark:border-gray-600 mx-2 hidden md:block"></div>
+
+                <!-- Acción: Rechazar / Regresar -->
+                <button @click="handleAction('rechazar')" class="px-5 py-2.5 text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-md transition flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
-                    <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                    </svg>
-                    {{ sending ? 'Enviando...' : 'Enviar Expediente' }}
+                    Rechazar / Regresar
                 </button>
+
+                 <!-- Acción: Enviar a Archivo -->
+                <button @click="handleAction('archivo')" class="px-5 py-2.5 text-white bg-gray-600 rounded-lg hover:bg-gray-700 shadow-md transition flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                    </svg>
+                    Enviar a Archivo
+                </button>
+
+                 <!-- Acción: Aceptar / Validar -->
+                 <button @click="handleAction('aceptar')" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Aceptar Expediente
+                </button>
+
             </div>
         </div>
     </div>
@@ -196,50 +197,35 @@ const fetchDetalles = async () => {
     }
 }
 
-const sending = ref(false)
+const handleAction = (action: string) => {
+    console.log('Acción seleccionada:', action)
+    let message = ''
+    let icon: 'info' | 'warning' | 'success' | 'error' | 'question' = 'info'
 
-const sendExpediente = async () => {
-    const result = await Swal.fire({
-        title: '¿Enviar Expediente?',
-        text: "El expediente será enviado a secretaría para su revisión. Esta acción no se puede deshacer.",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, enviar',
-        cancelButtonText: 'Cancelar'
-    })
-
-    if (!result.isConfirmed) return
-
-    sending.value = true
-    try {
-        const res = await api.post('/seguimiento/enviar-secretaria', {
-            codigo_cliente: props.expediente.codigo_cliente
-        })
-
-        if (res.data.success) {
-             Swal.fire({
-                icon: 'success',
-                title: 'Enviado',
-                text: 'El expediente ha sido enviado a secretaría correctamente.',
-                timer: 2000,
-                showConfirmButton: false
-            })
-            emit('close')
-            // Optionally emit an event to refresh the parent list if needed, 
-            // but closing modal is usually enough as parent might refresh on its own or not need to.
-            // If parent needs refresh, emit('sent') and handle in parent.
-        }
-    } catch (error: any) {
-        console.error(error)
-        Swal.fire('Error', error.response?.data?.message || 'No se pudo enviar el expediente.', 'error')
-    } finally {
-        sending.value = false
+    switch(action) {
+        case 'rechazar':
+            message = 'Funcionalidad para regresar el expediente (Rechazo).';
+             icon = 'warning'
+            break;
+        case 'archivo':
+            message = 'Funcionalidad para enviar a archivo. (Estado Final?)';
+            break;
+        case 'aceptar':
+            message = 'Funcionalidad para aceptar y avanzar flujo.';
+            icon = 'success'
+            break;
+        case 'almacenar': // Not added in template but user mentioned
+             message = 'Funcionalidad para almacenar.';
+             break;
     }
+
+    Swal.fire({
+        icon: icon,
+        title: 'Próximamente',
+        text: message,
+    })
 }
 
-// Formatters
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
 }

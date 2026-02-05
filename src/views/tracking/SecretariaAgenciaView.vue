@@ -50,7 +50,7 @@
                             {{ exp.fechas?.f_enviado_secretaria ? formatDate(exp.fechas.f_enviado_secretaria) : '-' }}
                         </td>
                         <td class="px-6 py-4 text-right">
-                             <button class="text-blue-600 hover:text-blue-800 font-medium text-xs">
+                             <button @click="openDetalles(exp)" class="text-blue-600 hover:text-blue-800 font-medium text-xs">
                                 Ver Detalles
                             </button>
                         </td>
@@ -65,12 +65,20 @@
             </button>
         </div>
     </div>
+
+    <!-- Modal Detalles (Secretaria) -->
+    <SecretariaDetallesModal 
+        :show="showModal" 
+        :expediente="selectedExpediente" 
+        @close="showModal = false" 
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
+import SecretariaDetallesModal from './components/SecretariaDetallesModal.vue'
 
 interface Expediente {
     codigo_cliente: string
@@ -84,6 +92,10 @@ interface Expediente {
 const expedientes = ref<Expediente[]>([])
 const loading = ref(false)
 const nextPageUrl = ref<string | null>(null)
+
+// Modal State
+const showModal = ref(false)
+const selectedExpediente = ref<any>(null)
 
 const fetchExpedientes = async (url: string | null = null) => {
     loading.value = true
@@ -107,6 +119,11 @@ const fetchExpedientes = async (url: string | null = null) => {
 
 const loadMore = () => {
     if (nextPageUrl.value) fetchExpedientes(nextPageUrl.value)
+}
+
+const openDetalles = (expor: any) => {
+    selectedExpediente.value = expor
+    showModal.value = true
 }
 
 const formatCurrency = (amount: number) => {
