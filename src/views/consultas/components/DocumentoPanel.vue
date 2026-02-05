@@ -337,6 +337,18 @@ const fetchRegistros = async () => {
     } catch (e) { console.error(e) }
 }
 
+const fetchUpdatedDocuments = async () => {
+    if (!props.expediente?.codigo_cliente) return
+    try {
+        const res = await api.get(`/nuevos-expedientes/${props.expediente.codigo_cliente}/detalles`)
+        if (res.data.success && res.data.data) {
+           linkedDocs.value = res.data.data.documentos || []
+        }
+    } catch (e) {
+        console.error('Error refreshing documents', e)
+    }
+}
+
 const resetForm = () => {
     docSearchStep.value = true
     docSelectionStep.value = false
@@ -464,9 +476,9 @@ const submitDocumento = async () => {
     }
 
     try {
-            await api.post(`/nuevos-expedientes/${props.expediente.codigo_cliente}/documentos`, payload)
-            
-            Swal.fire({
+        await api.post(`/nuevos-expedientes/${props.expediente.codigo_cliente}/documentos`, payload)
+        
+        Swal.fire({
             icon: 'success',
             title: existingDocFound.value ? 'Documento Vinculado' : 'Documento Registrado',
             text: 'El documento se ha asociado correctamente al expediente.',
@@ -474,7 +486,10 @@ const submitDocumento = async () => {
             showConfirmButton: false
         })
         emit('saved')
-        // close() -- Removed to keep open
+        
+        // Refresh local list and reset form
+        resetForm()
+        await fetchUpdatedDocuments()
     } catch (error: any) {
         console.error(error)
         Swal.fire('Error', error.response?.data?.message || 'No se pudo guardar el documento.', 'error')
