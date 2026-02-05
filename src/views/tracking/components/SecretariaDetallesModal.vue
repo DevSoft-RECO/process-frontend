@@ -30,6 +30,25 @@
                     </svg>
                 </div>
                 <div v-else class="space-y-8">
+                     <!-- Rejection Alert -->
+                    <div v-if="ultimoRechazo" class="mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-r-md">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm leading-5 font-medium text-red-800 dark:text-red-200">
+                                    Motivo del Regreso / Rechazo
+                                </h3>
+                                <div class="mt-2 text-sm leading-5 text-red-700 dark:text-red-300">
+                                    <p class="font-medium italic">"{{ ultimoRechazo.observacion_rechazo }}"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                      <!-- Garantías -->
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b pb-2 dark:border-gray-700">
@@ -40,18 +59,35 @@
                         </h3>
                          <div v-if="detallesData.garantias && detallesData.garantias.length > 0" class="grid gap-4">
                              <div v-for="g in detallesData.garantias" :key="g.id" class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                                <h4 class="font-bold text-gray-900 dark:text-white">{{ g.nombre }}</h4>
-                                <div class="mt-2 text-sm text-gray-600 dark:text-gray-400" v-if="g.pivot">
-                                    <div v-if="g.pivot.codeudor1 || g.pivot.codeudor2" class="mb-2">
-                                        <span class="font-semibold block text-gray-700 dark:text-gray-300">Codeudores:</span>
-                                        <ul class="list-disc list-inside pl-2">
-                                            <li v-if="g.pivot.codeudor1">{{ g.pivot.codeudor1 }}</li>
-                                            <li v-if="g.pivot.codeudor2">{{ g.pivot.codeudor2 }}</li>
+                                <div class="flex items-start justify-between">
+                                    <h4 class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                        {{ g.nombre }}
+                                        <span class="text-xs font-normal text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">ID: {{ g.id }}</span>
+                                    </h4>
+                                </div>
+                                
+                                <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" v-if="g.pivot">
+                                    <!-- Codeudores -->
+                                    <div class="bg-white dark:bg-gray-700/50 p-3 rounded-md">
+                                        <h5 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 border-b dark:border-gray-600 pb-1">Codeudores</h5>
+                                        <ul class="space-y-1">
+                                            <li v-if="g.pivot.codeudor1"><span class="text-gray-500 dark:text-gray-400">1.</span> {{ g.pivot.codeudor1 }}</li>
+                                            <li v-if="g.pivot.codeudor2"><span class="text-gray-500 dark:text-gray-400">2.</span> {{ g.pivot.codeudor2 }}</li>
+                                            <li v-if="g.pivot.codeudor3"><span class="text-gray-500 dark:text-gray-400">3.</span> {{ g.pivot.codeudor3 }}</li>
+                                            <li v-if="g.pivot.codeudor4"><span class="text-gray-500 dark:text-gray-400">4.</span> {{ g.pivot.codeudor4 }}</li>
+                                            <li v-if="!g.pivot.codeudor1 && !g.pivot.codeudor2 && !g.pivot.codeudor3 && !g.pivot.codeudor4" class="italic text-gray-400">Sin codeudores registrados</li>
                                         </ul>
                                     </div>
-                                    <div v-if="g.pivot.observacion1">
-                                        <span class="font-semibold block text-gray-700 dark:text-gray-300">Observaciones:</span>
-                                        <p class="pl-2">{{ g.pivot.observacion1 }}</p>
+                                    <!-- Observaciones -->
+                                    <div class="bg-white dark:bg-gray-700/50 p-3 rounded-md">
+                                        <h5 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 border-b dark:border-gray-600 pb-1">Observaciones</h5>
+                                         <ul class="space-y-1">
+                                            <li v-if="g.pivot.observacion1"><span class="text-gray-500 dark:text-gray-400">1.</span> {{ g.pivot.observacion1 }}</li>
+                                            <li v-if="g.pivot.observacion2"><span class="text-gray-500 dark:text-gray-400">2.</span> {{ g.pivot.observacion2 }}</li>
+                                            <li v-if="g.pivot.observacion3"><span class="text-gray-500 dark:text-gray-400">3.</span> {{ g.pivot.observacion3 }}</li>
+                                            <li v-if="g.pivot.observacion4"><span class="text-gray-500 dark:text-gray-400">4.</span> {{ g.pivot.observacion4 }}</li>
+                                            <li v-if="!g.pivot.observacion1 && !g.pivot.observacion2 && !g.pivot.observacion3 && !g.pivot.observacion4" class="italic text-gray-400">Sin observaciones registradas</li>
+                                        </ul>
                                     </div>
                                 </div>
                              </div>
@@ -160,7 +196,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 
@@ -180,6 +216,17 @@ watch(() => props.show, (newVal) => {
     } else {
         detallesData.value = {}
     }
+})
+
+const ultimoRechazo = computed(() => {
+    if (!detallesData.value?.expediente?.seguimientos || detallesData.value.expediente.seguimientos.length === 0) {
+        return null;
+    }
+    const latest = detallesData.value.expediente.seguimientos[0];
+    if (latest.id_estado === 2 && latest.observacion_rechazo) {
+        return latest;
+    }
+    return null;
 })
 
 const fetchDetalles = async () => {

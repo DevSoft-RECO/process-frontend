@@ -92,7 +92,7 @@
                         </td>
                         <td class="px-6 py-4 text-right">
                              <button @click="openDetalles(exp)" class="text-blue-600 hover:text-blue-800 font-medium text-xs">
-                                Ver Detalles
+                                Revisar
                             </button>
                         </td>
                     </tr>
