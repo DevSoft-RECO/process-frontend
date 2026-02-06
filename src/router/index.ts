@@ -140,6 +140,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'secretaria-credito/buzon-entrantes',
+                name: 'secretaria-credito-buzon',
+                component: () => import('@/views/secretaria-credito/BuzonEntrantesView.vue'),
+                meta: {
+                    title: 'Buzón Entrantes Crédito'
+                }
+            },
+            {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,
