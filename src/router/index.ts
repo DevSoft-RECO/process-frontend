@@ -172,6 +172,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'abogado/buzon',
+                name: 'buzon-abogado',
+                component: () => import('@/views/abogado/BuzonAbogadoView.vue'),
+                meta: {
+                    title: 'Bandeja de Abogado'
+                }
+            },
+            {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,
