@@ -12,6 +12,10 @@
                     </h2>
                     <p class="text-sm text-gray-500 mt-1">
                         Expediente: <span class="font-bold text-gray-800 dark:text-gray-300">{{ expediente?.codigo_cliente }} - {{ expediente?.nombre_asociado }}</span>
+                         <span v-if="numeroContrato" class="ml-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            Contrato: {{ numeroContrato }}
+                        </span>
                     </p>
                 </div>
                 <button @click="close" class="text-gray-400 hover:text-gray-500 focus:outline-none">
@@ -165,6 +169,14 @@
                 </button>
 
                 <div class="w-full md:w-auto border-l border-gray-300 dark:border-gray-600 mx-2 hidden md:block"></div>
+
+                <!-- Acción: Adjuntar Contrato (Visible si estado 3 y no tiene contrato) -->
+                 <button v-if="currentState === 3 && !numeroContrato" @click="handleAction('adjuntar-contrato')" class="px-5 py-2.5 text-white bg-sky-600 rounded-lg hover:bg-sky-700 shadow-md transition flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Agregar No. Contrato
+                </button>
 
                 <!-- Acción: Rechazar / Regresar (Visible si no es 3) -->
                 <button v-if="currentState !== 3" @click="handleAction('rechazar')" class="px-5 py-2.5 text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-md transition flex items-center gap-2">
@@ -332,6 +344,45 @@ const handleAction = async (action: string) => {
         return;
     }
 
+    if (action === 'adjuntar-contrato') {
+        const result = await Swal.fire({
+            title: 'Adjuntar Contrato',
+            text: "Ingrese el número de contrato:",
+            input: 'text',
+            inputPlaceholder: 'Número de contrato...',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#0ea5e9',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Debe ingresar un número de contrato'
+                }
+            }
+        })
+
+        if (result.isConfirmed) {
+            try {
+                const res = await api.post('/secretaria-agencia/adjuntar-contrato', {
+                    codigo_cliente: props.expediente.codigo_cliente,
+                    numero_contrato: result.value
+                })
+
+                if (res.data.success) {
+                    Swal.fire('Guardado', 'Número de contrato adjuntado correctamente.', 'success')
+                    emit('refresh')
+                    emit('close')
+                }
+            } catch (error: any) {
+                console.error(error)
+                Swal.fire('Error', error.response?.data?.message || 'Error al adjuntar contrato.', 'error')
+            }
+        }
+        return;
+    }
+
     if (action === 'archivo') {
         const { value: formValues } = await Swal.fire({
             title: 'Enviar a Archivo',
@@ -445,6 +496,12 @@ const isArchivoActionTaken = computed(() => {
     // If the backend defaults to 'No' on creation/reset, then 'No' doesn't mean action taken.
     // However, we only set 'observacion_envio' when doing this specific action in State 3.
     return latest.id_estado === 3 && !!latest.observacion_envio;
+})
+
+const numeroContrato = computed(() => {
+    if (!detallesData.value?.expediente?.seguimientos || detallesData.value.expediente.seguimientos.length === 0) return null;
+    const latest = detallesData.value.expediente.seguimientos[0];
+    return latest.numero_contrato;
 })
 
 const formatCurrency = (amount: number) => {
