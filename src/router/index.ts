@@ -164,6 +164,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'secretaria-credito/buzon-abogados',
+                name: 'secretaria-credito-buzon-abogados',
+                component: () => import('@/views/secretaria-credito/BuzonAbogadosView.vue'),
+                meta: {
+                    title: 'Enviado a Abogados'
+                }
+            },
+            {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,

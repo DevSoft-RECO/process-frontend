@@ -360,6 +360,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Buzón Aceptados',
                     route: '/admin/secretaria-credito/buzon-aceptados'
+                },
+                {
+                    label: 'Enviado a Abogados',
+                    route: '/admin/secretaria-credito/buzon-abogados'
                 }
             ]
         },
