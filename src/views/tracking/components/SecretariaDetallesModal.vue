@@ -179,7 +179,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                     </svg>
-                    Enviar a Archivo
+                    Validar Envío a Archivo
                 </button>
 
                  <!-- Acción: Aceptar / Validar (Visible si no es 3) -->
@@ -320,13 +320,19 @@ const handleAction = async (action: string) => {
         const { value: formValues } = await Swal.fire({
             title: 'Enviar a Archivo',
             html:
-                '<div class="text-left space-y-3">' +
-                '<label class="flex items-center space-x-2 cursor-pointer">' +
-                '  <input id="swal-input-garantia" type="checkbox" class="form-checkbox h-5 w-5 text-verde-cope rounded border-gray-300 focus:ring-verde-cope">' +
-                '  <span class="text-gray-900 font-medium">¿El expediente tiene garantía real?</span>' +
-                '</label>' +
-                '<p class="text-xs text-gray-500 ml-7">Si marca esta opción, se registrará el envío físico y avanzará el estado.</p>' +
-                '<label class="block text-sm font-medium text-gray-700 mt-4">Observación de Envío *</label>' +
+                '<div class="text-left space-y-4">' +
+                '<p class="text-sm font-medium text-gray-900">¿El expediente tiene garantía real?</p>' +
+                '<div class="flex flex-col gap-2">' +
+                '  <label class="flex items-center space-x-2 cursor-pointer p-2 rounded hover:bg-gray-50">' +
+                '      <input type="radio" name="swal-garantia" value="si" class="h-4 w-4 text-verde-cope focus:ring-verde-cope border-gray-300">' +
+                '      <span class="text-gray-900">Sí (Registrar envío físico)</span>' +
+                '  </label>' +
+                '  <label class="flex items-center space-x-2 cursor-pointer p-2 rounded hover:bg-gray-50">' +
+                '      <input type="radio" name="swal-garantia" value="no" class="h-4 w-4 text-red-600 focus:ring-red-600 border-gray-300" checked>' +
+                '      <span class="text-gray-900">No (Solo registrar razon)</span>' +
+                '  </label>' +
+                '</div>' +
+                '<label class="block text-sm font-medium text-gray-700 mt-2">Observación de Envío *</label>' +
                 '<textarea id="swal-input-obs" class="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-verde-cope" rows="3" placeholder="Ingrese detalles del envío..."></textarea>' +
                 '</div>',
             focusConfirm: false,
@@ -334,7 +340,8 @@ const handleAction = async (action: string) => {
             confirmButtonText: 'Procesar Envío',
             cancelButtonText: 'Cancelar',
             preConfirm: () => {
-                const garantia = (document.getElementById('swal-input-garantia') as HTMLInputElement).checked
+                const radioSi = document.querySelector('input[name="swal-garantia"][value="si"]') as HTMLInputElement
+                const garantia = radioSi.checked
                 const obs = (document.getElementById('swal-input-obs') as HTMLInputElement).value
                 
                 if (!obs) {
@@ -355,8 +362,8 @@ const handleAction = async (action: string) => {
 
                 if (res.data.success) {
                     let msg = formValues.garantia 
-                         ? 'Expediente marcado con Garantía Real y enviado (Estado Secundario Actualizado).'
-                         : 'Información registrada correctamente (Sin flujo paralelo).';
+                         ? 'Expediente marcado con Garantía Real y enviado.'
+                         : 'Información registrada correctamente.';
                     
                     Swal.fire('Procesado', msg, 'success')
                     emit('refresh')
