@@ -182,6 +182,14 @@
                     Validar Envío a Archivo
                 </button>
 
+                 <!-- Acción: Enviar a Protocolo (Visible si estado 3) -->
+                <button v-if="currentState === 3" @click="handleAction('protocolo')" class="px-5 py-2.5 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-md transition flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Enviar a Protocolo
+                </button>
+
                  <!-- Acción: Aceptar / Validar (Visible si no es 3) -->
                  <button v-if="currentState !== 3" @click="handleAction('aceptar')" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -374,6 +382,36 @@ const handleAction = async (action: string) => {
                 Swal.fire('Error', error.response?.data?.message || 'Error al enviar a archivo.', 'error')
             }
         }
+    }
+
+    if (action === 'protocolo') {
+        const result = await Swal.fire({
+            title: '¿Enviar a Protocolo?',
+            text: "El expediente será enviado a protocolo y saldra de su buzon al ser aceptado, una vez aceptado tambien podra archivarlo si este no cuenta con garantia real.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4F46E5', // indigo-600
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, Enviar',
+            cancelButtonText: 'Cancelar'
+        })
+
+        if (result.isConfirmed) {
+            try {
+                const res = await api.post('/seguimiento/enviar-protocolo', {
+                    codigo_cliente: props.expediente.codigo_cliente
+                })
+                if (res.data.success) {
+                    Swal.fire('Enviado', 'El expediente ha sido enviado a protocolo.', 'success')
+                    emit('refresh')
+                    emit('close')
+                }
+            } catch (error: any) {
+                console.error(error)
+                Swal.fire('Error', error.response?.data?.message || 'Error al enviar a protocolo.', 'error')
+            }
+        }
+        return;
     }
 }
 
