@@ -13,6 +13,9 @@
                     <p class="text-sm text-gray-500 mt-1">
                         Expediente: <span class="font-bold text-gray-800 dark:text-gray-300">{{ expediente?.codigo_cliente }} - {{ expediente?.nombre_asociado }}</span>
                     </p>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Contrato: <span class="font-mono font-bold text-gray-800 dark:text-gray-300">{{ numeroContrato }}</span>
+                    </p>
                 </div>
                 <button @click="close" class="text-gray-400 hover:text-gray-500 focus:outline-none">
                     <span class="sr-only">Cerrar</span>
@@ -148,11 +151,19 @@
                 <div class="w-full md:w-auto border-l border-gray-300 dark:border-gray-600 mx-2 hidden md:block"></div>
 
                  <!-- Acción: Aceptar / Validar (Visual) -->
-                 <button v-if="expediente?.seguimientos?.[0]?.id_estado === 5" @click="handleAction('aceptar')" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
+                <button v-if="expediente?.seguimientos?.[0]?.id_estado === 5" @click="handleAction('aceptar')" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                     Aceptar
+                </button>
+
+                <!-- Acción: Enviar a Abogado (Visible solo en estado 7) -->
+                <button v-if="expediente?.seguimientos?.[0]?.id_estado === 7" @click="handleAction('enviarAbogado')" class="px-5 py-2.5 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-md transition flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                    </svg>
+                    Enviar a Abogado
                 </button>
 
             </div>
@@ -161,7 +172,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 
@@ -203,6 +214,11 @@ const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
 }
 
+const numeroContrato = computed(() => {
+    if (!detallesData.value?.expediente?.seguimientos || detallesData.value.expediente.seguimientos.length === 0) return null;
+    const latest = detallesData.value.expediente.seguimientos[0];
+    return latest.numero_contrato;
+}) 
 const close = () => {
     emit('close')
 }
@@ -233,6 +249,36 @@ const handleAction = async (action: string) => {
             } catch (error: any) {
                 console.error(error)
                 Swal.fire('Error', error.response?.data?.message || 'Error al aceptar expediente.', 'error')
+            }
+        }
+        return;
+    }
+
+    if (action === 'enviarAbogado') {
+        const result = await Swal.fire({
+            title: '¿Enviar a Abogado?',
+            text: "El expediente pasará a estado 'En manos de abogado' (Estado 8).",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4F46E5', // indigo-600
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, Enviar',
+            cancelButtonText: 'Cancelar'
+        })
+
+        if (result.isConfirmed) {
+            try {
+                const res = await api.post('/secretaria-credito/enviar-abogado', {
+                    codigo_cliente: props.expediente.codigo_cliente
+                })
+                if (res.data.success) {
+                    Swal.fire('Enviado', 'El expediente ha sido enviado al abogado correctamente.', 'success')
+                    emit('refresh')
+                    emit('close')
+                }
+            } catch (error: any) {
+                console.error(error)
+                Swal.fire('Error', error.response?.data?.message || 'Error al enviar expediente.', 'error')
             }
         }
         return;
