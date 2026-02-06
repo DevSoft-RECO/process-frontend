@@ -82,8 +82,13 @@
                             <div class="text-sm text-gray-900 dark:text-white">{{ expediente.nombre_asociado || 'N/A' }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                <!-- Fecha vacía por defecto hasta que el abogado acepte -->
+                            <div class="text-sm text-gray-900 dark:text-white" v-if="expediente.fechas?.f_aceptado_abogado">
+                                {{ formatDate(expediente.fechas.f_aceptado_abogado) }}
+                                <div class="text-xs text-gray-500">
+                                    {{ timeAgo(expediente.fechas.f_aceptado_abogado) }}
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400" v-else>
                                 <span class="italic text-gray-300 dark:text-gray-600">Pendiente de recepción</span>
                             </div>
                         </td>
@@ -113,6 +118,9 @@
 import { ref, onMounted, computed } from 'vue'
 import api from '@/api/axios'
 import AbogadoDetallesModal from './components/AbogadoDetallesModal.vue'
+import { format } from 'date-fns'
+import { es } from 'date-fns/locale'
+import { formatDistanceToNow } from 'date-fns'
 
 const expedientes = ref<any[]>([])
 const loading = ref(true)
@@ -146,6 +154,16 @@ const filteredExpedientes = computed(() => {
         e.nombre_asociado?.toLowerCase().includes(s)
     )
 })
+
+const formatDate = (dateString: string) => {
+    if (!dateString) return ''
+    return format(new Date(dateString), "dd MMM yyyy, hh:mm a", { locale: es })
+}
+
+const timeAgo = (dateString: string) => {
+    if (!dateString) return ''
+    return formatDistanceToNow(new Date(dateString), { addSuffix: true, locale: es })
+}
 
 const openDetails = (expediente: any) => {
     selectedExpediente.value = expediente

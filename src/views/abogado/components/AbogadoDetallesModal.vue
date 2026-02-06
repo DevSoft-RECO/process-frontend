@@ -196,6 +196,14 @@
 
             <!-- Footer Action -->
             <div class="p-6 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 shrink-0 flex justify-end">
+                <button 
+                    v-if="!hasReceived"
+                    @click="handleRecibir" 
+                    class="mr-auto px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 dark:shadow-none flex items-center gap-2"
+                >
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Confirmar Recepción
+                </button>
                 <button @click="close" class="px-6 py-2.5 bg-gray-900 text-white dark:bg-white dark:text-gray-900 font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors shadow-lg shadow-gray-200 dark:shadow-none">
                     Cerrar Vista
                 </button>
@@ -251,6 +259,39 @@ const numeroContrato = computed(() => {
     const latest = detallesData.value.expediente.seguimientos[0];
     return latest.numero_contrato;
 })
+
+const hasReceived = computed(() => {
+    return !!props.expediente?.fechas?.f_aceptado_abogado;
+})
+
+const handleRecibir = async () => {
+    try {
+        const result = await Swal.fire({
+            title: '¿Confirmar Recepción?',
+            text: "Se marcará el expediente como recibido en su bandeja.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4F46E5',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, Recibir'
+        })
+
+        if (result.isConfirmed) {
+            const res = await api.post('/abogado/recibir', {
+                codigo_cliente: props.expediente.codigo_cliente
+            })
+            
+            if (res.data.success) {
+                Swal.fire('Recibido', 'El expediente ha sido marcado como recibido.', 'success')
+                emit('refresh')
+                emit('close')
+            }
+        }
+    } catch (error) {
+        console.error(error)
+        Swal.fire('Error', 'No se pudo procesar la solicitud.', 'error')
+    }
+}
 
 const close = () => {
     emit('close')
