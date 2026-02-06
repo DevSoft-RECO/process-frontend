@@ -180,6 +180,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'abogado/devueltos',
+                name: 'abogado-devueltos',
+                component: () => import('@/views/abogado/BuzonAbogadoDevueltosView.vue'),
+                meta: {
+                    title: 'Devueltos a Secretaría'
+                }
+            },
+            {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,

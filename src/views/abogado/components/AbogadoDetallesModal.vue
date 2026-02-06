@@ -28,7 +28,7 @@
                          <span class="hidden sm:inline text-gray-300" v-if="numeroContrato">|</span>
                         <span class="flex items-center gap-1.5" v-if="numeroContrato">
                              <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                             <span class="font-mono font-bold text-gray-700 dark:text-gray-300">{{ numeroContrato }}</span>
+                             <span class="font-mono font-bold text-gray-700 dark:text-gray-300">Contrato:{{ numeroContrato }}</span>
                         </span>
                     </div>
                 </div>
@@ -204,6 +204,14 @@
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     Confirmar Recepción
                 </button>
+                 <button 
+                    v-if="hasReceived && !hasSentToSecretaria"
+                    @click="handleEnviarSecretaria" 
+                    class="mr-auto px-6 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200 dark:shadow-none flex items-center gap-2"
+                >
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                    Enviar a Secretaría
+                </button>
                 <button @click="close" class="px-6 py-2.5 bg-gray-900 text-white dark:bg-white dark:text-gray-900 font-medium rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors shadow-lg shadow-gray-200 dark:shadow-none">
                     Cerrar Vista
                 </button>
@@ -264,6 +272,10 @@ const hasReceived = computed(() => {
     return !!props.expediente?.fechas?.f_aceptado_abogado;
 })
 
+const hasSentToSecretaria = computed(() => {
+    return !!props.expediente?.fechas?.f_enviado_secretaria_credito;
+})
+
 const handleRecibir = async () => {
     try {
         const result = await Swal.fire({
@@ -283,6 +295,35 @@ const handleRecibir = async () => {
             
             if (res.data.success) {
                 Swal.fire('Recibido', 'El expediente ha sido marcado como recibido.', 'success')
+                emit('refresh')
+                emit('close')
+            }
+        }
+    } catch (error) {
+        console.error(error)
+        Swal.fire('Error', 'No se pudo procesar la solicitud.', 'error')
+    }
+}
+
+const handleEnviarSecretaria = async () => {
+    try {
+         const result = await Swal.fire({
+            title: '¿Enviar a Secretaría de Créditos?',
+            text: "El expediente será devuelto a Secretaría para su digitalización.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#4F46E5',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, Enviar'
+        })
+
+        if (result.isConfirmed) {
+            const res = await api.post('/abogado/enviar-secretaria', {
+                codigo_cliente: props.expediente.codigo_cliente
+            })
+            
+             if (res.data.success) {
+                Swal.fire('Enviado', 'Expediente enviado a Secretaría de Créditos.', 'success')
                 emit('refresh')
                 emit('close')
             }

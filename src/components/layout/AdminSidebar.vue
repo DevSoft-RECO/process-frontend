@@ -379,6 +379,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Bandeja de Entrada',
                     route: '/admin/abogado/buzon'
+                },
+                {
+                    label: 'Devueltos a Secretaría',
+                    route: '/admin/abogado/devueltos'
                 }
             ]
         },
