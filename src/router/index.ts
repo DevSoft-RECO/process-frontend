@@ -140,6 +140,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'tracking/secretaria-agencia/archivados',
+                name: 'admin-tracking-secretaria-archivados',
+                component: () => import('@/views/tracking/SecretariaAgenciaArchivadosView.vue'),
+                meta: {
+                    title: 'Archivados Administrativamente'
+                }
+            },
+            {
                 path: 'secretaria-credito/buzon-entrantes',
                 name: 'secretaria-credito-buzon',
                 component: () => import('@/views/secretaria-credito/BuzonEntrantesView.vue'),

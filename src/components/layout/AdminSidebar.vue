@@ -338,6 +338,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Edición de Expedientes',
                     route: '/admin/tracking/secretaria-edicion'
+                },
+                {
+                    label: 'Archivados Administrativamente',
+                    route: '/admin/tracking/secretaria-agencia/archivados'
                 }
             ]
         },

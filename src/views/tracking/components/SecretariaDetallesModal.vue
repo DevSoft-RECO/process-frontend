@@ -211,7 +211,7 @@
                 </button>
 
                  <!-- Acción: Archivar Administrativamente (Visible si estado 7) -->
-                <button v-if="currentState === 7" @click="handleAction('administrativo')" class="px-5 py-2.5 text-white bg-teal-600 rounded-lg hover:bg-teal-700 shadow-md transition flex items-center gap-2">
+                <button v-if="currentState === 7" @click="handleAction('archivar-admin')" class="px-5 py-2.5 text-white bg-teal-600 rounded-lg hover:bg-teal-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                     </svg>
@@ -280,7 +280,7 @@ const fetchDetalles = async () => {
     }
 }
 
-const handleAction = async (action: string) => {
+const handleAction = async (action: 'aceptar' | 'rechazar' | 'adjuntar-contrato' | 'archivo' | 'protocolo' | 'archivar-admin') => {
     console.log('Acción seleccionada:', action)
     
     if (action === 'rechazar') {
@@ -481,12 +481,40 @@ const handleAction = async (action: string) => {
         return;
     }
 
-    if (action === 'administrativo') {
-        Swal.fire({
-            icon: 'info',
-            title: 'Próximamente',
-            text: 'Funcionalidad de Archivo Administrativo en construcción.',
+    if (action === 'archivar-admin') {
+        const { value: confirmacion } = await Swal.fire({
+            title: '¿Confirmar Archivo Administrativo?',
+            text: 'Escriba "Si" para confirmar que desea archivar administrativamente este expediente. Esto lo moverá a la bandeja de Archivados.',
+            input: 'text',
+            inputPlaceholder: 'Escriba "Si"',
+            showCancelButton: true,
+            confirmButtonText: 'Archivar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#d33',
+            inputValidator: (value) => {
+                if (!value || value.toLowerCase() !== 'si') {
+                    return 'Debe escribir "Si" para confirmar.'
+                }
+            }
         })
+
+        if (!confirmacion) return
+
+        loadingDetalles.value = true
+        try {
+            await api.post('/secretaria-agencia/archivar-administrativo', {
+                codigo_cliente: props.expediente.codigo_cliente
+            })
+
+            Swal.fire('Archivado', 'El expediente ha sido archivado administrativamente.', 'success')
+            emit('refresh')
+            emit('close')
+        } catch (error: any) {
+            console.error(error)
+            Swal.fire('Error', error.response?.data?.message || 'No se pudo archivar el expediente.', 'error')
+        } finally {
+            loadingDetalles.value = false
+        }
     }
 }
 
