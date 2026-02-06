@@ -317,7 +317,7 @@ const handleAction = async (action: string) => {
     if (action === 'aceptar') {
         const result = await Swal.fire({
             title: '¿Aceptar Expediente?',
-            text: "El expediente pasará a estado Aceptado (Estado 3) y se habilitará el envío a archivo.",
+            text: "El expediente pasará a estado Aceptado (Estado 7) y se moverá al Buzón de Aceptados.",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#10B981', // green-500
@@ -328,7 +328,7 @@ const handleAction = async (action: string) => {
 
         if (result.isConfirmed) {
             try {
-                const res = await api.post('/seguimiento/aceptar', {
+                const res = await api.post('/secretaria-credito/aceptar', {
                     codigo_cliente: props.expediente.codigo_cliente
                 })
                 if (res.data.success) {

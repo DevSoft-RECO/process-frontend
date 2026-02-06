@@ -209,11 +209,33 @@ const close = () => {
 
 const handleAction = async (action: string) => {
     if (action === 'aceptar') {
-        Swal.fire({
-            icon: 'info',
-            title: 'Botón sin acción',
-            text: 'Este botón es solo visual por el momento.',
+        const result = await Swal.fire({
+            title: '¿Aceptar Expediente?',
+            text: "El expediente pasará a estado Aceptado (Estado 7) y se moverá al Buzón de Aceptados.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10B981', // green-500
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, Aceptar',
+            cancelButtonText: 'Cancelar'
         })
+
+        if (result.isConfirmed) {
+            try {
+                const res = await api.post('/secretaria-credito/aceptar', {
+                    codigo_cliente: props.expediente.codigo_cliente
+                })
+                if (res.data.success) {
+                    Swal.fire('Aceptado', 'El expediente ha sido aceptado correctamente.', 'success')
+                    emit('refresh')
+                    emit('close')
+                }
+            } catch (error: any) {
+                console.error(error)
+                Swal.fire('Error', error.response?.data?.message || 'Error al aceptar expediente.', 'error')
+            }
+        }
+        return;
     }
 }
 </script>

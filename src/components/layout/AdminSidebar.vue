@@ -352,6 +352,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Buzón Entrantes',
                     route: '/admin/secretaria-credito/buzon-entrantes'
+                },
+                {
+                    label: 'Buzón Aceptados',
+                    route: '/admin/secretaria-credito/buzon-aceptados'
                 }
             ]
         },

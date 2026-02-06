@@ -148,6 +148,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'secretaria-credito/buzon-aceptados',
+                name: 'secretaria-credito-buzon-aceptados',
+                component: () => import('@/views/secretaria-credito/BuzonAceptadosView.vue'),
+                meta: {
+                    title: 'Buzón Aceptados Crédito'
+                }
+            },
+            {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,
