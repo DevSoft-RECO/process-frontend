@@ -175,7 +175,7 @@
                 </button>
 
                  <!-- Acción: Enviar a Archivo (Solo visible si estado 3) -->
-                <button v-if="currentState === 3" @click="handleAction('archivo')" class="px-5 py-2.5 text-white bg-gray-600 rounded-lg hover:bg-gray-700 shadow-md transition flex items-center gap-2">
+                <button v-if="currentState === 3 && !isArchivoActionTaken" @click="handleAction('archivo')" class="px-5 py-2.5 text-white bg-gray-600 rounded-lg hover:bg-gray-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                     </svg>
@@ -380,6 +380,17 @@ const handleAction = async (action: string) => {
 const currentState = computed(() => {
     if (!detallesData.value?.expediente?.seguimientos || detallesData.value.expediente.seguimientos.length === 0) return 0;
     return detallesData.value.expediente.seguimientos[0].id_estado;
+})
+
+const isArchivoActionTaken = computed(() => {
+    if (!detallesData.value?.expediente?.seguimientos || detallesData.value.expediente.seguimientos.length === 0) return false;
+    const latest = detallesData.value.expediente.seguimientos[0];
+    // If state is 3 AND we have a value for 'enviado_a_archivos' (Si/No) or an observation
+    // Since default might be 'No' from migration (if we didn't migrate nullable), checking observation is safer for "action taken"
+    // But user wants it to disappear.
+    // If the backend defaults to 'No' on creation/reset, then 'No' doesn't mean action taken.
+    // However, we only set 'observacion_envio' when doing this specific action in State 3.
+    return latest.id_estado === 3 && !!latest.observacion_envio;
 })
 
 const formatCurrency = (amount: number) => {
