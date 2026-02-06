@@ -76,6 +76,7 @@
                             <span v-else-if="activeTab === 'regresados'">Fecha Retorno</span>
                             <span v-else>Fecha Aceptado</span>
                         </th>
+                        <th scope="col" class="px-6 py-3">Estado Actual</th>
                         <th scope="col" class="px-6 py-3 text-right">Acciones</th>
                     </tr>
                 </thead>
@@ -110,6 +111,13 @@
                                       )
                             }}
                         </td>
+                        <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
+                             <span v-if="exp.seguimientos?.[0]?.estado" 
+                                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                {{ exp.seguimientos[0].estado?.nombre }}
+                            </span>
+                             <span v-else class="text-xs text-gray-400 italic">Desconocido</span>
+                        </td>
                         <td class="px-6 py-4 text-right">
                              <button @click="openDetalles(exp)" class="text-blue-600 hover:text-blue-800 font-medium text-xs">
                                 Revisar
@@ -143,14 +151,19 @@ import api from '@/api/axios'
 import SecretariaDetallesModal from './components/SecretariaDetallesModal.vue'
 
 interface Expediente {
-    codigo_cliente: string
-    nombre_asociado: string
-    monto_documento: number
+    codigo_cliente: string;
+    nombre_asociado: string;
+    monto_documento: number;
     fechas: {
-        f_enviado_secretaria: string | null
-        f_retorno_asesores: string | null
-        f_aceptado_secretaria: string | null
-    } | null
+        f_enviado_secretaria: string | null;
+        f_retorno_asesores: string | null;
+        f_aceptado_secretaria: string | null;
+    } | null;
+    seguimientos?: Array<{
+        estado?: {
+            nombre: string;
+        };
+    }>;
 }
 
 const expedientes = ref<Expediente[]>([])

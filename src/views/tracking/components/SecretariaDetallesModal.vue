@@ -179,7 +179,7 @@
                 </button>
 
                 <!-- Acción: Rechazar / Regresar (Visible si no es 3) -->
-                <button v-if="currentState !== 3" @click="handleAction('rechazar')" class="px-5 py-2.5 text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-md transition flex items-center gap-2">
+                <button v-if="currentState == 1" @click="handleAction('rechazar')" class="px-5 py-2.5 text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
@@ -210,8 +210,8 @@
                     Archivar Administrativamente
                 </button>
 
-                 <!-- Acción: Aceptar / Validar (Visible si no es 3) -->
-                 <button v-if="currentState !== 3" @click="handleAction('aceptar')" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
+                 <!-- Acción: Aceptar / Validar (Visible si estado 1) -->
+                 <button v-if="currentState === 1" @click="handleAction('aceptar')" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
@@ -317,7 +317,7 @@ const handleAction = async (action: string) => {
     if (action === 'aceptar') {
         const result = await Swal.fire({
             title: '¿Aceptar Expediente?',
-            text: "El expediente pasará a estado Aceptado (Estado 7) y se moverá al Buzón de Aceptados.",
+            text: "El expediente pasará a estado Aceptado (Estado 3) y se habilitará el envío a archivo.",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#10B981', // green-500
@@ -328,7 +328,7 @@ const handleAction = async (action: string) => {
 
         if (result.isConfirmed) {
             try {
-                const res = await api.post('/secretaria-credito/aceptar', {
+                const res = await api.post('/seguimiento/aceptar', {
                     codigo_cliente: props.expediente.codigo_cliente
                 })
                 if (res.data.success) {
