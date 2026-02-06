@@ -317,11 +317,56 @@ const handleAction = async (action: string) => {
     }
 
     if (action === 'archivo') {
-        Swal.fire({
-            icon: 'info',
-            title: 'Próximamente',
-            text: 'Funcionalidad para envío físico a archivo.',
+        const { value: formValues } = await Swal.fire({
+            title: 'Enviar a Archivo',
+            html:
+                '<div class="text-left space-y-3">' +
+                '<label class="flex items-center space-x-2 cursor-pointer">' +
+                '  <input id="swal-input-garantia" type="checkbox" class="form-checkbox h-5 w-5 text-verde-cope rounded border-gray-300 focus:ring-verde-cope">' +
+                '  <span class="text-gray-900 font-medium">¿El expediente tiene garantía real?</span>' +
+                '</label>' +
+                '<p class="text-xs text-gray-500 ml-7">Si marca esta opción, se registrará el envío físico y avanzará el estado.</p>' +
+                '<label class="block text-sm font-medium text-gray-700 mt-4">Observación de Envío *</label>' +
+                '<textarea id="swal-input-obs" class="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-verde-cope" rows="3" placeholder="Ingrese detalles del envío..."></textarea>' +
+                '</div>',
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Procesar Envío',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                const garantia = (document.getElementById('swal-input-garantia') as HTMLInputElement).checked
+                const obs = (document.getElementById('swal-input-obs') as HTMLInputElement).value
+                
+                if (!obs) {
+                    Swal.showValidationMessage('Debe ingresar una observación')
+                    return false
+                }
+                return { garantia: garantia, obs: obs }
+            }
         })
+
+        if (formValues) {
+            try {
+                const res = await api.post('/seguimiento/enviar-archivo', {
+                    codigo_cliente: props.expediente.codigo_cliente,
+                    tiene_garantia_real: formValues.garantia,
+                    observacion: formValues.obs
+                })
+
+                if (res.data.success) {
+                    let msg = formValues.garantia 
+                         ? 'Expediente marcado con Garantía Real y enviado (Estado Secundario Actualizado).'
+                         : 'Información registrada correctamente (Sin flujo paralelo).';
+                    
+                    Swal.fire('Procesado', msg, 'success')
+                    emit('refresh')
+                    emit('close')
+                }
+            } catch (error: any) {
+                console.error(error)
+                Swal.fire('Error', error.response?.data?.message || 'Error al enviar a archivo.', 'error')
+            }
+        }
     }
 }
 
