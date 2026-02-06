@@ -185,14 +185,25 @@ const emit = defineEmits(['close', 'refresh'])
 
 const loadingDetalles = ref(false)
 const detallesData = ref<any>({})
+const bufetes = ref<any[]>([]) // Store bufetes list
 
 watch(() => props.show, (newVal) => {
     if (newVal && props.expediente) {
         fetchDetalles()
+        fetchBufetes() // Load bufetes when modal opens
     } else {
         detallesData.value = {}
     }
 })
+
+const fetchBufetes = async () => {
+    try {
+        const res = await api.get('/bufetes')
+        bufetes.value = res.data
+    } catch (error) {
+        console.error('Error loading bufetes:', error)
+    }
+}
 
 const fetchDetalles = async () => {
     loadingDetalles.value = true
@@ -219,6 +230,7 @@ const numeroContrato = computed(() => {
     const latest = detallesData.value.expediente.seguimientos[0];
     return latest.numero_contrato;
 }) 
+
 const close = () => {
     emit('close')
 }
@@ -255,21 +267,38 @@ const handleAction = async (action: string) => {
     }
 
     if (action === 'enviarAbogado') {
+        // Create options object for SweetAlert
+        const bufeteOptions: any = {};
+        bufetes.value.forEach(b => {
+            const userName = b.user?.name || 'Usuario desconocido';
+            const agency = b.agencia?.nombre || 'Sin agencia';
+            bufeteOptions[b.id] = `${userName} - ${agency}`;
+        });
+
         const result = await Swal.fire({
             title: '¿Enviar a Abogado?',
-            text: "El expediente pasará a estado 'En manos de abogado' (Estado 8).",
+            text: "Seleccione el abogado a quien se enviará el expediente. Pasará a estado 'En manos de abogado' (Estado 8).",
             icon: 'question',
+            input: 'select',
+            inputOptions: bufeteOptions,
+            inputPlaceholder: 'Seleccione un abogado',
             showCancelButton: true,
             confirmButtonColor: '#4F46E5', // indigo-600
             cancelButtonColor: '#d33',
             confirmButtonText: 'Sí, Enviar',
-            cancelButtonText: 'Cancelar'
+            cancelButtonText: 'Cancelar',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Debe seleccionar un abogado'
+                }
+            }
         })
 
-        if (result.isConfirmed) {
+        if (result.isConfirmed && result.value) {
             try {
                 const res = await api.post('/secretaria-credito/enviar-abogado', {
-                    codigo_cliente: props.expediente.codigo_cliente
+                    codigo_cliente: props.expediente.codigo_cliente,
+                    bufete_id: result.value // Pass selected bufete_id
                 })
                 if (res.data.success) {
                     Swal.fire('Enviado', 'El expediente ha sido enviado al abogado correctamente.', 'success')
