@@ -454,7 +454,7 @@ const handleAction = async (action: string) => {
     if (action === 'protocolo') {
         const result = await Swal.fire({
             title: '¿Enviar a Protocolo?',
-            text: "El expediente será enviado a protocolo y saldra de su buzon al ser aceptado, una vez aceptado tambien podra archivarlo si este no cuenta con garantia real.",
+            text: "El expediente será enviado a protocolo y permanecera en su buzon, una vez aceptado se la habilitara el boton de archivar y cambiara a la seccion Archivado Administrativo.",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#4F46E5', // indigo-600
