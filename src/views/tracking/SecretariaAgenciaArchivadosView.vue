@@ -119,7 +119,7 @@ const selectedExpediente = ref<any>(null)
 const fetchExpedientes = async (url: string | null = null) => {
     loading.value = true
     try {
-        const endpoint = url || '/secretaria-agencia/archivados'
+        const endpoint = url || '/secretaria-agencia/buzon-archivados'
         
         const res = await api.get(endpoint)
 
