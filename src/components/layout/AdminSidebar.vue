@@ -342,6 +342,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Archivados Administrativamente',
                     route: '/admin/tracking/secretaria-agencia/archivados'
+                },
+                {
+                    label: 'Buzón Pagarés',
+                    route: '/admin/tracking/secretaria-agencia/buzon-pagares'
                 }
             ]
         },

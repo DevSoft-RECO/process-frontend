@@ -132,6 +132,12 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'tracking/secretaria-agencia/buzon-pagares',
+                name: 'secretaria-agencia-buzon-pagares',
+                component: () => import('@/views/secretaria-agencia/BuzonConPagaresView.vue'),
+                meta: { title: 'Buzón Pagarés' }
+            },
+            {
                 path: 'tracking/secretaria-edicion',
                 name: 'admin-tracking-secretaria-edicion',
                 component: () => import('@/views/tracking/SecretariaEdicionView.vue'),
