@@ -202,6 +202,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'archivo/buzon-recibidos',
+                name: 'archivo-buzon-recibidos',
+                component: () => import('@/views/archivo/BuzonRecibidosView.vue'),
+                meta: {
+                    title: 'Buzón Recibidos (Archivo)'
+                }
+            },
+            {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,
