@@ -175,6 +175,14 @@
                     Ver Documento
                 </button>
 
+                <!-- Acción: Finalizar Proceso (Si hay contrato) -->
+                <button v-if="hasContrato" @click="finalizarProceso" class="px-5 py-2.5 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-md transition flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Finalizar Proceso
+                </button>
+
                 <!-- Acción: Adjuntar (Si es estado 10 y NO tiene contrato) -->
                 <button v-if="isDevuelto && !hasContrato" @click="adjuntarExpediente" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -345,6 +353,65 @@ const adjuntarExpediente = async () => {
         })
         fetchDetalles() // Refresh modal details (to show "Ver Documento")
         emit('refresh') // Refresh parent list
+    }
+}
+
+const finalizarProceso = async () => {
+    const { value: esPagare } = await Swal.fire({
+        title: 'Finalizar Proceso',
+        html: `
+            <p class="mb-4 text-gray-600">¿Es un Pagaré?</p>
+            <div class="flex justify-center gap-6">
+                <label class="inline-flex items-center space-x-2 cursor-pointer">
+                    <input type="radio" name="es_pagare" value="si" class="form-radio text-indigo-600 h-5 w-5 border-gray-300 focus:ring-indigo-500">
+                    <span class="text-gray-900 font-medium">Sí</span>
+                </label>
+                <label class="inline-flex items-center space-x-2 cursor-pointer">
+                    <input type="radio" name="es_pagare" value="no" class="form-radio text-red-600 h-5 w-5 border-gray-300 focus:ring-red-500">
+                    <span class="text-gray-900 font-medium">No</span>
+                </label>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#4F46E5',
+        preConfirm: () => {
+            const si = document.querySelector('input[name="es_pagare"][value="si"]:checked');
+            const no = document.querySelector('input[name="es_pagare"][value="no"]:checked');
+            
+            if (!si && !no) {
+                Swal.showValidationMessage('Debe seleccionar una opción');
+                return null;
+            }
+            return si ? 'si' : 'no';
+        }
+    });
+
+    if (esPagare) {
+        try {
+            const res = await api.post('/secretaria-credito/finalizar-proceso', {
+                codigo_cliente: props.expediente.codigo_cliente,
+                es_pagare: esPagare
+            });
+            
+            if (res.data.success) {
+                let msg = 'Proceso finalizado correctamente.';
+                if (esPagare === 'si') {
+                    msg += ' El expediente ha pasado a Protocolos (Estado 5).';
+                } else {
+                    msg += ' El expediente ha pasado a Archivo (Estado 4).';
+                }
+                
+                await Swal.fire('Éxito', msg, 'success');
+                emit('refresh');
+                emit('close');
+            }
+        } catch (error: any) {
+            console.error(error);
+            Swal.fire('Error', error.response?.data?.message || 'Error al finalizar el proceso.', 'error');
+        }
     }
 }
 
