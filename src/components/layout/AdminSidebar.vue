@@ -364,6 +364,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Enviado a Abogados',
                     route: '/admin/secretaria-credito/buzon-abogados'
+                },
+                {
+                    label: 'Escanear Documentos',
+                    route: '/admin/secretaria-credito/escanear-documentos'
                 }
             ]
         },

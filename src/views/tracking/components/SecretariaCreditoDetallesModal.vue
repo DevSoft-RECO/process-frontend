@@ -166,6 +166,23 @@
                     Enviar a Abogado
                 </button>
 
+                <!-- Acción: Ver Documento (Si existe path_contrato) -->
+                <button v-if="hasContrato" @click="verDocumento" class="px-5 py-2.5 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    Ver Documento
+                </button>
+
+                <!-- Acción: Adjuntar (Si es estado 10 y NO tiene contrato) -->
+                <button v-if="isDevuelto && !hasContrato" @click="adjuntarExpediente" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Adjuntar Expediente
+                </button>
+
             </div>
         </div>
     </div>
@@ -231,8 +248,104 @@ const numeroContrato = computed(() => {
     return latest.numero_contrato;
 }) 
 
+const hasContrato = computed(() => {
+    // Check if the latest tracking (which should be state 10 in this context) has path_contrato
+    if (!detallesData.value?.expediente?.seguimientos || detallesData.value.expediente.seguimientos.length === 0) return false;
+    // We check the first one because API returns ordered desc
+    const latest = detallesData.value.expediente.seguimientos[0];
+    return !!latest.path_contrato;
+})
+
+const isDevuelto = computed(() => {
+    return props.expediente?.seguimientos?.[0]?.id_estado === 10;
+})
+
 const close = () => {
     emit('close')
+}
+
+const verDocumento = () => {
+    const url = `${import.meta.env.VITE_API_URL}/secretaria-credito/ver-contrato/${props.expediente.codigo_cliente}`;
+    // Open in new tab (browser will handle PDF view or download)
+    // We need to pass the token if using API middleware? 
+    // Usually download links are tricky with bearer tokens without cookies or temp tokens.
+    // For simplicity, we'll try to use a fetch with blob or if the API endpoint is protected, we need a way.
+    // Assuming axios interceptor handles it, but window.open doesn't.
+    // Let's use axios -> blob -> url
+    
+    api.get(url, { responseType: 'blob' })
+    .then(response => {
+        const fileURL = window.URL.createObjectURL(new Blob([response.data], {type: 'application/pdf'}));
+        const fileLink = document.createElement('a');
+        fileLink.href = fileURL;
+        fileLink.target = '_blank';
+        // fileLink.setAttribute('download', 'file.pdf'); // If we want to force download
+        document.body.appendChild(fileLink);
+        fileLink.click();
+    })
+    .catch((err) => {
+        console.error(err)
+        Swal.fire('Error', 'No se pudo descargar el documento.', 'error')
+    });
+}
+
+const adjuntarExpediente = async () => {
+    const { value: file } = await Swal.fire({
+        title: 'Adjuntar Expediente Escaneado',
+        input: 'file',
+        inputAttributes: {
+            'accept': 'application/pdf',
+            'aria-label': 'Subir expediente escaneado'
+        },
+        html: `
+            <p class="text-sm text-gray-500 mb-4">Seleccione el archivo PDF del expediente escaneado para el cliente <b>${props.expediente.codigo_cliente}</b>.</p>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Subir',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#10B981',
+        cancelButtonColor: '#d33',
+        showLoaderOnConfirm: true,
+        preConfirm: async (file) => {
+            if (!file) {
+                Swal.showValidationMessage('Por favor seleccione un archivo')
+                return
+            }
+            
+            const formData = new FormData()
+            formData.append('file', file)
+            formData.append('codigo_cliente', props.expediente.codigo_cliente)
+
+            try {
+                const response = await api.post('/secretaria-credito/guardar-escaneado', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                
+                if (!response.data.success) {
+                    throw new Error(response.data.message || 'Error al subir')
+                }
+                
+                return response.data
+            } catch (error: any) {
+                Swal.showValidationMessage(
+                    `Error: ${error.response?.data?.message || 'No se pudo subir el archivo'}`
+                )
+            }
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    })
+
+    if (file) {
+        Swal.fire({
+            title: '¡Subido!',
+            text: 'El expediente ha sido escaneado y adjuntado correctamente.',
+            icon: 'success'
+        })
+        fetchDetalles() // Refresh modal details (to show "Ver Documento")
+        emit('refresh') // Refresh parent list
+    }
 }
 
 const handleAction = async (action: string) => {

@@ -172,6 +172,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'secretaria-credito/escanear-documentos',
+                name: 'secretaria-credito-escanear-documentos',
+                component: () => import('@/views/secretaria-credito/EscanearDocumentosView.vue'),
+                meta: {
+                    title: 'Escanear Documentos'
+                }
+            },
+            {
                 path: 'abogado/buzon',
                 name: 'buzon-abogado',
                 component: () => import('@/views/abogado/BuzonAbogadoView.vue'),
