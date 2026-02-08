@@ -56,8 +56,15 @@
                                 {{ exp.seguimientos?.[0]?.estado?.nombre || 'Desconocido' }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right">
-                             <!-- Action buttons if needed, for now just view details potentially -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right flex justify-end gap-2">
+                             <button 
+                                v-if="!exp.seguimientos?.[0]?.recibi_pagare || exp.seguimientos?.[0]?.recibi_pagare !== 'si'"
+                                @click="recibirPagare(exp)" 
+                                class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 font-medium"
+                             >
+                                Recibí Pagaré
+                             </button>
+                             
                              <button @click="verDetalles(exp)" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">Ver Detalles</button>
                         </td>
                     </tr>
@@ -101,9 +108,35 @@ const formatCurrency = (amount: number) => {
 }
 
 const verDetalles = (exp: any) => {
-    // Implement logic to view details via modal logic if needed, reusing components
-    // For now simplistic alert or nothing implies future work.
     Swal.fire('Info', 'Detalles del expediente: ' + exp.codigo_cliente, 'info')
+}
+
+const recibirPagare = async (exp: any) => {
+    const result = await Swal.fire({
+        title: '¿Confirmar recepción?',
+        text: `¿Confirma que ha recibido el pagaré físico del expediente ${exp.codigo_cliente}?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, recibí pagaré',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#10B981'
+    })
+
+    if (result.isConfirmed) {
+        try {
+            const res = await api.post('/secretaria-agencia/recibir-pagare', {
+                codigo_cliente: exp.codigo_cliente
+            })
+
+            if (res.data.success) {
+                Swal.fire('Éxito', 'Pagaré marcado como recibido.', 'success')
+                fetchExpedientes() // Refresh to update list and hide button
+            }
+        } catch (error) {
+            console.error(error)
+            Swal.fire('Error', 'No se pudo registrar la recepción.', 'error')
+        }
+    }
 }
 
 onMounted(() => {
