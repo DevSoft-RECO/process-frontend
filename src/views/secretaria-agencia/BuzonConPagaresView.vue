@@ -65,7 +65,13 @@
                                 Recibí Pagaré
                              </button>
                              
-                             <button @click="verDetalles(exp)" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">Ver Detalles</button>
+                             <button 
+                                v-if="exp.seguimientos?.[0]?.recibi_pagare === 'si'"
+                                @click="archivarPagare(exp)" 
+                                class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 font-medium"
+                             >
+                                Archivar Administrativamente
+                             </button>
                         </td>
                     </tr>
                 </tbody>
@@ -107,10 +113,6 @@ const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
 }
 
-const verDetalles = (exp: any) => {
-    Swal.fire('Info', 'Detalles del expediente: ' + exp.codigo_cliente, 'info')
-}
-
 const recibirPagare = async (exp: any) => {
     const result = await Swal.fire({
         title: '¿Confirmar recepción?',
@@ -135,6 +137,34 @@ const recibirPagare = async (exp: any) => {
         } catch (error) {
             console.error(error)
             Swal.fire('Error', 'No se pudo registrar la recepción.', 'error')
+        }
+    }
+}
+
+const archivarPagare = async (exp: any) => {
+    const result = await Swal.fire({
+        title: '¿Archivar Expediente?',
+        text: `El expediente ${exp.codigo_cliente} cambiará al estado 6 (Archivado) y saldrá de este buzón.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, archivar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#EF4444'
+    })
+
+    if (result.isConfirmed) {
+        try {
+            const res = await api.post('/secretaria-agencia/archivar-pagare', {
+                codigo_cliente: exp.codigo_cliente
+            })
+
+            if (res.data.success) {
+                Swal.fire('Éxito', 'Expediente archivado correctamente.', 'success')
+                fetchExpedientes() // Refresh to list
+            }
+        } catch (error) {
+            console.error(error)
+            Swal.fire('Error', 'No se pudo archivar el expediente.', 'error')
         }
     }
 }
