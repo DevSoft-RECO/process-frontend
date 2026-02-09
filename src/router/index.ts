@@ -36,6 +36,14 @@ const routes: RouteRecordRaw[] = [
         },
         children: [
             {
+                path: 'dashboard',
+                name: 'dashboard',
+                component: DashboardView,
+                meta: {
+                    title: 'Process YK'
+                }
+            },
+            {
                 path: 'carga-datos/clientes',
                 name: 'admin-carga-clientes',
                 component: () => import('@/views/carga-datos/ExpedientesHistoricosImportView.vue'),
@@ -201,14 +209,33 @@ const routes: RouteRecordRaw[] = [
                     title: 'Buzón Recibidos (Archivo)'
                 }
             },
+
+            // Asesores de Crédito
             {
-                path: 'dashboard',
-                name: 'dashboard',
-                component: DashboardView,
+                path: 'asesores/nuevos',
+                name: 'asesores-nuevos',
+                component: () => import('@/views/asesores-creditos/NuevosPendientesView.vue'),
                 meta: {
-                    title: 'Process YK'
+                    title: 'Nuevos / Pendientes'
+                }
+            },
+            {
+                path: 'asesores/seguimiento',
+                name: 'asesores-seguimiento',
+                component: () => import('@/views/asesores-creditos/EnSeguimientoView.vue'),
+                meta: {
+                    title: 'En Seguimiento'
+                }
+            },
+            {
+                path: 'asesores/retornados',
+                name: 'asesores-retornados',
+                component: () => import('@/views/asesores-creditos/RetornadosView.vue'),
+                meta: {
+                    title: 'Retornados'
                 }
             }
+
         ]
     },
 

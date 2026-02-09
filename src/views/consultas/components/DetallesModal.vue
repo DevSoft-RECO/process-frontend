@@ -201,7 +201,7 @@ const props = defineProps<{
     expediente: any
 }>()
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'saved'])
 
 const loadingDetalles = ref(false)
 const detallesData = ref<any>({})
@@ -313,6 +313,7 @@ const sendExpediente = async () => {
                 showConfirmButton: false
             })
             emit('close')
+            emit('saved')
             // Optionally emit an event to refresh the parent list if needed, 
             // but closing modal is usually enough as parent might refresh on its own or not need to.
             // If parent needs refresh, emit('sent') and handle in parent.
