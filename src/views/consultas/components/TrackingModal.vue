@@ -51,7 +51,7 @@
 
           <!-- EVENTS -->
           <div
-            v-for="(seg, index) in historyData.seguimientos"
+            v-for="seg in historyData.seguimientos"
             :key="seg.id_seguimiento"
             class="relative flex gap-6 group"
           >
