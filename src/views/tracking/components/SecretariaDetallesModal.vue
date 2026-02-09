@@ -502,7 +502,7 @@ const handleAction = async (action: 'aceptar' | 'rechazar' | 'adjuntar-contrato'
 
         loadingDetalles.value = true
         try {
-            await api.post('/secretaria-agencia/archivar-administrativo', {
+            await api.post('/secretaria-agencia/archivar-administrativamente', {
                 codigo_cliente: props.expediente.codigo_cliente
             })
 
