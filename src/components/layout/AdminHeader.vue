@@ -1,9 +1,9 @@
 <template>
   <header
-    class="sticky top-0 z-30 flex h-16 w-full items-center justify-between px-6
-           bg-white dark:bg-gray-800
-           border-b-2 border-[var(--color-verde-cope)]
-           shadow-sm transition-colors duration-300"
+    class="sticky top-4 z-30 flex h-16 items-center justify-between px-6 mx-6 mt-4 mb-2 rounded-2xl
+           bg-white/80 dark:bg-gray-800/80 backdrop-blur-md
+           border border-white/40 dark:border-gray-700/50
+           shadow-lg transition-all duration-300"
   >
     <div class="flex items-center gap-4">
 

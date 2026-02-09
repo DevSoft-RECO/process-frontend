@@ -1,11 +1,11 @@
 <template>
-  <div class="flex h-screen bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 font-sans overflow-hidden transition-colors duration-300">
+  <div class="flex h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-950 dark:to-gray-900 text-gray-800 dark:text-gray-100 font-sans overflow-hidden transition-colors duration-300">
 
     <AdminSidebar />
 
     <div
       class="flex flex-col flex-1 h-full transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
-      :class="[layoutStore.isCollapsed ? 'md:ml-20' : 'md:ml-64']"
+      :class="[layoutStore.isCollapsed ? 'md:ml-28' : 'md:ml-[18rem]']"
     >
 
       <AdminHeader />
