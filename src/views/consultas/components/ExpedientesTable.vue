@@ -39,6 +39,7 @@
                             <div class="flex justify-center gap-2">
                                 <!-- New Unified Button -->
                                 <button 
+                                    v-if="canEdit(exp)"
                                     @click="$emit('open-adjuntar', exp)"
                                     class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                                     title="Adjuntar Información"
@@ -50,6 +51,7 @@
                                 </button>
                                 <!-- New Buttons -->
                                 <button 
+                                    v-if="canEdit(exp)"
                                     @click="$emit('open-detalles', exp)"
                                     class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-purple-600 bg-purple-100 hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
                                     title="Ver Detalles"
@@ -97,5 +99,19 @@ defineEmits(['open-adjuntar', 'open-detalles', 'open-tracking', 'load-more'])
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
+}
+
+// Logic to control button visibility
+const canEdit = (exp: any) => {
+    // If no tracking, it's new -> Editable
+    if (!exp.seguimientos || exp.seguimientos.length === 0) {
+        return true
+    }
+    
+    // If has tracking, check the LATEST state (index 0 because of orderBy desc in controller)
+    const latestState = exp.seguimientos[0]
+    
+    // Editable only if returned (State 2)
+    return latestState.id_estado === 2
 }
 </script>
