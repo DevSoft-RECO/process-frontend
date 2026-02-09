@@ -265,7 +265,7 @@ const menuItems = computed(() => {
             show: true,
             children: [
                 {
-                    label: 'Nuevos / Pendientes',
+                    label: 'Cargados / Pendeintes',
                     route: '/admin/asesores/nuevos'
                 },
                 {
