@@ -1,8 +1,8 @@
 <template>
   <header
     class="sticky top-4 z-30 flex h-16 items-center justify-between px-6 mx-6 mt-4 mb-2 rounded-2xl
-           bg-white/80 dark:bg-gray-800/80 backdrop-blur-md
-           border border-white/40 dark:border-gray-700/50
+           bg-header-cope/95 dark:bg-gray-900/90 backdrop-blur-md
+           border border-white/10 dark:border-gray-700/50
            shadow-lg transition-all duration-300"
   >
     <div class="flex items-center gap-4">
@@ -10,7 +10,7 @@
       <!-- Mobile Sidebar Toggle -->
       <button
         @click="layoutStore.toggleSidebar"
-        class="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+        class="md:hidden p-2 rounded-lg text-white hover:bg-white/20 transition"
       >
         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
       </button>
@@ -18,7 +18,7 @@
       <!-- Desktop Sidebar Toggle -->
       <button
         @click="layoutStore.toggleCollapse"
-        class="hidden md:flex p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+        class="hidden md:flex p-2 rounded-lg text-white hover:bg-white/20 transition"
       >
         <svg
             class="w-6 h-6 transition-transform duration-300"
@@ -31,10 +31,10 @@
 
       <!-- Branding / Title -->
       <div class="flex flex-col ml-2">
-        <h1 class="text-lg font-extrabold text-[var(--color-azul-cope)] dark:text-white uppercase tracking-tight leading-tight">
+        <h1 class="text-lg font-extrabold text-white uppercase tracking-tight leading-tight">
           {{ currentRouteTitle }}
         </h1>
-        <span class="text-[10px] font-bold text-gray-400 dark:text-gray-400 uppercase tracking-widest">
+        <span class="text-[10px] font-bold text-slate-200 uppercase tracking-widest">
           Sistema Centralizado
         </span>
       </div>
@@ -46,10 +46,10 @@
        <!-- Theme Toggle -->
        <button
         @click="layoutStore.toggleTheme"
-        class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition focus:outline-none"
+        class="p-2 rounded-lg text-white hover:bg-white/20 transition focus:outline-none"
         title="Cambiar Tema"
       >
-        <svg v-if="layoutStore.isDark" class="w-6 h-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg v-if="layoutStore.isDark" class="w-6 h-6 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
         <svg v-else class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -60,29 +60,29 @@
       <div class="relative">
         <button
           @click="isDropdownOpen = !isDropdownOpen"
-          class="flex items-center gap-3 focus:outline-none group hover:bg-gray-50 dark:hover:bg-gray-700/50 p-2 rounded-lg transition"
+          class="flex items-center gap-3 focus:outline-none group hover:bg-white/10 p-2 rounded-lg transition"
         >
             <div class="hidden md:block text-right">
-                <p class="text-sm font-bold text-gray-700 dark:text-gray-200">
+                <p class="text-sm font-bold text-white">
                     {{ userName }}
                 </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">{{ userAgencia }}</p>
+                <p class="text-xs text-slate-200">{{ userAgencia }}</p>
             </div>
 
             <img
                 v-if="userPhoto"
                 :src="userPhoto"
-                class="h-9 w-9 rounded-full object-cover border-2 border-[var(--color-verde-cope)]"
+                class="h-9 w-9 rounded-full object-cover border-2 border-white/50"
                 alt="Avatar"
             >
             <div
                 v-else
-                class="h-9 w-9 rounded-full bg-[var(--color-azul-cope)] text-white flex items-center justify-center font-bold text-sm border-2 border-[var(--color-verde-cope)]"
+                class="h-9 w-9 rounded-full bg-white text-verde-cope flex items-center justify-center font-bold text-sm border-2 border-white/50"
             >
                 {{ userInitials }}
             </div>
 
-            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
         </button>
