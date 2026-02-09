@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen bg-gradient-to-br from-slate-200 to-blue-300 dark:from-slate-950 dark:to-slate-900 text-gray-800 dark:text-gray-100 font-sans overflow-hidden transition-colors duration-300">
+  <div class="h-screen bg-gradient-to-br from-slate-200 to-blue-300 dark:from-slate-950 dark:to-slate-900 text-gray-800 dark:text-gray-100 font-sans overflow-hidden transition-colors duration-300">
 
     <AdminSidebar />
 
@@ -10,7 +10,7 @@
 
       <AdminHeader />
 
-      <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 relative custom-scrollbar">
+      <main class="flex-1 w-full min-w-0 overflow-x-auto overflow-y-auto p-6 relative custom-scrollbar">
         <RouterView v-slot="{ Component }">
             <component :is="Component" />
         </RouterView>

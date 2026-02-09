@@ -25,6 +25,7 @@
                           <th scope="col" class="px-6 py-3">Interés</th>
                           <th scope="col" class="px-6 py-3">Monto</th>
                           <th scope="col" class="px-6 py-3">Fecha Envío Archivo</th>
+                          <th scope="col" class="px-6 py-3">Observación Garantía</th>
                           <th scope="col" class="px-6 py-3">Garantía Real</th>
                           <th scope="col" class="px-6 py-3">Contrato</th>
                           <th scope="col" class="px-6 py-3 text-right">Acciones</th>
@@ -32,70 +33,91 @@
                   </thead>
                   <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                       <tr v-if="loading && expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                          <td colspan="8" class="px-6 py-4 text-center text-gray-500">
+                          <td colspan="9" class="px-6 py-4 text-center text-gray-500">
                               Cargando...
                           </td>
                       </tr>
                       <tr v-else-if="expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                          <td colspan="8" class="px-6 py-8 text-center text-gray-500">
+                          <td colspan="9" class="px-6 py-8 text-center text-gray-500">
                               No hay expedientes en archivo.
                           </td>
                       </tr>
                       <tr v-for="exp in expedientes" :key="exp.codigo_cliente" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                          <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                          <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
                               {{ exp.codigo_cliente }}
                           </td>
-                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
+                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400 max-w-[150px] truncate" :title="exp.nombre_asociado">
                               {{ exp.nombre_asociado }}
                           </td>
-                           <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
+                           <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                               {{ exp.tasa_interes }}%
                           </td>
-                          <td class="px-6 py-4 font-mono text-gray-900 dark:text-white">
+                          <td class="px-6 py-4 font-mono text-gray-900 dark:text-white whitespace-nowrap">
                               {{ formatCurrency(exp.monto_documento) }}
                           </td>
-                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
+                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                               {{ exp.fechas?.f_enviado_archivos ? formatDate(exp.fechas.f_enviado_archivos) : '-' }}
                           </td>
                           
+                          <!-- Observación Garantía (Envío) -->
+                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400 max-w-[150px]">
+                              <div 
+                                v-if="exp.seguimientos?.[0]?.observacion_envio"
+                                @click="showObservation(exp.seguimientos[0].observacion_envio)"
+                                class="truncate cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                                title="Clic para ver completo"
+                              >
+                                {{ exp.seguimientos[0].observacion_envio }}
+                              </div>
+                              <span v-else>-</span>
+                          </td>
+                          
                           <!-- Garantía Real -->
-                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
-                             <!-- Si ya tiene valor, mostrarlo -->
-                             <span v-if="exp.seguimientos?.[0]?.recibi_garantia_real" class="text-green-600 font-medium text-xs">
+                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400 max-w-[140px]">
+                             <!-- Si ya tiene valor, mostrarlo truncate -->
+                             <span 
+                                v-if="exp.seguimientos?.[0]?.recibi_garantia_real" 
+                                class="text-green-600 font-medium text-xs block truncate"
+                                :title="exp.seguimientos[0].recibi_garantia_real"
+                             >
                                  {{ exp.seguimientos[0].recibi_garantia_real }}
                              </span>
                              <!-- Si no, y estado secundario es 4, mostrar botón -->
                              <button 
                                 v-else-if="exp.seguimientos?.[0]?.id_estado_secundario === 4"
                                 @click="recibirGarantia(exp)"
-                                class="px-2 py-1 text-xs font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700"
+                                class="px-2 py-1 text-xs font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 whitespace-nowrap"
                              >
                                 Recibir Garantía
                              </button>
                              <!-- Default -->
-                             <span v-else class="text-gray-400 text-xs italic">No aplica</span>
+                             <span v-else class="text-gray-400 text-xs italic whitespace-nowrap">No aplica</span>
                           </td>
 
                           <!-- Contrato -->
-                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
-                             <!-- Si ya tiene valor, mostrarlo -->
-                             <span v-if="exp.seguimientos?.[0]?.recibi_contrato" class="text-green-600 font-medium text-xs">
+                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400 max-w-[140px]">
+                             <!-- Si ya tiene valor, mostrarlo truncate -->
+                             <span 
+                                v-if="exp.seguimientos?.[0]?.recibi_contrato" 
+                                class="text-green-600 font-medium text-xs block truncate"
+                                :title="exp.seguimientos[0].recibi_contrato"
+                             >
                                  {{ exp.seguimientos[0].recibi_contrato }}
                              </span>
                              <!-- Si no, y estado es 4, mostrar botón -->
                              <button 
                                 v-else-if="exp.seguimientos?.[0]?.id_estado === 4"
                                 @click="recibirContratoAction(exp)"
-                                class="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
+                                class="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 whitespace-nowrap"
                              >
                                 Recibir Contrato
                              </button>
                              <!-- Default -->
-                             <span v-else class="text-gray-400 text-xs italic">No aplica</span>
+                             <span v-else class="text-gray-400 text-xs italic whitespace-nowrap">No aplica</span>
                           </td>
 
                           <td class="px-6 py-4 text-right">
-                               <button @click="verDetalles(exp)" class="text-blue-600 hover:text-blue-800 font-medium text-xs">
+                               <button @click="verDetalles(exp)" class="text-blue-600 hover:text-blue-800 font-medium text-xs whitespace-nowrap">
                                   Transferir a integracion
                               </button>
                           </td>
@@ -161,6 +183,15 @@
       return new Date(dateString).toLocaleString()
   }
   
+  const showObservation = (text: string) => {
+      Swal.fire({
+          title: 'Observación Garantía',
+          text: text,
+          icon: 'info',
+          confirmButtonText: 'Cerrar'
+      })
+  }
+
   const recibirGarantia = async (exp: any) => {
       const result = await Swal.fire({
           title: '¿Confirmar recepción?',
