@@ -61,6 +61,7 @@
                                     Revisar y enviar
                                 </button>
                                 <button 
+                                    v-if="exp.seguimientos && exp.seguimientos.length > 0"
                                     @click="$emit('open-tracking', exp)"
                                     class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-orange-600 bg-orange-100 hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
                                     title="Ver Seguimiento"
