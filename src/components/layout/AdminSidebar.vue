@@ -189,9 +189,9 @@
 
     <div class="p-4 mt-auto border-t border-white/10 dark:border-gray-800 shrink-0">
         <div v-if="!layoutStore.isCollapsed" class="fade-in text-center">
-            <p class="text-xs font-medium text-gray-400 dark:text-gray-500 mb-1">Desarrollado por</p>
+            <p class="text-xs font-medium text-gray-400 dark:text-gray-500 mb-1">Dev R.E.C.O</p>
             <p class="text-xs font-bold text-white dark:text-gray-300 tracking-wide">
-                Área de Informática <span class="text-verde-cope">2025</span>
+                Process v2.0 <span class="text-verde-cope">2026</span>
             </p>
         </div>
         <div v-else class="flex justify-center fade-in">
@@ -257,84 +257,33 @@ const menuItems = computed(() => {
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2 7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2v10a1 1 0 01-1 1h-3m-4 0h4" />',
             show: true
         },
-        {
-            id: 'carga-datos',
-            label: 'Carga de Datos',
-            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />',
-            show: true,
-            children: [
-                {
-                    label: 'Expedientes Históricos', // Antes Clientes
-                    route: '/admin/carga-datos/clientes'
-                },
-                {
-                    label: 'Cargar Expedientes',
-                    route: '/admin/carga-datos/nuevos-expedientes'
-                }
-            ]
-        },
+
         {
             id: 'formularios',
-            label: 'Formularios',
+            label: 'Asesores de Credito',
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />',
             show: true,
             children: [
                 {
-                    label: 'Buscar Usuario',
-                    route: '/admin/consultas/busqueda-cliente'
+                    label: 'Mis Expedientes',
+                    route: '/admin/consultas/mis-expedientes'
                 },
                 {
                     label: 'Listado Expedientes Históricos',
                     route: '/admin/consultas/expedientes'
-                },
-                {
-                    label: 'Mis Expedientes',
-                    route: '/admin/consultas/mis-expedientes'
                 }
-            ]
-        },
 
-        {
-            id: 'catalogos',
-            label: 'Catálogos',
-            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />',
-            show: true,
-            children: [
-                {
-                    label: 'Garantías',
-                    route: '/admin/catalogos/garantias'
-                },
-                {
-                    label: 'Tipo Documentos',
-                    route: '/admin/catalogos/tipo-documentos'
-                },
-                {
-                    label: 'Agencias',
-                    route: '/admin/catalogos/agencias'
-                },
-                {
-                    label: 'Bufetes',
-                    route: '/admin/catalogos/bufetes'
-                },
-                {
-                    label: 'Registros Propiedad',
-                    route: '/admin/catalogos/registros-propiedad'
-                },
-                {
-                    label: 'Tipos de Estado',
-                    route: '/admin/catalogos/tipo-estados'
-                }
             ]
         },
         
         {
             id: 'tracking',
-            label: 'Buzón / Tracking',
+            label: 'Buzón Secre. Agencia',
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />',
             show: true,
             children: [
                 {
-                    label: 'Secretaría Agencia',
+                    label: 'Bandeja Principal',
                     route: '/admin/tracking/secretaria-agencia'
                 },
                 {
@@ -352,22 +301,8 @@ const menuItems = computed(() => {
             ]
         },
         {
-            id: 'archivo',
-            label: 'Archivo',
-            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />',
-            show: true,
-            children: [
-                {
-                    label: 'Buzón Recibidos',
-                    route: '/admin/archivo/buzon-recibidos'
-                }
-            ]
-        },
-        
-
-        {
             id: 'secretaria-creditos',
-            label: 'Secretaría Créditos',
+            label: 'Buzón Secre. Créditos',
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />',
             show: true,
             children: [
@@ -409,6 +344,68 @@ const menuItems = computed(() => {
                 {
                     label: 'Devueltos a Secretaría',
                     route: '/admin/abogado/devueltos'
+                }
+            ]
+        },
+        {
+            id: 'archivo',
+            label: 'Archivo',
+            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />',
+            show: true,
+            children: [
+                {
+                    label: 'Buzón Recibidos',
+                    route: '/admin/archivo/buzon-recibidos'
+                }
+            ]
+        },
+
+        {
+            id: 'carga-datos',
+            label: 'Carga de Datos',
+            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />',
+            show: true,
+            children: [
+                {
+                    label: 'Expedientes Históricos', // Antes Clientes
+                    route: '/admin/carga-datos/clientes'
+                },
+                {
+                    label: 'Cargar Expedientes',
+                    route: '/admin/carga-datos/nuevos-expedientes'
+                }
+            ]
+        },
+        
+        {
+            id: 'catalogos',
+            label: 'Configuraciones',
+            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />',
+            show: true,
+            children: [
+                {
+                    label: 'Garantías',
+                    route: '/admin/catalogos/garantias'
+                },
+                {
+                    label: 'Tipo Documentos',
+                    route: '/admin/catalogos/tipo-documentos'
+                },
+                {
+                    label: 'Agencias',
+                    route: '/admin/catalogos/agencias'
+                },
+                {
+                    label: 'Bufetes',
+                    route: '/admin/catalogos/bufetes'
+                },
+                {
+                    label: 'Registros Propiedad',
+                    route: '/admin/catalogos/registros-propiedad'
+                },
+                {
+                    label: 'Tipos de Estado',
+                    route: '/admin/catalogos/tipo-estados'
                 }
             ]
         },

@@ -52,14 +52,6 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
-                path: 'consultas/busqueda-cliente',
-                name: 'admin-busqueda-cliente',
-                component: () => import('@/views/consultas/BusquedaClienteView.vue'),
-                meta: {
-                    title: 'Búsqueda de Cliente'
-                }
-            },
-            {
                 path: 'consultas/expedientes',
                 name: 'admin-consultas-expedientes',
                 component: () => import('@/views/consultas/ExpedientesHistoricosView.vue'),
