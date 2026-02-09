@@ -384,6 +384,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Escanear Documentos',
                     route: '/admin/secretaria-credito/escanear-documentos'
+                },
+                {
+                    label: 'Edición de Expedientes',
+                    route: '/admin/tracking/secretaria-edicion'
                 }
             ]
         },
