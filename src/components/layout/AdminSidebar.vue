@@ -300,10 +300,6 @@ const menuItems = computed(() => {
                 {
                     label: 'Archivados Administrativamente',
                     route: '/admin/tracking/secretaria-agencia/archivados'
-                },
-                {
-                    label: 'Buzón Pagarés',
-                    route: '/admin/tracking/secretaria-agencia/buzon-pagares'
                 }
             ]
         },
@@ -326,7 +322,7 @@ const menuItems = computed(() => {
                     route: '/admin/secretaria-credito/buzon-abogados'
                 },
                 {
-                    label: 'Escanear Documentos',
+                    label: 'Escanear y Finalizar',
                     route: '/admin/secretaria-credito/escanear-documentos'
                 },
                 {

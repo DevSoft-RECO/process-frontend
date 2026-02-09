@@ -89,6 +89,7 @@
     <SecretariaDetallesModal 
         :show="showModal" 
         :expediente="selectedExpediente" 
+        :is-archived-view="true"
         @close="showModal = false"
         @refresh="handleRefresh" 
     />

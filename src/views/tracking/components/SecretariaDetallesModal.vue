@@ -187,7 +187,7 @@
                 </button>
 
                 <!-- Acción: Rechazar / Regresar (Visible si no es 3) -->
-                <button v-if="currentState == 1" @click="handleAction('rechazar')" class="px-5 py-2.5 text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-md transition flex items-center gap-2">
+                <button v-if="currentState == 1 && !isArchivedView" @click="handleAction('rechazar')" class="px-5 py-2.5 text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
@@ -219,7 +219,7 @@
                 </button>
 
                  <!-- Acción: Aceptar / Validar (Visible si estado 1) -->
-                 <button v-if="currentState === 1" @click="handleAction('aceptar')" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
+                 <button v-if="currentState === 1 && !isArchivedView" @click="handleAction('aceptar')" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
@@ -239,6 +239,7 @@ import Swal from 'sweetalert2'
 const props = defineProps<{
     show: boolean
     expediente: any
+    isArchivedView?: boolean
 }>()
 
 const emit = defineEmits(['close', 'refresh'])
