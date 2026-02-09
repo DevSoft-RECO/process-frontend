@@ -5,7 +5,7 @@
 
     <div
       class="flex flex-col flex-1 h-full transition-all duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
-      :class="[layoutStore.isCollapsed ? 'md:ml-28' : 'md:ml-[18rem]']"
+      :class="[layoutStore.isCollapsed ? 'md:ml-[5.5rem]' : 'md:ml-[16.5rem]']"
     >
 
       <AdminHeader />
