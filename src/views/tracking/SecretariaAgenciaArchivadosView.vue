@@ -25,17 +25,18 @@
                         <th scope="col" class="px-6 py-3">Monto</th>
                         <th scope="col" class="px-6 py-3">Fecha Aceptado</th>
                         <th scope="col" class="px-6 py-3">Estado Actual</th>
+                        <th scope="col" class="px-6 py-3">Recibí Pagaré</th>
                         <th scope="col" class="px-6 py-3 text-right">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     <tr v-if="loading && expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
                             Cargando...
                         </td>
                     </tr>
                     <tr v-else-if="expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                        <td colspan="7" class="px-6 py-8 text-center text-gray-500">
                             No hay expedientes archivados administrativamente.
                         </td>
                     </tr>
@@ -58,6 +59,14 @@
                                 {{ exp.seguimientos[0].estado?.nombre }}
                             </span>
                              <span v-else class="text-xs text-gray-400 italic">Desconocido</span>
+                        </td>
+                         <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
+                            <span v-if="exp.seguimientos?.[0]?.recibi_pagare === 'si'" class="text-green-600 font-bold">
+                                Sí
+                            </span>
+                             <button v-else @click="recibirPagare(exp)" class="text-verde-cope hover:text-green-800 font-medium text-xs border border-verde-cope px-2 py-1 rounded hover:bg-green-50 transition">
+                                Recibí Pagaré
+                            </button>
                         </td>
                         <td class="px-6 py-4 text-right">
                              <button @click="openDetalles(exp)" class="text-blue-600 hover:text-blue-800 font-medium text-xs">
@@ -89,6 +98,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
+import Swal from 'sweetalert2'
 import SecretariaDetallesModal from './components/SecretariaDetallesModal.vue'
 
 interface Expediente {
@@ -104,6 +114,7 @@ interface Expediente {
         estado?: {
             nombre: string;
         };
+        recibi_pagare?: string;
     }>;
 }
 
@@ -144,6 +155,40 @@ const fetchExpedientes = async (url: string | null = null) => {
 
 const loadMore = () => {
     if (nextPageUrl.value) fetchExpedientes(nextPageUrl.value)
+}
+
+const recibirPagare = async (exp: any) => {
+    const result = await Swal.fire({
+        title: '¿Confirmar recepción?',
+        text: `¿Confirma que ha recibido el pagaré físico del expediente ${exp.codigo_cliente}?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, recibí pagaré',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#10B981'
+    })
+
+    if (result.isConfirmed) {
+        try {
+            const res = await api.post('/secretaria-agencia/recibir-pagare', {
+                codigo_cliente: exp.codigo_cliente
+            })
+
+            if (res.data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: 'Pagaré marcado como recibido.',
+                    timer: 1500,
+                    showConfirmButton: false
+                })
+                fetchExpedientes()
+            }
+        } catch (error) {
+            console.error(error)
+            Swal.fire('Error', 'No se pudo registrar la recepción.', 'error')
+        }
+    }
 }
 
 const openDetalles = (expor: any) => {
