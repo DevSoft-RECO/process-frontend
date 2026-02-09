@@ -64,9 +64,12 @@
                             <span v-if="exp.seguimientos?.[0]?.recibi_pagare === 'si'" class="text-green-600 font-bold">
                                 Sí
                             </span>
-                             <button v-else @click="recibirPagare(exp)" class="text-verde-cope hover:text-green-800 font-medium text-xs border border-verde-cope px-2 py-1 rounded hover:bg-green-50 transition">
+                             <button v-else-if="exp.seguimientos?.[0]?.es_un_pagare === 'si'" @click="recibirPagare(exp)" class="text-verde-cope hover:text-green-800 font-medium text-xs border border-verde-cope px-2 py-1 rounded hover:bg-green-50 transition">
                                 Recibí Pagaré
                             </button>
+                            <span v-else class="text-xs text-gray-400 italic">
+                                -
+                            </span>
                         </td>
                         <td class="px-6 py-4 text-right">
                              <button @click="openDetalles(exp)" class="text-blue-600 hover:text-blue-800 font-medium text-xs">
@@ -116,6 +119,7 @@ interface Expediente {
             nombre: string;
         };
         recibi_pagare?: string;
+        es_un_pagare?: string;
     }>;
 }
 
