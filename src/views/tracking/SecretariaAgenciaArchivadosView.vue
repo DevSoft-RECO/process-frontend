@@ -54,11 +54,17 @@
                             {{ exp.fechas?.f_aceptado_secretaria ? formatDate(exp.fechas.f_aceptado_secretaria) : '-' }}
                         </td>
                         <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
-                             <span v-if="exp.seguimientos?.[0]?.estado" 
-                                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                {{ exp.seguimientos[0].estado?.nombre }}
-                            </span>
-                             <span v-else class="text-xs text-gray-400 italic">Desconocido</span>
+                             <div class="flex flex-col">
+                                <span v-if="exp.seguimientos?.[0]?.estado" 
+                                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 w-fit">
+                                    {{ exp.seguimientos[0].estado?.nombre }}
+                                </span>
+                                <span v-else class="text-xs text-gray-400 italic">Desconocido</span>
+
+                                <span v-if="exp.seguimientos?.[0]?.estadoSecundario || exp.seguimientos?.[0]?.estado_secundario" class="text-xs text-gray-500 mt-1 pl-1">
+                                    + {{ (exp.seguimientos[0].estadoSecundario || exp.seguimientos[0].estado_secundario)?.nombre }}
+                                </span>
+                             </div>
                         </td>
                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
                             <span v-if="exp.seguimientos?.[0]?.recibi_pagare === 'si'" class="text-green-600 font-bold">
@@ -120,6 +126,12 @@ interface Expediente {
         };
         recibi_pagare?: string;
         es_un_pagare?: string;
+        estadoSecundario?: {
+            nombre: string;
+        };
+        estado_secundario?: {
+            nombre: string;
+        };
     }>;
 }
 

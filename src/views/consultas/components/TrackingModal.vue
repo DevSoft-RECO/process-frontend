@@ -55,6 +55,9 @@
                             <div class="flex justify-between items-start mb-1">
                                 <h3 class="font-bold text-gray-900 dark:text-gray-100">
                                     {{ seg.estado?.nombre || 'Estado Desconocido' }}
+                                    <span v-if="seg.estado_secundario || seg.estadoSecundario" class="font-normal text-gray-500 dark:text-gray-400">
+                                        - {{ (seg.estado_secundario || seg.estadoSecundario)?.nombre }}
+                                    </span>
                                 </h3>
                                 <span class="text-xs font-mono text-gray-500 dark:text-gray-400 whitespace-nowrap ml-2">
                                     {{ formatDate(seg.created_at) }}
@@ -75,10 +78,10 @@
                                 PROCESO FINALIZADO
                             </div>
 
-                             <div v-if="seg.observacion || seg.observacion_rechazo" class="mt-2 text-sm p-2 rounded bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600">
+                             <div v-if="(seg.id_estado === 2 && seg.observacion_rechazo) || (seg.id_estado !== 2 && seg.observacion)" class="mt-2 text-sm p-2 rounded bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600">
                                 <span class="block text-xs font-semibold text-gray-500 uppercase mb-1">Observación:</span>
                                 <p class="text-gray-700 dark:text-gray-300 italic">
-                                    "{{ seg.observacion || seg.observacion_rechazo }}"
+                                    "{{ seg.id_estado === 2 ? seg.observacion_rechazo : seg.observacion }}"
                                 </p>
                             </div>
 
