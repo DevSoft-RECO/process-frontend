@@ -45,6 +45,17 @@
                 >
                     En Seguimiento
                 </button>
+                <button 
+                    @click="activeTab = 'retornados'"
+                    :class="[
+                        activeTab === 'retornados'
+                        ? 'border-verde-cope text-verde-cope'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                        'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors'
+                    ]"
+                >
+                    Retornados
+                </button>
             </nav>
         </div>
     </div>
@@ -97,7 +108,7 @@ import TrackingModal from './components/TrackingModal.vue'
 const expedientes = ref<any[]>([])
 const loading = ref(false)
 const nextPageUrl = ref<string | null>(null)
-const activeTab = ref<'nuevos' | 'seguimiento'>('nuevos')
+const activeTab = ref<'nuevos' | 'seguimiento' | 'retornados'>('nuevos')
 
 // Modal State
 const showAdjuntarModal = ref(false)
