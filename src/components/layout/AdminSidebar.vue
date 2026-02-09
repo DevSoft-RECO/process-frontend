@@ -212,7 +212,7 @@ import { useLayoutStore } from '@/stores/layout'
 const route = useRoute()
 const layoutStore = useLayoutStore()
 // const authStore = useAuthStore()
-const openGroups = ref<string[]>(['asesores-creditos'])
+const openGroups = ref<string[]>([])
 
 // --- NUEVA FUNCIÓN PARA CERRAR EN MÓVIL ---
 const handleItemClick = () => {
