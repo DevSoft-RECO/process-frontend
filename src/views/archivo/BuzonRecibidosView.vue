@@ -25,18 +25,19 @@
                           <th scope="col" class="px-6 py-3">Interés</th>
                           <th scope="col" class="px-6 py-3">Monto</th>
                           <th scope="col" class="px-6 py-3">Fecha Envío Archivo</th>
-                          <th scope="col" class="px-6 py-3">Estado</th>
+                          <th scope="col" class="px-6 py-3">Garantía Real</th>
+                          <th scope="col" class="px-6 py-3">Contrato</th>
                           <th scope="col" class="px-6 py-3 text-right">Acciones</th>
                       </tr>
                   </thead>
                   <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                       <tr v-if="loading && expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                          <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                          <td colspan="8" class="px-6 py-4 text-center text-gray-500">
                               Cargando...
                           </td>
                       </tr>
                       <tr v-else-if="expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                          <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                          <td colspan="8" class="px-6 py-8 text-center text-gray-500">
                               No hay expedientes en archivo.
                           </td>
                       </tr>
@@ -56,12 +57,43 @@
                           <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
                               {{ exp.fechas?.f_enviado_archivos ? formatDate(exp.fechas.f_enviado_archivos) : '-' }}
                           </td>
+                          
+                          <!-- Garantía Real -->
                           <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
-                               <span v-if="exp.seguimientos?.[0]?.estado" 
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
-                                  {{ exp.seguimientos[0].estado?.nombre }}
-                              </span>
+                             <!-- Si ya tiene valor, mostrarlo -->
+                             <span v-if="exp.seguimientos?.[0]?.recibi_garantia_real" class="text-green-600 font-medium text-xs">
+                                 {{ exp.seguimientos[0].recibi_garantia_real }}
+                             </span>
+                             <!-- Si no, y estado secundario es 4, mostrar botón -->
+                             <button 
+                                v-else-if="exp.seguimientos?.[0]?.id_estado_secundario === 4"
+                                @click="recibirGarantia(exp)"
+                                class="px-2 py-1 text-xs font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700"
+                             >
+                                Recibir Garantía
+                             </button>
+                             <!-- Default -->
+                             <span v-else class="text-gray-400 text-xs italic">No aplica</span>
                           </td>
+
+                          <!-- Contrato -->
+                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
+                             <!-- Si ya tiene valor, mostrarlo -->
+                             <span v-if="exp.seguimientos?.[0]?.recibi_contrato" class="text-green-600 font-medium text-xs">
+                                 {{ exp.seguimientos[0].recibi_contrato }}
+                             </span>
+                             <!-- Si no, y estado es 4, mostrar botón -->
+                             <button 
+                                v-else-if="exp.seguimientos?.[0]?.id_estado === 4"
+                                @click="recibirContratoAction(exp)"
+                                class="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
+                             >
+                                Recibir Contrato
+                             </button>
+                             <!-- Default -->
+                             <span v-else class="text-gray-400 text-xs italic">No aplica</span>
+                          </td>
+
                           <td class="px-6 py-4 text-right">
                                <button @click="verDetalles(exp)" class="text-blue-600 hover:text-blue-800 font-medium text-xs">
                                   Transferir a integracion
@@ -129,6 +161,54 @@
       return new Date(dateString).toLocaleString()
   }
   
+  const recibirGarantia = async (exp: any) => {
+      const result = await Swal.fire({
+          title: '¿Confirmar recepción?',
+          text: `¿Has recibido la Garantía Real del expediente ${exp.codigo_cliente}?`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, recibir',
+          cancelButtonText: 'Cancelar'
+      })
+
+      if (result.isConfirmed) {
+          try {
+              const res = await api.post(`/archivo/recibir-garantia/${exp.codigo_cliente}`)
+              if (res.data.success) {
+                  Swal.fire('Éxito', res.data.message, 'success')
+                  fetchExpedientes() // Refresh
+              }
+          } catch (error) {
+              console.error(error)
+              Swal.fire('Error', 'No se pudo registrar la recepción.', 'error')
+          }
+      }
+  }
+
+  const recibirContratoAction = async (exp: any) => {
+      const result = await Swal.fire({
+          title: '¿Confirmar recepción?',
+          text: `¿Has recibido el Contrato del expediente ${exp.codigo_cliente}?`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, recibir',
+          cancelButtonText: 'Cancelar'
+      })
+
+      if (result.isConfirmed) {
+          try {
+              const res = await api.post(`/archivo/recibir-contrato/${exp.codigo_cliente}`)
+              if (res.data.success) {
+                  Swal.fire('Éxito', res.data.message, 'success')
+                  fetchExpedientes() // Refresh
+              }
+          } catch (error) {
+              console.error(error)
+              Swal.fire('Error', 'No se pudo registrar la recepción.', 'error')
+          }
+      }
+  }
+
   onMounted(() => {
       fetchExpedientes()
   })
