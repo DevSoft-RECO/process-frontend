@@ -54,7 +54,7 @@
                                 <p class="text-sm font-bold text-gray-800 dark:text-gray-200">{{ ld.tipo_documento?.nombre || 'Documento' }}</p>
                                 <p class="text-xs text-gray-500">No: {{ ld.numero }} | Fecha: {{ ld.fecha }}</p>
                             </div>
-                            <button type="button" @click="detachDocumento(ld.id)" :disabled="!canEdit" class="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 p-1.5 rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed" title="Desvincular">
+                            <button type="button" @click="detachDocumento(ld.id)" class="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 p-1.5 rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed" title="Desvincular">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                                 </svg>
@@ -102,7 +102,7 @@
                                         Propietario: {{ doc.propietario || 'N/A' }} | Registro: {{ doc.registro_propiedad?.nombre || 'N/A' }}
                                     </p>
                                 </div>
-                                <button type="button" @click="selectExistingDoc(doc)" :disabled="!canEdit" class="px-3 py-1.5 text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                <button type="button" @click="selectExistingDoc(doc)" class="px-3 py-1.5 text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
                                     {{ doc.already_linked ? 'Vincular de nuevo' : 'Seleccionar' }}
                                 </button>
                             </div>
@@ -115,7 +115,7 @@
                         </button>
                         <div class="flex gap-3 ml-auto">
                             <!-- Option to create NEW despite matches -->
-                            <button type="button" @click="proceedToCreate" :disabled="!canEdit" class="px-4 py-2 text-white bg-verde-cope rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <button type="button" @click="proceedToCreate" class="px-4 py-2 text-white bg-verde-cope rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                 </svg>
@@ -240,7 +240,7 @@
                         <button type="button" @click="close" class="px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 transition">
                             Cancelar
                         </button>
-                        <button type="submit" :disabled="submitting || !canEdit" class="px-5 py-2.5 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button type="submit" :disabled="submitting" class="px-5 py-2.5 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                             <svg v-if="submitting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -255,17 +255,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, computed } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
-import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps<{
     expediente: any
 }>()
 
 const emit = defineEmits(['close', 'saved'])
-const authStore = useAuthStore()
 
 // State
 const docSearchStep = ref(true)
@@ -296,19 +294,6 @@ const docForm = reactive({
     referencia: '',
     monto_poliza: '',
     observacion: ''
-})
-
-const canEdit = computed(() => {
-    // 1. Super Admin always can edit
-    if (authStore.hasRole('Super Admin')) return true;
-
-    // 2. Check tracking status
-    // If no tracking info (new), can edit
-    if (!props.expediente?.seguimientos || props.expediente.seguimientos.length === 0) return true;
-
-    // 3. User said: "once entered tracking, cannot modify except Super Admin". 
-    // So even if rejected, regular users cannot edit.
-    return false;
 })
 
 // Initialize logic
@@ -430,10 +415,6 @@ const proceedToCreate = () => {
 
 const detachDocumento = async (docId: number) => {
     if (!props.expediente) return
-    if (!canEdit.value) {
-        Swal.fire('Acceso Denegado', 'No tiene permisos para modificar este expediente en su estado actual.', 'warning');
-        return;
-    }
 
     const result = await Swal.fire({
         title: '¿Estás seguro?',
@@ -463,10 +444,6 @@ const detachDocumento = async (docId: number) => {
 
 const submitDocumento = async () => {
     if (!props.expediente) return
-    if (!canEdit.value) {
-        Swal.fire('Acceso Denegado', 'No tiene permisos para modificar este expediente en su estado actual.', 'warning');
-        return;
-    }
     
     submitting.value = true
 

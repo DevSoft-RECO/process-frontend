@@ -51,8 +51,7 @@
                                             Instrucciones para corrección:
                                         </p>
                                         <p class="mt-1">
-                                            Debido a que los registros están bloqueados, para actualizar cualquier campo erróneo debe solicitar el cambio enviando un correo a soporte
-                                            antes de volver a enviar el expediente.
+                                           Porfavor corriga los cambios que se le solicitan y vuelva a enviar el expediente.
                                         </p>
                                     </div>
                                 </div>

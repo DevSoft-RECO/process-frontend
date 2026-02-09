@@ -18,7 +18,7 @@
                             Ref: {{ expediente.tipo_garantia }}
                     </span>
                 </label>
-                <select v-model="form.garantia_id" :disabled="!canEdit" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800">
+                <select v-model="form.garantia_id" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800">
                     <option value="" disabled>Seleccione una garantía...</option>
                     <option v-for="g in garantiasList" :key="g.id" :value="g.id">{{ g.nombre }}</option>
                 </select>
@@ -30,12 +30,12 @@
                     <!-- Codeudor Input -->
                     <div>
                         <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Codeudor {{ i }}</label>
-                        <input v-model="form[`codeudor${i}` as keyof typeof form]" :disabled="!canEdit" type="text" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" :placeholder="`Nombre del Codeudor ${i}`" />
+                        <input v-model="form[`codeudor${i}` as keyof typeof form]" type="text" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" :placeholder="`Nombre del Codeudor ${i}`" />
                     </div>
                     <!-- Observacion Input -->
                     <div>
                         <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Observación {{ i }}</label>
-                        <input v-model="form[`observacion${i}` as keyof typeof form]" :disabled="!canEdit" type="text" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" :placeholder="`Observación para Codeudor ${i}`" />
+                        <input v-model="form[`observacion${i}` as keyof typeof form]" type="text" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" :placeholder="`Observación para Codeudor ${i}`" />
                     </div>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <button type="button" @click="close" class="px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 transition">
                     Cancelar
                 </button>
-                <button type="submit" :disabled="submitting || !canEdit" class="px-5 py-2.5 text-white bg-verde-cope rounded-lg hover:bg-green-700 shadow-lg shadow-green-500/30 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                <button type="submit" :disabled="submitting" class="px-5 py-2.5 text-white bg-verde-cope rounded-lg hover:bg-green-700 shadow-lg shadow-green-500/30 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                     <svg v-if="submitting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -60,14 +60,12 @@
 import { ref, reactive, watch, computed } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
-import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps<{
     expediente: any
 }>()
 
 const emit = defineEmits(['close', 'saved'])
-const authStore = useAuthStore()
 
 const submitting = ref(false)
 const garantiasList = ref<any[]>([])
@@ -76,19 +74,6 @@ const form = reactive({
     garantia_id: '',
     codeudor1: '', codeudor2: '', codeudor3: '', codeudor4: '',
     observacion1: '', observacion2: '', observacion3: '', observacion4: ''
-})
-
-const canEdit = computed(() => {
-    // 1. Super Admin always can edit
-    if (authStore.hasRole('Super Admin')) return true;
-
-    // 2. Check tracking status
-    // If no tracking info (new), can edit
-    if (!props.expediente?.seguimientos || props.expediente.seguimientos.length === 0) return true;
-
-    // 3. User said: "once entered tracking, cannot modify except Super Admin". 
-    // So even if rejected, regular users cannot edit.
-    return false;
 })
 
 const shouldShowFields = computed(() => {
@@ -147,10 +132,6 @@ const close = () => {
 
 const submit = async () => {
     if (!props.expediente) return
-    if (!canEdit.value) {
-        Swal.fire('Acceso Denegado', 'No tiene permisos para modificar este expediente en su estado actual.', 'warning');
-        return;
-    }
 
     submitting.value = true
     
