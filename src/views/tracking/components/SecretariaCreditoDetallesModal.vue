@@ -176,15 +176,21 @@
                 </button>
 
                 <!-- Acción: Finalizar Proceso (Si hay contrato) -->
-                <button v-if="hasContrato" @click="finalizarProceso" class="px-5 py-2.5 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-md transition flex items-center gap-2">
+                <!-- Estado Finalizado -->
+                <span v-if="isFinalized" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                    Estado Final: {{ finalizedStatus }}
+                </span>
+
+                <!-- Acción: Finalizar Proceso (Si hay contrato y NO está finalizado) -->
+                <button v-if="hasContrato && !isFinalized" @click="finalizarProceso" class="px-5 py-2.5 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                     Finalizar Proceso
                 </button>
 
-                <!-- Acción: Adjuntar (Si es estado 10 y NO tiene contrato) -->
-                <button v-if="isDevuelto && !hasContrato" @click="adjuntarExpediente" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
+                <!-- Acción: Adjuntar (Si es estado 10 y NO tiene contrato y NO está cargando) -->
+                <button v-if="isDevuelto && !hasContrato && !loadingDetalles" @click="adjuntarExpediente" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
@@ -266,6 +272,18 @@ const hasContrato = computed(() => {
 
 const isDevuelto = computed(() => {
     return props.expediente?.seguimientos?.[0]?.id_estado === 10;
+})
+
+const isFinalized = computed(() => {
+    if (!detallesData.value?.expediente?.seguimientos || detallesData.value.expediente.seguimientos.length === 0) return false;
+    const latest = detallesData.value.expediente.seguimientos[0];
+    return !!latest.es_un_pagare;
+})
+
+const finalizedStatus = computed(() => {
+    if (!isFinalized.value) return '';
+    const latest = detallesData.value.expediente.seguimientos[0];
+    return latest.es_un_pagare === 'si' ? 'Pagaré (Enviado a Protocolos)' : 'Archivo (Sin Pagaré)';
 })
 
 const close = () => {
