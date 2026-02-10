@@ -180,30 +180,29 @@ const handleDrop = (event: DragEvent) => {
 const handleSubmit = async () => {
     if (!selectedFile.value) return
 
-    if (form.full) {
-        // Security Check for Full Load
-        const { value: password } = await Swal.fire({
-            title: 'Confirmación de Seguridad',
-            text: "La carga completa es una operación intensiva. Ingresa la contraseña de administrador:",
-            input: 'password',
-            inputPlaceholder: 'Contraseña',
-            showCancelButton: true,
-            confirmButtonText: 'Confirmar',
-            cancelButtonText: 'Cancelar'
-        })
+    // 1. Validation for Date Range (if not full load)
+    if (!form.full && !form.desde) {
+        Swal.fire('Atención', 'Debes especificar al menos la fecha "Desde" o activar la carga completa.', 'warning')
+        return
+    }
 
-        // Simple hardcoded check as requested/discussed "emergency pin"
-        // In production this should be a backend validation or auth check.
-        if (password !== 'admin123') { 
-            Swal.fire('Error', 'Contraseña incorrecta', 'error')
-            return
-        }
-    } else {
-        // Validation for Date Range
-        if (!form.desde) {
-            Swal.fire('Atención', 'Debes especificar al menos la fecha "Desde" o activar la carga completa.', 'warning')
-            return
-        }
+    // 2. Security Check (ALWAYS)
+    const { value: password } = await Swal.fire({
+        title: 'Confirmación de Seguridad',
+        text: "Ingresa la contraseña de administrador para autorizar la importación:",
+        input: 'password',
+        inputPlaceholder: 'Contraseña',
+        showCancelButton: true,
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar'
+    })
+
+    if (!password) return // User cancelled
+
+    // Simple hardcoded check
+    if (password !== 'admin123') { 
+        Swal.fire('Error', 'Contraseña incorrecta', 'error')
+        return
     }
 
     importStore.startImport(selectedFile.value, {
