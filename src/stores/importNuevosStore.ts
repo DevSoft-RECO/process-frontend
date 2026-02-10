@@ -16,7 +16,7 @@ export const useImportNuevosStore = defineStore('importNuevos', () => {
     const isWidgetVisible = ref(false)
     const isWidgetMinimized = ref(false)
 
-    const startImport = async (file: File) => {
+    const startImport = async (file: File, dates?: { desde: string | null, hasta: string | null, full: boolean }) => {
         isUploading.value = true
         status.value = 'uploading'
         isWidgetVisible.value = true
@@ -26,6 +26,11 @@ export const useImportNuevosStore = defineStore('importNuevos', () => {
 
         const formData = new FormData()
         formData.append('file', file)
+        if (dates) {
+            if (dates.desde) formData.append('desde', dates.desde)
+            if (dates.hasta) formData.append('hasta', dates.hasta)
+            if (dates.full) formData.append('full', '1')
+        }
 
         try {
             const { data } = await axios.post('/import-nuevos/upload', formData, {
