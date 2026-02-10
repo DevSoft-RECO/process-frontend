@@ -117,8 +117,19 @@
                           </td>
 
                           <td class="px-6 py-4 text-right">
-                               <button @click="verDetalles(exp)" class="text-blue-600 hover:text-blue-800 font-medium text-xs whitespace-nowrap">
-                                  Transferir a integracion
+                               <button 
+                                  v-if="exp.seguimientos?.[0]?.archivado_at"
+                                  disabled
+                                  class="text-gray-400 font-medium text-xs whitespace-nowrap cursor-not-allowed"
+                               >
+                                  Completado
+                              </button>
+                               <button 
+                                  v-else
+                                  @click="archivarAction(exp)" 
+                                  class="text-blue-600 hover:text-blue-800 font-medium text-xs whitespace-nowrap"
+                               >
+                                  Archivar Expediente
                               </button>
                           </td>
                       </tr>
@@ -170,8 +181,30 @@
       if (nextPageUrl.value) fetchExpedientes(nextPageUrl.value)
   }
   
-  const verDetalles = (exp: any) => {
-       Swal.fire('Info', 'Detalles del expediente: ' + exp.codigo_cliente, 'info')
+  const archivarAction = async (exp: any) => {
+      const result = await Swal.fire({
+          title: '¿Archivar Expediente?',
+          text: `¿Estás seguro de archivar el expediente ${exp.codigo_cliente}? Se creará un registro histórico.`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, archivar',
+          cancelButtonText: 'Cancelar',
+          confirmButtonColor: '#003366'
+      })
+
+      if (result.isConfirmed) {
+          try {
+              const res = await api.post(`/archivo/archivar/${exp.codigo_cliente}`)
+              if (res.data.success) {
+                  Swal.fire('Éxito', res.data.message, 'success')
+                  fetchExpedientes() // Refresh to update button state
+              }
+          } catch (error: any) {
+              console.error(error)
+              const msg = error.response?.data?.message || 'No se pudo archivar el expediente.'
+              Swal.fire('Error', msg, 'error')
+          }
+      }
   }
   
   const formatCurrency = (amount: number) => {
