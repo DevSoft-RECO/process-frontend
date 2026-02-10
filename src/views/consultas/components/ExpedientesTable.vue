@@ -59,7 +59,7 @@
                                 </button>
                                 <!-- New Buttons -->
                                 <button 
-                                    v-if="canEdit(exp)"
+                                    v-if="canEdit(exp) && hasAttachments(exp)"
                                     @click="$emit('open-detalles', exp)"
                                     class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-purple-600 bg-purple-100 hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
                                     title="Ver Detalles"
@@ -133,5 +133,11 @@ const canEdit = (exp: any) => {
     
     // Editable only if returned (State 2)
     return latestState.id_estado === 2
+}
+
+const hasAttachments = (exp: any) => {
+    const hasGarantias = exp.garantias && exp.garantias.length > 0
+    const hasDocumentos = exp.documentos && exp.documentos.length > 0
+    return hasGarantias || hasDocumentos
 }
 </script>
