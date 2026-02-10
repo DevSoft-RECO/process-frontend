@@ -45,23 +45,19 @@
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
-                        <th scope="col" class="px-4 py-3 min-w-[100px]">Código</th>
-                        <th scope="col" class="px-4 py-3 min-w-[150px]">Agencia</th>
-                        <th scope="col" class="px-4 py-3 min-w-[120px]">Fecha Inicio</th>
-                        <th scope="col" class="px-4 py-3 min-w-[120px]">No. Documento</th>
-                        <th scope="col" class="px-4 py-3 min-w-[200px]">Asociado</th>
-                        <th scope="col" class="px-4 py-3 text-right min-w-[120px]">Monto</th>
-                        <th scope="col" class="px-4 py-3 min-w-[150px]">Tipo Garantía</th>
-                        <th scope="col" class="px-4 py-3 text-center min-w-[100px]">Datos Garantía</th>
-                        <th scope="col" class="px-4 py-3 min-w-[120px]">Contrato</th>
+                        <th scope="col" class="px-4 py-3 min-w-[120px]">Código / Agencia</th>
+                        <th scope="col" class="px-4 py-3 min-w-[150px]">Fecha / Documento</th>
+                        <th scope="col" class="px-4 py-3 min-w-[200px]">Asociado / Monto</th>
+                        <th scope="col" class="px-4 py-3 min-w-[150px]">Garantía / Contrato</th>
+                        <th scope="col" class="px-4 py-3 text-center min-w-[100px]">Garantía</th>
                         <th scope="col" class="px-4 py-3 min-w-[150px]">Inscripción Otros</th>
-                        <th scope="col" class="px-4 py-3 min-w-[100px]">Ingreso (Archivo)</th>
-                        <th scope="col" class="px-4 py-3 text-center min-w-[100px]">Estado</th>
+                        <th scope="col" class="px-4 py-3 min-w-[150px]">Ingreso / Estado</th>
+                        <th scope="col" class="px-4 py-3 text-center min-w-[80px]">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     <tr v-if="loading && expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                        <td colspan="12" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="8" class="px-6 py-4 text-center text-gray-500">
                             <div class="flex justify-center items-center gap-2">
                                 <svg class="animate-spin h-5 w-5 text-verde-cope" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -72,32 +68,36 @@
                         </td>
                     </tr>
                     <tr v-else-if="expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                        <td colspan="12" class="px-6 py-8 text-center text-gray-500">
+                        <td colspan="8" class="px-6 py-8 text-center text-gray-500">
                             {{ message || 'No hay expedientes en el archivo histórico.' }}
                         </td>
                     </tr>
                     <tr v-for="exp in expedientes" :key="exp.codigo_cliente" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                        <td class="px-4 py-3 font-bold text-gray-900 dark:text-white sticky left-0 bg-white dark:bg-gray-800">
-                            {{ exp.codigo_cliente }}
+                        <!-- Código / Agencia -->
+                        <td class="px-4 py-3 sticky left-0 bg-white dark:bg-gray-800">
+                            <div class="font-bold text-gray-900 dark:text-white">{{ exp.codigo_cliente }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ exp.agencia }}</div>
                         </td>
-                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
-                            {{ exp.agencia }}
+
+                        <!-- Fecha Inicio / No. Documento -->
+                        <td class="px-4 py-3">
+                            <div class="text-gray-900 dark:text-gray-200 text-sm mb-1">{{ formatDate(exp.fecha_inicio) }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 font-mono">{{ exp.numero_documento }}</div>
                         </td>
-                        <td class="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                            {{ formatDate(exp.fecha_inicio) }}
+
+                        <!-- Asociado / Monto -->
+                        <td class="px-4 py-3">
+                            <div class="font-medium text-gray-900 dark:text-white mb-1">{{ exp.asociado }}</div>
+                            <div class="text-xs font-mono text-gray-600 dark:text-gray-300">{{ formatCurrency(exp.monto) }}</div>
                         </td>
-                        <td class="px-4 py-3 text-gray-500 dark:text-gray-400 font-mono text-xs">
-                             {{ exp.numero_documento }}
+
+                        <!-- Tipo Garantía / Contrato -->
+                        <td class="px-4 py-3">
+                             <div class="text-sm text-gray-700 dark:text-gray-300 mb-1">{{ exp.tipo_garantia }}</div>
+                             <div class="text-xs text-indigo-600 dark:text-indigo-400">{{ exp.contrato }}</div>
                         </td>
-                        <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">
-                            {{ exp.asociado }}
-                        </td>
-                         <td class="px-4 py-3 text-right font-mono text-gray-900 dark:text-gray-200">
-                            {{ formatCurrency(exp.monto) }}
-                        </td>
-                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300 text-xs">
-                             {{ exp.tipo_garantia }}
-                        </td>
+
+                        <!-- Datos Garantía -->
                         <td class="px-4 py-3 text-center">
                             <button 
                                v-if="exp.datos_garantia"
@@ -108,24 +108,32 @@
                             </button>
                              <span v-else class="text-xs text-gray-400 italic">N/A</span>
                         </td>
-                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300 text-xs">
-                             {{ exp.contrato }}
-                        </td>
+
+                        <!-- Inscripción Otros -->
                         <td class="px-4 py-3 text-gray-700 dark:text-gray-300 text-xs">
                              <span class="line-clamp-2" :title="exp.inscripcion_otros_contratos">
                                 {{ exp.inscripcion_otros_contratos }}
                              </span>
                         </td>
-                         <td class="px-4 py-3 text-gray-700 dark:text-gray-300 text-xs">
-                             {{ exp.ingreso }}
-                        </td>
-                        <td class="px-4 py-3 text-center">
+
+                        <!-- Ingreso / Estado -->
+                         <td class="px-4 py-3">
+                             <div class="text-gray-700 dark:text-gray-300 text-xs mb-1">{{ exp.ingreso }}</div>
                              <span :class="[
-                                'px-2 py-1 rounded-full text-xs font-medium',
-                                'bg-gray-100 text-gray-800'
+                                'px-2 py-0.5 rounded-full text-[10px] font-medium border',
+                                'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'
                              ]">
                                 {{ exp.estado || 'N/A' }}
                              </span>
+                        </td>
+
+                        <!-- Acciones -->
+                        <td class="px-4 py-3 text-center">
+                             <button class="text-gray-500 hover:text-azul-cope dark:text-gray-400 dark:hover:text-white transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                </svg>
+                             </button>
                         </td>
                     </tr>
                 </tbody>
