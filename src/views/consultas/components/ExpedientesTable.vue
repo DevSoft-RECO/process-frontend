@@ -6,6 +6,8 @@
                     <tr>
                         <th scope="col" class="px-6 py-3">Código</th>
                         <th scope="col" class="px-6 py-3">Nombre Asociado</th>
+                        <th scope="col" class="px-6 py-3">Fecha Ingreso</th>
+                        <th scope="col" class="px-6 py-3">Tasa Interés</th>
                         <th scope="col" class="px-6 py-3">CUI</th>
                         <th scope="col" class="px-6 py-3 text-right">Monto</th>
                         <th scope="col" class="px-6 py-3 text-center">Acciones</th>
@@ -13,12 +15,12 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     <tr v-if="loading && expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
                             Cargando...
                         </td>
                     </tr>
                     <tr v-else-if="expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                        <td colspan="7" class="px-6 py-8 text-center text-gray-500">
                             No hay expedientes nuevos.
                         </td>
                     </tr>
@@ -28,6 +30,12 @@
                         </td>
                         <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
                             {{ exp.nombre_asociado }}
+                        </td>
+                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300 text-xs">
+                             {{ formatDate(exp.fecha_inicio) }}
+                        </td>
+                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300 text-xs text-center">
+                             {{ exp.tasa_interes }}%
                         </td>
                         <td class="px-6 py-4 text-gray-500 dark:text-gray-400 font-mono text-xs">
                             {{ exp.cui }}
@@ -99,6 +107,18 @@ defineEmits(['open-adjuntar', 'open-detalles', 'open-tracking', 'load-more'])
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
+}
+
+const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A'
+    // Manual formatting for consistency DD/MM/YYYY
+    // Adjust for timezone offset if needed, or assume string date is local
+    // Using string slice YYYY-MM-DD is safer for consistency without timezone shifts
+    if(dateString.includes('T')) return new Date(dateString).toLocaleDateString('es-ES')
+    
+    // If format is YYYY-MM-DD
+    const [y, m, dstr] = dateString.split('-')
+    return `${dstr}/${m}/${y}`
 }
 
 // Logic to control button visibility
