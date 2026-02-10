@@ -129,7 +129,11 @@
 
                         <!-- Acciones -->
                         <td class="px-4 py-3 text-center">
-                             <button class="text-gray-500 hover:text-azul-cope dark:text-gray-400 dark:hover:text-white transition">
+                             <button 
+                                @click="openModal(exp)"
+                                title="Ver / Editar"
+                                class="text-gray-500 hover:text-azul-cope dark:text-gray-400 dark:hover:text-white transition"
+                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                   <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                                 </svg>
@@ -151,6 +155,14 @@
             </button>
         </div>
     </div>
+
+    <!-- Modal -->
+    <ArchivoHistoricoModal 
+        :isOpen="showModal"
+        :expediente="selectedExpediente"
+        @close="showModal = false"
+        @save="handleSave"
+    />
   </div>
 </template>
 
@@ -158,6 +170,7 @@
 import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
+import ArchivoHistoricoModal from './components/ArchivoHistoricoModal.vue'
 
 interface Expediente {
     codigo_cliente: number
@@ -172,7 +185,9 @@ interface Expediente {
     inscripcion_otros_contratos: string
     ingreso: string
     estado: string
-    // Add other fields as needed
+    inventario: string
+    salida: string
+    observacion: string
 }
 
 const expedientes = ref<Expediente[]>([])
@@ -181,6 +196,24 @@ const nextPageUrl = ref<string | null>(null)
 const searchQuery = ref('')
 const isSearching = ref(false)
 const message = ref('')
+
+// Modal state
+const showModal = ref(false)
+const selectedExpediente = ref<Expediente | null>(null)
+
+const openModal = (exp: Expediente) => {
+    selectedExpediente.value = exp
+    showModal.value = true
+}
+
+const handleSave = () => {
+    // Refresh list after edit
+    if (isSearching.value) {
+        handleSearch()
+    } else {
+        fetchExpedientes(null) // Reset to first page to see updates
+    }
+}
 
 const fetchExpedientes = async (url: string | null = null) => {
     loading.value = true
