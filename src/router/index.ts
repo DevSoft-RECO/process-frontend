@@ -222,6 +222,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'asesores/finalizados',
+                name: 'asesores-finalizados',
+                component: () => import('@/views/asesores-creditos/FinalizadosView.vue'),
+                meta: {
+                    title: 'Finalizados (Histórico)'
+                }
+            },
+            {
                 path: 'asesores/seguimiento',
                 name: 'asesores-seguimiento',
                 component: () => import('@/views/asesores-creditos/EnSeguimientoView.vue'),

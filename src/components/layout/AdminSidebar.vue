@@ -265,7 +265,7 @@ const menuItems = computed(() => {
             show: true,
             children: [
                 {
-                    label: 'Cargados / Pendeintes',
+                    label: 'Cargados / Pendientes',
                     route: '/admin/asesores/nuevos'
                 },
                 {
@@ -275,6 +275,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Retornados',
                     route: '/admin/asesores/retornados'
+                },
+                {
+                    label: 'Finalizados (Histórico)',
+                    route: '/admin/asesores/finalizados'
                 },
                 {
                     label: 'Listado Histórico',
