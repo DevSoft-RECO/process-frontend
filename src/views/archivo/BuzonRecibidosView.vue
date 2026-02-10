@@ -28,17 +28,18 @@
                           <th scope="col" class="px-6 py-3">Observación Garantía</th>
                           <th scope="col" class="px-6 py-3">Garantía Real</th>
                           <th scope="col" class="px-6 py-3">Contrato</th>
+                          <th scope="col" class="px-6 py-3">Recibido en Archivo</th>
                           <th scope="col" class="px-6 py-3 text-right">Acciones</th>
                       </tr>
                   </thead>
                   <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                       <tr v-if="loading && expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                          <td colspan="9" class="px-6 py-4 text-center text-gray-500">
+                          <td colspan="10" class="px-6 py-4 text-center text-gray-500">
                               Cargando...
                           </td>
                       </tr>
                       <tr v-else-if="expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                          <td colspan="9" class="px-6 py-8 text-center text-gray-500">
+                          <td colspan="10" class="px-6 py-8 text-center text-gray-500">
                               No hay expedientes en archivo.
                           </td>
                       </tr>
@@ -116,6 +117,11 @@
                              <span v-else class="text-gray-400 text-xs italic whitespace-nowrap">No aplica</span>
                           </td>
 
+                          <!-- Fecha Recibido (Archivado) -->
+                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                              {{ exp.seguimientos?.[0]?.archivado_at ? formatDate(exp.seguimientos[0].archivado_at) : '-' }}
+                          </td>
+
                           <td class="px-6 py-4 text-right">
                                <button 
                                   v-if="exp.seguimientos?.[0]?.archivado_at"
@@ -127,7 +133,14 @@
                                <button 
                                   v-else
                                   @click="archivarAction(exp)" 
-                                  class="text-blue-600 hover:text-blue-800 font-medium text-xs whitespace-nowrap"
+                                  :disabled="!canArchive(exp)"
+                                  :class="[
+                                    'font-medium text-xs whitespace-nowrap',
+                                    canArchive(exp) 
+                                        ? 'text-blue-600 hover:text-blue-800' 
+                                        : 'text-gray-300 cursor-not-allowed'
+                                  ]"
+                                  :title="!canArchive(exp) ? 'El expediente debe estar en Integración (Estado 11)' : ''"
                                >
                                   Archivar Expediente
                               </button>
@@ -179,6 +192,14 @@
   
   const loadMore = () => {
       if (nextPageUrl.value) fetchExpedientes(nextPageUrl.value)
+  }
+
+  const canArchive = (exp: any) => {
+      const s = exp.seguimientos?.[0]
+      if (!s) return false
+      
+      // La condición para archivar es que el estado sea 11
+      return s.id_estado === 11
   }
   
   const archivarAction = async (exp: any) => {
