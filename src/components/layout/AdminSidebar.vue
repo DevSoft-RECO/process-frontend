@@ -359,6 +359,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Buzón Recibidos',
                     route: '/admin/archivo/buzon-recibidos'
+                },
+                {
+                    label: 'Archivo Histórico',
+                    route: '/admin/archivo/historico'
                 }
             ]
         },

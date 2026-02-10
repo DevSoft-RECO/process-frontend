@@ -203,6 +203,14 @@ const routes: RouteRecordRaw[] = [
                     title: 'Buzón Recibidos (Archivo)'
                 }
             },
+            {
+                path: 'archivo/historico',
+                name: 'archivo-historico',
+                component: () => import('@/views/archivo/ArchivoHistoricoView.vue'),
+                meta: {
+                    title: 'Archivo Histórico'
+                }
+            },
 
             // Asesores de Crédito
             {
