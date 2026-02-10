@@ -139,6 +139,7 @@
     <SecretariaDetallesModal 
         :show="showModal" 
         :expediente="selectedExpediente" 
+        :canArchiveAdmin="activeTab === 'aceptados'"
         @close="showModal = false"
         @refresh="handleRefresh" 
     />

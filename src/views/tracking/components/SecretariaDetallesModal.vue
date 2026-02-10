@@ -210,8 +210,8 @@
                     Enviar a Protocolo
                 </button>
 
-                 <!-- Acción: Archivar Administrativamente (Visible si estado 7) -->
-                <button v-if="currentState === 7 && !isArchivadoAdministrativamente" @click="handleAction('archivar-admin')" class="px-5 py-2.5 text-white bg-teal-600 rounded-lg hover:bg-teal-700 shadow-md transition flex items-center gap-2">
+                 <!-- Acción: Archivar Administrativamente (Visible si f_aceptado_secretaria_credito existe y no está archivado) -->
+                <button v-if="hasFechaAceptadoSecretariaCredito && !isArchivadoAdministrativamente" @click="handleAction('archivar-admin')" class="px-5 py-2.5 text-white bg-teal-600 rounded-lg hover:bg-teal-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                     </svg>
@@ -240,6 +240,7 @@ const props = defineProps<{
     show: boolean
     expediente: any
     isArchivedView?: boolean
+    canArchiveAdmin?: boolean
 }>()
 
 const emit = defineEmits(['close', 'refresh'])
@@ -539,6 +540,18 @@ const isArchivadoAdministrativamente = computed(() => {
     if (!detallesData.value?.expediente?.seguimientos || detallesData.value.expediente.seguimientos.length === 0) return false;
     const latest = detallesData.value.expediente.seguimientos[0];
     return latest.archivo_administrativo === 'Si';
+})
+
+const hasFechaAceptadoSecretariaCredito = computed(() => {
+    // Check in detallesData (loaded from API)
+    if (detallesData.value?.expediente?.fechas?.f_aceptado_secretaria_credito) {
+        return true;
+    }
+    // Fallback/Early check in props (if available in list view)
+    if (props.expediente?.fechas?.f_aceptado_secretaria_credito) {
+        return true;
+    }
+    return false;
 })
 
 const numeroContrato = computed(() => {
