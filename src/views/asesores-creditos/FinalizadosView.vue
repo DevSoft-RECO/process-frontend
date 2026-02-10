@@ -44,6 +44,8 @@
           :expedientes="expedientes"
           :loading="loading"
           :next-page-url="nextPageUrl"
+          :hide-actions="true"
+          :finalized-mode="true"
           @load-more="loadMore"
           @open-detalles="openDetallesModal"
       />

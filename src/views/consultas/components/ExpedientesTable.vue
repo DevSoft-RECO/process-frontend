@@ -44,7 +44,7 @@
                             {{ formatCurrency(exp.monto_documento) }}
                         </td>
                         <td class="px-6 py-4 text-center">
-                            <div class="flex justify-center gap-2">
+                            <div class="flex justify-center gap-2" v-if="!hideActions">
                                 <!-- New Unified Button -->
                                 <button 
                                     v-if="canEdit(exp)"
@@ -82,6 +82,11 @@
                                     Seguimiento
                                 </button>
                             </div>
+                            <div v-else-if="finalizedMode" class="text-center">
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">
+                                    Finalizado
+                                </span>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -101,6 +106,8 @@ defineProps<{
     expedientes: any[]
     loading: boolean
     nextPageUrl: string | null
+    hideActions?: boolean
+    finalizedMode?: boolean
 }>()
 
 defineEmits(['open-adjuntar', 'open-detalles', 'open-tracking', 'load-more'])
