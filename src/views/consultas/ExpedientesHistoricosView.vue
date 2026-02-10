@@ -16,7 +16,7 @@
                 v-model="searchQuery" 
                 @keyup.enter="handleSearch"
                 type="text" 
-                placeholder="Buscar por Código Cliente..." 
+                placeholder="Buscar por Contrato..." 
                 class="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-verde-cope focus:border-transparent outline-none w-full md:w-64 transition-all"
             />
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -45,19 +45,23 @@
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
-                        <th scope="col" class="px-6 py-3">Código</th>
-                        <th scope="col" class="px-6 py-3">Agencia</th>
-                        <th scope="col" class="px-6 py-3">Asociado</th>
-                        <th scope="col" class="px-6 py-3">CUI</th>
-                        <th scope="col" class="px-6 py-3 text-right">Monto</th>
-                        <th scope="col" class="px-6 py-3 text-center">Tasa</th>
-                        <th scope="col" class="px-6 py-3">Fecha Inicio</th>
-                        <th scope="col" class="px-6 py-3 text-center">Estado</th>
+                        <th scope="col" class="px-4 py-3 min-w-[100px]">Código</th>
+                        <th scope="col" class="px-4 py-3 min-w-[150px]">Agencia</th>
+                        <th scope="col" class="px-4 py-3 min-w-[120px]">Fecha Inicio</th>
+                        <th scope="col" class="px-4 py-3 min-w-[120px]">No. Documento</th>
+                        <th scope="col" class="px-4 py-3 min-w-[200px]">Asociado</th>
+                        <th scope="col" class="px-4 py-3 text-right min-w-[120px]">Monto</th>
+                        <th scope="col" class="px-4 py-3 min-w-[150px]">Tipo Garantía</th>
+                        <th scope="col" class="px-4 py-3 text-center min-w-[100px]">Datos Garantía</th>
+                        <th scope="col" class="px-4 py-3 min-w-[120px]">Contrato</th>
+                        <th scope="col" class="px-4 py-3 min-w-[150px]">Inscripción Otros</th>
+                        <th scope="col" class="px-4 py-3 min-w-[100px]">Ingreso</th>
+                        <th scope="col" class="px-4 py-3 text-center min-w-[100px]">Estado</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     <tr v-if="loading && expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                        <td colspan="8" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="12" class="px-6 py-4 text-center text-gray-500">
                             <div class="flex justify-center items-center gap-2">
                                 <svg class="animate-spin h-5 w-5 text-verde-cope" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -68,33 +72,54 @@
                         </td>
                     </tr>
                     <tr v-else-if="expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                        <td colspan="8" class="px-6 py-8 text-center text-gray-500">
+                        <td colspan="12" class="px-6 py-8 text-center text-gray-500">
                             {{ message || 'No hay expedientes disponibles.' }}
                         </td>
                     </tr>
                     <tr v-for="exp in expedientes" :key="exp.codigo_cliente" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                        <td class="px-6 py-4 font-bold text-gray-900 dark:text-white">
+                        <td class="px-4 py-3 font-bold text-gray-900 dark:text-white sticky left-0 bg-white dark:bg-gray-800">
                             {{ exp.codigo_cliente }}
                         </td>
-                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
+                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
                             {{ exp.agencia }}
                         </td>
-                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                            {{ exp.asociado }}
-                        </td>
-                         <td class="px-6 py-4 text-gray-500 dark:text-gray-400 font-mono text-xs">
-                            {{ exp.cui }}
-                        </td>
-                         <td class="px-6 py-4 text-right font-mono text-gray-900 dark:text-gray-200">
-                            {{ formatCurrency(exp.monto) }}
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            {{ exp.tasa_interes }}%
-                        </td>
-                         <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        <td class="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                             {{ formatDate(exp.fecha_inicio) }}
                         </td>
-                        <td class="px-6 py-4 text-center">
+                        <td class="px-4 py-3 text-gray-500 dark:text-gray-400 font-mono text-xs">
+                             {{ exp.numero_documento }}
+                        </td>
+                        <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">
+                            {{ exp.asociado }}
+                        </td>
+                         <td class="px-4 py-3 text-right font-mono text-gray-900 dark:text-gray-200">
+                            {{ formatCurrency(exp.monto) }}
+                        </td>
+                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300 text-xs">
+                             {{ exp.tipo_garantia }}
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <button 
+                               v-if="exp.datos_garantia"
+                               @click="showGarantia(exp.datos_garantia)"
+                               class="text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full border border-gray-300 dark:border-gray-600 transition"
+                            >
+                                Ver
+                            </button>
+                             <span v-else class="text-xs text-gray-400 italic">N/A</span>
+                        </td>
+                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300 text-xs">
+                             {{ exp.contrato }}
+                        </td>
+                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300 text-xs">
+                             <span class="line-clamp-2" :title="exp.inscripcion_otros_contratos">
+                                {{ exp.inscripcion_otros_contratos }}
+                             </span>
+                        </td>
+                         <td class="px-4 py-3 text-gray-700 dark:text-gray-300 text-xs">
+                             {{ exp.ingreso }}
+                        </td>
+                        <td class="px-4 py-3 text-center">
                              <span :class="[
                                 'px-2 py-1 rounded-full text-xs font-medium',
                                 'bg-gray-100 text-gray-800'
@@ -129,11 +154,15 @@ import Swal from 'sweetalert2'
 interface Expediente {
     codigo_cliente: number
     agencia: string
-    asociado: string
-    cui: string
-    monto: number
-    tasa_interes: number
     fecha_inicio: string
+    numero_documento: string
+    asociado: string
+    monto: number
+    tipo_garantia: string
+    datos_garantia: string
+    contrato: string
+    inscripcion_otros_contratos: string
+    ingreso: string
     estado: string
     // Add other fields as needed
 }
@@ -185,7 +214,7 @@ const handleSearch = async () => {
 
     try {
         const response = await api.post('/expedientes/search-by-codigo', {
-            codigo_cliente: searchQuery.value
+            contrato: searchQuery.value
         })
 
         if (response.data.success) {
@@ -193,8 +222,8 @@ const handleSearch = async () => {
         }
     } catch (error: any) {
         if (error.response && error.response.status === 404) {
-            message.value = 'No se encontró ningún expediente con ese código.'
-            Swal.fire('No encontrado', 'No existe un expediente con ese código.', 'info')
+            message.value = 'No se encontró ningún expediente con ese contrato.'
+            Swal.fire('No encontrado', 'No existe un expediente con ese contrato.', 'info')
         } else {
             console.error("Search error", error)
             Swal.fire('Error', 'Ocurrió un error al buscar.', 'error')
@@ -214,6 +243,19 @@ const loadMore = () => {
     if (nextPageUrl.value) {
         fetchExpedientes(nextPageUrl.value)
     }
+}
+
+const showGarantia = (text: string) => {
+    Swal.fire({
+        title: 'Datos de Garantía',
+        text: text,
+        confirmButtonText: 'Cerrar',
+        confirmButtonColor: '#003366', // Azul cope
+        width: '600px',
+        customClass: {
+            htmlContainer: 'text-left text-sm max-h-[60vh] overflow-y-auto'
+        }
+    })
 }
 
 const formatCurrency = (amount: number) => {
