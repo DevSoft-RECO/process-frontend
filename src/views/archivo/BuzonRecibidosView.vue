@@ -73,49 +73,35 @@
                               <span v-else>-</span>
                           </td>
                           
-                          <!-- Garantía Real -->
-                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400 max-w-[140px]">
-                             <!-- Si ya tiene valor, mostrarlo truncate -->
-                             <span 
-                                v-if="exp.seguimientos?.[0]?.recibi_garantia_real" 
-                                class="text-green-600 font-medium text-xs block truncate"
-                                :title="exp.seguimientos[0].recibi_garantia_real"
-                             >
-                                 {{ exp.seguimientos[0].recibi_garantia_real }}
-                             </span>
-                             <!-- Si no, y estado secundario es 4, mostrar botón -->
-                             <button 
-                                v-else-if="exp.seguimientos?.[0]?.id_estado_secundario === 4"
-                                @click="recibirGarantia(exp)"
-                                class="px-2 py-1 text-xs font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 whitespace-nowrap"
-                             >
-                                Recibir Garantía
-                             </button>
-                             <!-- Default -->
-                             <span v-else class="text-gray-400 text-xs italic whitespace-nowrap">No aplica</span>
-                          </td>
+                            <td class="px-6 py-4">
+                                <span v-if="exp.seguimientos?.[0]?.recibi_garantia_real" 
+                                    class="text-green-600 font-medium text-xs block truncate">
+                                    {{ exp.seguimientos[0].recibi_garantia_real }}
+                                </span>
+                                <button v-else-if="exp.seguimientos?.[0]?.enviado_a_archivos === 'Si'"
+                                        @click="recibirGarantia(exp)"
+                                        class="px-2 py-1 text-xs font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700">
+                                    Recibir Garantía
+                                </button>
+                                <span v-else class="text-gray-400 text-xs italic">No aplica</span>
+                            </td>
 
-                          <!-- Contrato -->
-                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400 max-w-[140px]">
-                             <!-- Si ya tiene valor, mostrarlo truncate -->
-                             <span 
-                                v-if="exp.seguimientos?.[0]?.recibi_contrato" 
-                                class="text-green-600 font-medium text-xs block truncate"
-                                :title="exp.seguimientos[0].recibi_contrato"
-                             >
-                                 {{ exp.seguimientos[0].recibi_contrato }}
-                             </span>
-                             <!-- Si no, y estado es 4, mostrar botón -->
-                             <button 
-                                v-else-if="exp.seguimientos?.[0]?.id_estado === 4"
-                                @click="recibirContratoAction(exp)"
-                                class="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 whitespace-nowrap"
-                             >
-                                Recibir Contrato
-                             </button>
-                             <!-- Default -->
-                             <span v-else class="text-gray-400 text-xs italic whitespace-nowrap">No aplica</span>
-                          </td>
+                            <td class="px-6 py-4">
+                                <span v-if="exp.seguimientos?.[0]?.es_un_pagare === 'Pendiente' || exp.seguimientos?.[0]?.es_un_pagare === null" 
+                                    class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">
+                                    En Proceso...
+                                </span>
+
+                                <button v-else-if="exp.seguimientos?.[0]?.es_un_pagare === 'no' && !exp.seguimientos?.[0]?.recibi_contrato"
+                                        @click="recibirContratoAction(exp)"
+                                        class="bg-blue-600 text-white px-2 py-1 rounded text-xs">
+                                    Recibir Contrato
+                                </button>
+                                
+                                <span v-else class="text-gray-500 text-xs">
+                                    {{ exp.seguimientos[0].recibi_contrato || 'No aplica' }}
+                                </span>
+                            </td>
 
                           <!-- Fecha Recibido (Archivado) -->
                           <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
@@ -194,22 +180,22 @@
       if (nextPageUrl.value) fetchExpedientes(nextPageUrl.value)
   }
 
-  const canArchive = (exp: any) => {
-      const s = exp.seguimientos?.[0]
-      if (!s) return false
-      
-      const recibidoG = !!s.recibi_garantia_real;
-      const recibidoC = !!s.recibi_contrato;
-      const enviadoAmbas = s.enviado_a_archivos === 'Si';
+    const canArchive = (exp: any) => {
+        const s = exp.seguimientos?.[0];
+        if (!s) return false;
 
-      if (enviadoAmbas) {
-          // Si vienen ambas, deben estar marcadas las dos
-          return recibidoG && recibidoC;
-      } else {
-          // Si NO vienen ambas (solo una), con que una esté marcada es suficiente
-          return recibidoG || recibidoC;
-      }
-  }
+        // 1. Si el flujo no ha decidido, BLOQUEO TOTAL
+        if (s.es_un_pagare === 'Pendiente' || s.es_un_pagare === null) {
+            return false;
+        }
+
+        // 2. Definimos si falta algo por recibir
+        const faltaGarantia = (s.enviado_a_archivos === 'Si' && !s.recibi_garantia_real);
+        const faltaContrato = (s.es_un_pagare === 'no' && !s.recibi_contrato);
+
+        // Solo habilitar si NO falta nada
+        return !faltaGarantia && !faltaContrato;
+    }
   
   const archivarAction = async (exp: any) => {
       const result = await Swal.fire({
