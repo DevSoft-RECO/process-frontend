@@ -198,8 +198,17 @@
       const s = exp.seguimientos?.[0]
       if (!s) return false
       
-      // La condición para archivar es que el estado sea 11
-      return s.id_estado === 11
+      const recibidoG = !!s.recibi_garantia_real;
+      const recibidoC = !!s.recibi_contrato;
+      const enviadoAmbas = s.enviado_a_archivos === 'Si';
+
+      if (enviadoAmbas) {
+          // Si vienen ambas, deben estar marcadas las dos
+          return recibidoG && recibidoC;
+      } else {
+          // Si NO vienen ambas (solo una), con que una esté marcada es suficiente
+          return recibidoG || recibidoC;
+      }
   }
   
   const archivarAction = async (exp: any) => {
