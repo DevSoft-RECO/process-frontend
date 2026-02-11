@@ -299,7 +299,8 @@ const docForm = reactive({
 // Initialize logic
 
 
-const initModal = () => {
+// Initialize logic
+async function initModal() {
     resetForm()
     linkedDocs.value = props.expediente?.documentos || []
     
@@ -308,24 +309,24 @@ const initModal = () => {
     if (registrosList.value.length === 0) fetchRegistros()
 }
 
-const fetchTiposDocumento = async () => {
+async function fetchTiposDocumento() {
     try {
         const res = await api.get('/tipo-documentos')
         if (res.data.success) tiposDocumentoList.value = res.data.data.data || res.data.data
     } catch (e) { console.error(e) }
 }
 
-const fetchRegistros = async () => {
+async function fetchRegistros() {
     try {
         const res = await api.get('/registros-propiedad')
         if (res.data.success) registrosList.value = res.data.data.data || res.data.data
     } catch (e) { console.error(e) }
 }
 
-const fetchUpdatedDocuments = async () => {
-    if (!props.expediente?.codigo_cliente) return
+async function fetchUpdatedDocuments() {
+    if (!props.expediente?.id) return
     try {
-        const res = await api.get(`/nuevos-expedientes/${props.expediente.codigo_cliente}/detalles`)
+        const res = await api.get(`/nuevos-expedientes/${props.expediente.id}/detalles`)
         if (res.data.success && res.data.data) {
            linkedDocs.value = res.data.data.documentos || []
         }
@@ -334,7 +335,7 @@ const fetchUpdatedDocuments = async () => {
     }
 }
 
-const resetForm = () => {
+function resetForm() {
     docSearchStep.value = true
     docSelectionStep.value = false
     existingDocFound.value = false
@@ -357,7 +358,7 @@ const resetForm = () => {
     docForm.observacion = ''
 }
 
-const checkDocumento = async () => {
+async function checkDocumento() {
     if (!docForm.numero || !docForm.fecha) return
     checkingDoc.value = true
     isDuplicate.value = false 
@@ -367,7 +368,7 @@ const checkDocumento = async () => {
         const res = await api.post('/documentos/check', {
             numero: docForm.numero,
             fecha: docForm.fecha,
-            nuevo_expediente_id: props.expediente?.codigo_cliente
+            nuevo_expediente_id: props.expediente?.id
         })
         
         if (res.data.found && Array.isArray(res.data.data) && res.data.data.length > 0) {
@@ -379,13 +380,13 @@ const checkDocumento = async () => {
         }
     } catch (e: any) {
         console.error(e)
-        Swal.fire('Error', 'No se pudo verificar el documento', 'error')
+        // Swal.fire('Error', 'No se pudo verificar el documento', 'error')
     } finally {
         checkingDoc.value = false
     }
 }
 
-const selectExistingDoc = (doc: any) => {
+function selectExistingDoc(doc: any) {
     existingDocFound.value = true
     existingDocId.value = doc.id
     isDuplicate.value = doc.already_linked
@@ -405,7 +406,7 @@ const selectExistingDoc = (doc: any) => {
     docSelectionStep.value = false 
 }
 
-const proceedToCreate = () => {
+function proceedToCreate() {
     existingDocFound.value = false
     existingDocId.value = null
     isDuplicate.value = false
@@ -417,6 +418,7 @@ const detachDocumento = async (docId: number) => {
     if (!props.expediente) return
 
     const result = await Swal.fire({
+        // ... (swal options)
         title: '¿Estás seguro?',
         text: "Desvincularás este documento del expediente.",
         icon: 'warning',
@@ -429,14 +431,16 @@ const detachDocumento = async (docId: number) => {
 
     if (result.isConfirmed) {
         try {
-            const res = await api.delete(`/nuevos-expedientes/${props.expediente.codigo_cliente}/documentos/${docId}`)
+            const res = await api.delete(`/nuevos-expedientes/${props.expediente.id}/documentos/${docId}`)
             if (res.data.success) {
+                // ...
                 linkedDocs.value = linkedDocs.value.filter(d => d.id !== docId)
                 emit('saved') // Trigger refresh on parent
                 Swal.fire('Desvinculado', 'El documento ha sido quitado.', 'success')
             }
         } catch (error) {
-            console.error(error)
+            // ...
+             console.error(error)
             Swal.fire('Error', 'No se pudo desvincular el documento.', 'error')
         }
     }
@@ -453,7 +457,7 @@ const submitDocumento = async () => {
     }
 
     try {
-        await api.post(`/nuevos-expedientes/${props.expediente.codigo_cliente}/documentos`, payload)
+        await api.post(`/nuevos-expedientes/${props.expediente.id}/documentos`, payload)
         
         Swal.fire({
             icon: 'success',

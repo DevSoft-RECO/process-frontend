@@ -214,7 +214,7 @@ const fetchHistory = async () => {
     
     loading.value = true
     try {
-        const res = await api.get(`/tracking/${props.expediente.codigo_cliente}`)
+        const res = await api.get(`/tracking/${props.expediente.id}`)
         if (res.data.success) {
             historyData.value = res.data.data
             expedienteInfo.value = res.data.data.expediente

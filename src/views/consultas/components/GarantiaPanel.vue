@@ -136,7 +136,7 @@ const submit = async () => {
     submitting.value = true
     
     try {
-        await api.post(`/nuevos-expedientes/${props.expediente.codigo_cliente}/garantias`, form)
+        await api.post(`/nuevos-expedientes/${props.expediente.id}/garantias`, form)
         
         Swal.fire({
             icon: 'success',

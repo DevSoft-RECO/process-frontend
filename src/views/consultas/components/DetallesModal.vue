@@ -270,7 +270,7 @@ watch(() => props.show, (newVal) => {
 const fetchDetalles = async () => {
     loadingDetalles.value = true
     try {
-        const res = await api.get(`/nuevos-expedientes/${props.expediente.codigo_cliente}/detalles`)
+        const res = await api.get(`/nuevos-expedientes/${props.expediente.id}/detalles`)
         if (res.data.success) {
             detallesData.value = res.data.data
         }
@@ -301,7 +301,7 @@ const sendExpediente = async () => {
     sending.value = true
     try {
         const res = await api.post('/seguimiento/enviar-secretaria', {
-            codigo_cliente: props.expediente.codigo_cliente
+            expediente_id: props.expediente.id
         })
 
         if (res.data.success) {
