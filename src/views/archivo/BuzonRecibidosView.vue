@@ -224,7 +224,7 @@
 
       if (result.isConfirmed) {
           try {
-              const res = await api.post(`/archivo/archivar/${exp.codigo_cliente}`)
+              const res = await api.post(`/archivo/archivar/${exp.id}`)
               if (res.data.success) {
                   Swal.fire('Éxito', res.data.message, 'success')
                   fetchExpedientes() // Refresh to update button state
@@ -267,7 +267,7 @@
 
       if (result.isConfirmed) {
           try {
-              const res = await api.post(`/archivo/recibir-garantia/${exp.codigo_cliente}`)
+              const res = await api.post(`/archivo/recibir-garantia/${exp.id}`)
               if (res.data.success) {
                   Swal.fire('Éxito', res.data.message, 'success')
                   fetchExpedientes() // Refresh
@@ -291,7 +291,7 @@
 
       if (result.isConfirmed) {
           try {
-              const res = await api.post(`/archivo/recibir-contrato/${exp.codigo_cliente}`)
+              const res = await api.post(`/archivo/recibir-contrato/${exp.id}`)
               if (res.data.success) {
                   Swal.fire('Éxito', res.data.message, 'success')
                   fetchExpedientes() // Refresh
