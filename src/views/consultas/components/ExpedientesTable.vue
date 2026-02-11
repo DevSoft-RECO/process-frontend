@@ -4,6 +4,7 @@
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
+                        <th scope="col" class="px-6 py-3">ID Expediente</th>
                         <th scope="col" class="px-6 py-3">Código</th>
                         <th scope="col" class="px-6 py-3">Nombre Asociado</th>
                         <th scope="col" class="px-6 py-3">Fecha Ingreso</th>
@@ -15,17 +16,20 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     <tr v-if="loading && expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="8" class="px-6 py-4 text-center text-gray-500">
                             Cargando...
                         </td>
                     </tr>
                     <tr v-else-if="expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                        <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                        <td colspan="8" class="px-6 py-8 text-center text-gray-500">
                             No hay expedientes nuevos.
                         </td>
                     </tr>
-                    <tr v-for="exp in expedientes" :key="exp.codigo_cliente" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <tr v-for="exp in expedientes" :key="exp.id" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                         <td class="px-6 py-4 font-bold text-gray-900 dark:text-white">
+                            {{ exp.id }}
+                        </td>
+                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
                             {{ exp.codigo_cliente }}
                         </td>
                         <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
