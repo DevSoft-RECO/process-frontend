@@ -112,6 +112,7 @@ import Swal from 'sweetalert2'
 import SecretariaDetallesModal from './components/SecretariaDetallesModal.vue'
 
 interface Expediente {
+    id: number;
     codigo_cliente: string;
     nombre_asociado: string;
     monto_documento: number;
@@ -188,7 +189,7 @@ const recibirPagare = async (exp: any) => {
     if (result.isConfirmed) {
         try {
             const res = await api.post('/secretaria-agencia/recibir-pagare', {
-                codigo_cliente: exp.codigo_cliente
+                id: exp.id
             })
 
             if (res.data.success) {

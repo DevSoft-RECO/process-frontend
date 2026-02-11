@@ -270,7 +270,7 @@ const ultimoRechazo = computed(() => {
 const fetchDetalles = async () => {
     loadingDetalles.value = true
     try {
-        const res = await api.get(`/nuevos-expedientes/${props.expediente.codigo_cliente}/detalles`)
+        const res = await api.get(`/nuevos-expedientes/${props.expediente.id}/detalles`)
         if (res.data.success) {
             detallesData.value = res.data.data
         }
@@ -307,7 +307,7 @@ const handleAction = async (action: 'aceptar' | 'rechazar' | 'adjuntar-contrato'
         if (result.isConfirmed) {
             try {
                 const res = await api.post('/seguimiento/rechazar', {
-                    codigo_cliente: props.expediente.codigo_cliente,
+                    expediente_id: props.expediente.id,
                     observacion: result.value
                 })
 
@@ -339,7 +339,7 @@ const handleAction = async (action: 'aceptar' | 'rechazar' | 'adjuntar-contrato'
         if (result.isConfirmed) {
             try {
                 const res = await api.post('/seguimiento/aceptar', {
-                    codigo_cliente: props.expediente.codigo_cliente
+                    expediente_id: props.expediente.id
                 })
                 if (res.data.success) {
                     Swal.fire('Aceptado', 'El expediente ha sido aceptado correctamente.', 'success')
@@ -376,7 +376,7 @@ const handleAction = async (action: 'aceptar' | 'rechazar' | 'adjuntar-contrato'
         if (result.isConfirmed) {
             try {
                 const res = await api.post('/secretaria-agencia/adjuntar-contrato', {
-                    codigo_cliente: props.expediente.codigo_cliente,
+                    id: props.expediente.id,
                     numero_contrato: result.value
                 })
 
@@ -432,7 +432,7 @@ const handleAction = async (action: 'aceptar' | 'rechazar' | 'adjuntar-contrato'
         if (formValues) {
             try {
                 const res = await api.post('/seguimiento/enviar-archivo', {
-                    codigo_cliente: props.expediente.codigo_cliente,
+                    expediente_id: props.expediente.id,
                     tiene_garantia_real: formValues.garantia,
                     observacion: formValues.obs
                 })
@@ -468,7 +468,7 @@ const handleAction = async (action: 'aceptar' | 'rechazar' | 'adjuntar-contrato'
         if (result.isConfirmed) {
             try {
                 const res = await api.post('/seguimiento/enviar-protocolo', {
-                    codigo_cliente: props.expediente.codigo_cliente
+                    expediente_id: props.expediente.id
                 })
                 if (res.data.success) {
                     Swal.fire('Enviado', 'El expediente ha sido enviado a protocolo.', 'success')
@@ -505,7 +505,7 @@ const handleAction = async (action: 'aceptar' | 'rechazar' | 'adjuntar-contrato'
         loadingDetalles.value = true
         try {
             await api.post('/secretaria-agencia/archivar-administrativamente', {
-                codigo_cliente: props.expediente.codigo_cliente
+                id: props.expediente.id
             })
 
             Swal.fire('Archivado', 'El expediente ha sido archivado administrativamente.', 'success')

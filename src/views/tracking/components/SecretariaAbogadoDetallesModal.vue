@@ -232,7 +232,7 @@ watch(() => props.show, (newVal) => {
 const fetchDetalles = async () => {
     loadingDetalles.value = true
     try {
-        const res = await api.get(`/nuevos-expedientes/${props.expediente.codigo_cliente}/detalles`)
+        const res = await api.get(`/nuevos-expedientes/${props.expediente.id}/detalles`)
         if (res.data.success) {
             detallesData.value = res.data.data
         }

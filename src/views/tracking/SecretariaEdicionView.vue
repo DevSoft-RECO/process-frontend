@@ -254,10 +254,23 @@ const search = async () => {
     detallesData.value = null
     
     try {
-        const res = await api.get(`/nuevos-expedientes/${searchQuery.value}/detalles`)
-        if (res.data.success) {
-            detallesData.value = res.data.data
-            currentExpedienteId.value = res.data.data.expediente.codigo_cliente
+        // First search for the expediente by code/name/cui
+        const searchRes = await api.get('/nuevos-expedientes', {
+            params: { search: searchQuery.value }
+        })
+
+        if (searchRes.data.success && searchRes.data.data.data.length > 0) {
+            // Take the first match
+            const expediente = searchRes.data.data.data[0];
+            
+            // Now fetch strict details using ID
+            const res = await api.get(`/nuevos-expedientes/${expediente.id}/detalles`)
+            if (res.data.success) {
+                detallesData.value = res.data.data
+                currentExpedienteId.value = res.data.data.expediente.id
+            }
+        } else {
+             detallesData.value = null // No results
         } 
     } catch (error: any) {
         console.error(error)

@@ -239,8 +239,7 @@ const fetchBufetes = async () => {
 const fetchDetalles = async () => {
     loadingDetalles.value = true
     try {
-        // Reuse same endpoint as NuevoExpedienteController for details (readonly)
-        const res = await api.get(`/nuevos-expedientes/${props.expediente.codigo_cliente}/detalles`)
+        const res = await api.get(`/nuevos-expedientes/${props.expediente.id}/detalles`)
         if (res.data.success) {
             detallesData.value = res.data.data
         }
@@ -291,7 +290,7 @@ const close = () => {
 }
 
 const verDocumento = () => {
-    const url = `${import.meta.env.VITE_API_URL}/secretaria-credito/ver-contrato/${props.expediente.codigo_cliente}`;
+    const url = `${import.meta.env.VITE_API_URL}/secretaria-credito/ver-contrato/${props.expediente.id}`;
     // Open in new tab (browser will handle PDF view or download)
     // We need to pass the token if using API middleware? 
     // Usually download links are tricky with bearer tokens without cookies or temp tokens.
@@ -340,7 +339,7 @@ const adjuntarExpediente = async () => {
             
             const formData = new FormData()
             formData.append('file', file)
-            formData.append('codigo_cliente', props.expediente.codigo_cliente)
+            formData.append('id', props.expediente.id)
 
             try {
                 const response = await api.post('/secretaria-credito/guardar-escaneado', formData, {
@@ -410,7 +409,7 @@ const finalizarProceso = async () => {
     if (esPagare) {
         try {
             const res = await api.post('/secretaria-credito/finalizar-proceso', {
-                codigo_cliente: props.expediente.codigo_cliente,
+                id: props.expediente.id,
                 es_pagare: esPagare
             });
             
@@ -449,7 +448,7 @@ const handleAction = async (action: string) => {
         if (result.isConfirmed) {
             try {
                 const res = await api.post('/secretaria-credito/aceptar', {
-                    codigo_cliente: props.expediente.codigo_cliente
+                    id: props.expediente.id
                 })
                 if (res.data.success) {
                     Swal.fire('Aceptado', 'El expediente ha sido aceptado correctamente.', 'success')
@@ -495,7 +494,7 @@ const handleAction = async (action: string) => {
         if (result.isConfirmed && result.value) {
             try {
                 const res = await api.post('/secretaria-credito/enviar-abogado', {
-                    codigo_cliente: props.expediente.codigo_cliente,
+                    id: props.expediente.id,
                     bufete_id: result.value // Pass selected bufete_id
                 })
                 if (res.data.success) {
