@@ -289,29 +289,16 @@ const close = () => {
     emit('close')
 }
 
-const verDocumento = () => {
-    const url = `${import.meta.env.VITE_API_URL}/secretaria-credito/ver-contrato/${props.expediente.id}`;
-    // Open in new tab (browser will handle PDF view or download)
-    // We need to pass the token if using API middleware? 
-    // Usually download links are tricky with bearer tokens without cookies or temp tokens.
-    // For simplicity, we'll try to use a fetch with blob or if the API endpoint is protected, we need a way.
-    // Assuming axios interceptor handles it, but window.open doesn't.
-    // Let's use axios -> blob -> url
-    
-    api.get(url, { responseType: 'blob' })
-    .then(response => {
-        const fileURL = window.URL.createObjectURL(new Blob([response.data], {type: 'application/pdf'}));
-        const fileLink = document.createElement('a');
-        fileLink.href = fileURL;
-        fileLink.target = '_blank';
-        // fileLink.setAttribute('download', 'file.pdf'); // If we want to force download
-        document.body.appendChild(fileLink);
-        fileLink.click();
-    })
-    .catch((err) => {
-        console.error(err)
-        Swal.fire('Error', 'No se pudo descargar el documento.', 'error')
-    });
+const verDocumento = async () => {
+    try {
+        const res = await api.get(`/secretaria-credito/ver-contrato/${props.expediente.id}`)
+        if (res.data.success) {
+            window.open(res.data.url, '_blank')
+        }
+    } catch (error) {
+        console.error(error)
+        Swal.fire('Error', 'No se pudo abrir el documento.', 'error')
+    }
 }
 
 const adjuntarExpediente = async () => {
