@@ -150,11 +150,13 @@
                                      <div class="flex items-center gap-3">
                                          <span class="font-bold text-gray-800 dark:text-white">{{ d.tipo_documento?.nombre || 'Documento' }}</span>
                                          <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">No: {{ d.numero }}</span>
-                                         <div v-if="d.nuevos_expedientes_count > 1" class="flex items-center gap-2">
-                                             <span class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded border border-red-200 flex items-center gap-1">
-                                                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                                 Compartido ({{ d.nuevos_expedientes_count }})
-                                             </span>
+                                        <div v-if="d.expedientes_asociados_count > 0" class="flex items-center gap-2">
+                                            <span class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded border border-red-200 flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                                {{ d.expedientes_asociados_count === 1 ? 'Compartido con otro 1' : `Compartido con otros ${d.expedientes_asociados_count}` }}
+                                            </span>
                                              <button @click="showSharedExpedientes(d.id, d.nuevos_expedientes_count)" class="text-xs text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 font-medium bg-blue-50 px-2 py-0.5 rounded border border-blue-100 transition-colors">
                                                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                  Ver Lista
@@ -321,8 +323,24 @@ const showSharedExpedientes = async (docId: number, count: number) => {
         if (res.data.success) {
             const expedientes = res.data.data
             
+            // Filter out the current expediente's number
+            const currentNum = detallesData.value?.expediente?.numero_documento
+            const filteredExpedientes = currentNum 
+                ? expedientes.filter((num: string) => String(num) !== String(currentNum)) 
+                : expedientes
+
+            if (filteredExpedientes.length === 0) {
+                 Swal.fire({
+                    title: 'Información',
+                    text: 'No se encontraron otros productos vinculados.',
+                    icon: 'info',
+                    confirmButtonText: 'Entendido'
+                })
+                return
+            }
+            
             let htmlList = '<ul style="text-align: left; max-height: 200px; overflow-y: auto; list-style-type: none; padding: 0;">'
-            expedientes.forEach((num: string) => {
+            filteredExpedientes.forEach((num: string) => {
                 htmlList += `<li style="padding: 5px 10px; border-bottom: 1px solid #eee;">• ${num}</li>`
             })
             htmlList += '</ul>'
