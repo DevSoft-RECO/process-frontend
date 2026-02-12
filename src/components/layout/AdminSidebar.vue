@@ -330,6 +330,10 @@ const menuItems = computed(() => {
                     route: '/admin/secretaria-credito/escanear-documentos'
                 },
                 {
+                    label: 'Buzón Completados',
+                    route: '/admin/secretaria-credito/buzon-completados'
+                },
+                {
                     label: 'Edición de Expedientes',
                     route: '/admin/tracking/secretaria-edicion'
                 }

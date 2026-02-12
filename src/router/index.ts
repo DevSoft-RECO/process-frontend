@@ -164,6 +164,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'secretaria-credito/buzon-completados',
+                name: 'secretaria-credito-buzon-completados',
+                component: () => import('@/views/secretaria-credito/BuzonCompletadosView.vue'),
+                meta: {
+                    title: 'Buzón Completados Crédito'
+                }
+            },
+            {
                 path: 'secretaria-credito/buzon-abogados',
                 name: 'secretaria-credito-buzon-abogados',
                 component: () => import('@/views/secretaria-credito/BuzonAbogadosView.vue'),
@@ -297,8 +305,7 @@ router.beforeEach(async (to, _from) => {
 
         // Verificar permiso
         if (to.meta.permission && !authStore.hasPermission(to.meta.permission)) {
-            const motherAppUrl =
-                import.meta.env.VITE_MOTHER_APP_URL || 'http://localhost:5173'
+
 
             console.warn(
                 `⛔ Acceso denegado: Usuario no tiene el permiso '${to.meta.permission}'.`
@@ -310,8 +317,7 @@ router.beforeEach(async (to, _from) => {
 
         // Verificar rol
         if (to.meta.role && !authStore.hasRole(to.meta.role)) {
-            const motherAppUrl =
-                import.meta.env.VITE_MOTHER_APP_URL || 'http://localhost:5173'
+
 
             console.warn(
                 `⛔ Acceso denegado: Usuario no tiene el rol '${to.meta.role}'.`
