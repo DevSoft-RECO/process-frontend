@@ -254,30 +254,19 @@ const search = async () => {
     detallesData.value = null
     
     try {
-        // First search for the expediente by code/name/cui
-        const searchRes = await api.get('/nuevos-expedientes', {
+        // Llamada directa a la nueva función optimizada
+        const res = await api.get('/expedientes/search-edit', {
             params: { search: searchQuery.value }
         })
 
-        if (searchRes.data.success && searchRes.data.data.data.length > 0) {
-            // Take the first match
-            const expediente = searchRes.data.data.data[0];
-            
-            // Now fetch strict details using ID
-            const res = await api.get(`/nuevos-expedientes/${expediente.id}/detalles`)
-            if (res.data.success) {
-                detallesData.value = res.data.data
-                currentExpedienteId.value = res.data.data.expediente.id
-            }
-        } else {
-             detallesData.value = null // No results
-        } 
+        if (res.data.success) {
+            // Seteamos detallesData y los modales ya tendrán qué listar y editar
+            detallesData.value = res.data.data
+            currentExpedienteId.value = res.data.data.expediente.id
+        }
     } catch (error: any) {
-        console.error(error)
-        if (error.response?.status === 404) {
-            // Just let the empty state show
-        } else {
-             Swal.fire('Error', 'Error al buscar el expediente.', 'error')
+        if (error.response?.status !== 404) {
+            Swal.fire('Error', 'Error al procesar la búsqueda.', 'error')
         }
     } finally {
         searching.value = false
