@@ -204,6 +204,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'archivo/sistema',
+                name: 'archivo-sistema',
+                component: () => import('@/views/archivo/ArchivoSistemaView.vue'),
+                meta: {
+                    title: 'Archivo Sistema'
+                }
+            },
+            {
                 path: 'archivo/historico',
                 name: 'archivo-historico',
                 component: () => import('@/views/archivo/ArchivoHistoricoView.vue'),
