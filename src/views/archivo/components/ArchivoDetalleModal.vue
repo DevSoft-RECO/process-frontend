@@ -47,7 +47,7 @@
                     </p>
                   </div>
                   <div v-if="detalle.path_contrato">
-                    <a :href="'/storage/' + detalle.path_contrato" target="_blank" 
+                    <a :href="`${apiUrl}/${detalle.path_contrato}`" target="_blank" 
                        class="flex items-center justify-center gap-2 w-full p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition shadow-lg">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                       VER PDF ESCANEADO
@@ -176,6 +176,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import api from '@/api/axios'
+
+const apiUrl = import.meta.env.VITE_API_URL
 
 const props = defineProps<{
   show: boolean
