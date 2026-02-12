@@ -67,12 +67,6 @@
                          <input v-model="form.monto_poliza" type="number" step="0.01" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring-verde-cope sm:text-sm">
                     </div>
 
-                    <!-- Clave Catastral -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Clave Catastral</label>
-                         <input v-model="form.clave_catastral" type="text" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring-verde-cope sm:text-sm">
-                    </div>
-                    
                     <!-- Datos Registrales -->
                     <div class="col-span-2 grid grid-cols-3 gap-2">
                         <div>
@@ -86,6 +80,10 @@
                          <div>
                              <label class="block text-xs font-medium text-gray-500 mb-1">Libro</label>
                              <input v-model="form.libro" type="text" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm text-xs">
+                        </div>
+                        <div>
+                             <label class="block text-xs font-medium text-gray-500 mb-1">No Dominio</label>
+                             <input v-model="form.no_dominio" type="text" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm text-xs">
                         </div>
                     </div>
 
@@ -142,7 +140,6 @@ const form = reactive<any>({
     propietario: '',
     autorizador: '',
     observacion: '',
-    clave_catastral: '',
     referencia: ''
 })
 
