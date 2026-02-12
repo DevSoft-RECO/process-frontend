@@ -34,7 +34,7 @@
                                 type="text"
                                 @keyup.enter="search"
                                 class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition sm:text-sm"
-                                placeholder="Ingrese código de cliente (Ej: 12345)"
+                                placeholder="Ingrese numero de producto"
                             />
                         </div>
                     </div>
@@ -64,8 +64,8 @@
                     </div>
                     <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <span class="block text-sm text-gray-500 dark:text-gray-400">Código Cliente</span>
-                            <span class="text-lg font-medium text-gray-900 dark:text-white">{{ detallesData.expediente.codigo_cliente }}</span>
+                            <span class="block text-sm text-gray-500 dark:text-gray-400">Código Cliente/ Producto</span>
+                            <span class="text-lg font-medium text-gray-900 dark:text-white">{{ detallesData.expediente.codigo_cliente }} / {{ detallesData.expediente.numero_documento }}</span>
                         </div>
                         <div>
                             <span class="block text-sm text-gray-500 dark:text-gray-400">Nombre Asociado</span>
@@ -150,12 +150,13 @@
                                      <div class="flex items-center gap-3">
                                          <span class="font-bold text-gray-800 dark:text-white">{{ d.tipo_documento?.nombre || 'Documento' }}</span>
                                          <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">No: {{ d.numero }}</span>
-                                         <div v-if="d.nuevos_expedientes_count > 1" class="flex flex-col gap-1 items-start">
+                                         <div v-if="d.nuevos_expedientes_count > 1" class="flex items-center gap-2">
                                              <span class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded border border-red-200 flex items-center gap-1">
                                                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                                  Compartido ({{ d.nuevos_expedientes_count }})
                                              </span>
-                                             <button @click="showSharedExpedientes(d.id, d.nuevos_expedientes_count)" class="text-[10px] text-blue-600 hover:underline flex items-center gap-1">
+                                             <button @click="showSharedExpedientes(d.id, d.nuevos_expedientes_count)" class="text-xs text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 font-medium bg-blue-50 px-2 py-0.5 rounded border border-blue-100 transition-colors">
+                                                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                  Ver Lista
                                              </button>
                                          </div>
@@ -327,7 +328,7 @@ const showSharedExpedientes = async (docId: number, count: number) => {
             htmlList += '</ul>'
 
             Swal.fire({
-                title: `Numeros de Productos Vinculados`,
+                title: `Otros Productos Vinculados`,
                 html: htmlList,
                 confirmButtonText: 'Cerrar'
             })
