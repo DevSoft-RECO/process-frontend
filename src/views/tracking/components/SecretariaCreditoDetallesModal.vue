@@ -2,21 +2,38 @@
     <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-5xl my-8">
             <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-700/50 rounded-t-xl">
-                <div>
-                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 mb-2">
-                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        Revisión de Secretaría Crédito
-                    </span>
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <div class="py-4 border-b border-gray-100 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-2">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">
                         Detalles del Expediente
                     </h2>
-                    <p class="text-sm text-gray-500 mt-1">
-                        Expediente: <span class="font-bold text-gray-800 dark:text-gray-300">{{ expediente?.codigo_cliente }} - {{ expediente?.nombre_asociado }}</span>
-                    </p>
-                    <p class="text-sm text-gray-500 mt-1">
-                        Contrato: <span class="font-mono font-bold text-gray-800 dark:text-gray-300">{{ numeroContrato }}</span>
-                    </p>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 ring-1 ring-inset ring-blue-700/10">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Revisión de Secretaría de Crédito
+                    </span>
                 </div>
+                <div class="flex flex-wrap items-center gap-x-3 mt-1.5 text-sm text-gray-500 dark:text-gray-400">
+                    <span class="flex items-center gap-1.5">
+                        No. Expediente: <span class="font-bold text-gray-900 dark:text-gray-200">{{ expediente?.id }}</span>
+                    </span>
+
+                    <span class="text-gray-300 dark:text-gray-700">|</span>
+
+                    <span class="font-medium text-gray-700 dark:text-gray-300 italic">
+                        {{ expediente?.nombre_asociado }}
+                    </span>
+
+                    <span>
+                        Producto: <span class="font-semibold text-gray-800 dark:text-gray-200">{{ expediente?.numero_documento }}</span>
+                    </span>
+
+                    <span v-if="numeroContrato" class="ml-1 px-2 py-0.5 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-bold rounded-md border border-purple-100 dark:border-purple-800">
+                        Contrato: {{ numeroContrato }}
+                    </span>
+                </div>
+            </div>
                 <button @click="close" class="text-gray-400 hover:text-gray-500 focus:outline-none">
                     <span class="sr-only">Cerrar</span>
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -472,7 +489,7 @@ const handleAction = async (action: string) => {
     if (action === 'aceptar') {
         const result = await Swal.fire({
             title: '¿Aceptar Expediente?',
-            text: "El expediente pasará a estado Aceptado (Estado 7) y se moverá al Buzón de Aceptados.",
+            text: "Una vez que aceptes el expediente, se moverá al Buzón de Aceptados.",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#10B981', // green-500
