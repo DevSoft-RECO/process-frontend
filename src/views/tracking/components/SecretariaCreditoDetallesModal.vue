@@ -182,12 +182,20 @@
                 </span>
 
                 <!-- Acción: Finalizar Proceso (Si hay contrato y NO está finalizado) -->
-                <button v-if="hasContrato && !isFinalized" @click="finalizarProceso" class="px-5 py-2.5 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-md transition flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Finalizar Proceso
-                </button>
+                    <button 
+                        v-if="hasContrato && !isFinalized" 
+                        @click="finalizarProceso" 
+                        :class="[
+                            'px-5 py-2.5 text-white rounded-lg shadow-md transition flex items-center gap-2',
+                            esEnviadoAArchivos ? 'bg-green-600 hover:bg-green-700' : 'bg-indigo-600 hover:bg-indigo-700'
+                        ]"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path v-if="esEnviadoAArchivos" stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                            <path v-else stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        {{ esEnviadoAArchivos ? 'Enviar a Archivos' : 'Revisar y finalizar' }}
+                    </button>
 
                 <!-- Acción: Adjuntar (Si es estado 10 y NO tiene contrato y NO está cargando) -->
                 <button v-if="isDevuelto && !hasContrato && !loadingDetalles" @click="adjuntarExpediente" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
@@ -282,7 +290,7 @@ const isFinalized = computed(() => {
 const finalizedStatus = computed(() => {
     if (!isFinalized.value) return '';
     const latest = detallesData.value.expediente.seguimientos[0];
-    return latest.es_un_pagare === 'si' ? 'Pagaré (Enviado a Protocolos)' : 'Archivo (Sin Pagaré)';
+    return latest.es_un_pagare === 'si' ? 'Pagaré (Enviado a secreatria agencia)' : 'Archivo (Contrato Enviado)';
 })
 
 const close = () => {
@@ -360,64 +368,105 @@ const adjuntarExpediente = async () => {
     }
 }
 
-const finalizarProceso = async () => {
-    const { value: esPagare } = await Swal.fire({
-        title: 'Finalizar Proceso',
-        html: `
-            <p class="mb-4 text-gray-600">¿Es un Pagaré?</p>
-            <div class="flex justify-center gap-6">
-                <label class="inline-flex items-center space-x-2 cursor-pointer">
-                    <input type="radio" name="es_pagare" value="si" class="form-radio text-indigo-600 h-5 w-5 border-gray-300 focus:ring-indigo-500">
-                    <span class="text-gray-900 font-medium">Sí</span>
-                </label>
-                <label class="inline-flex items-center space-x-2 cursor-pointer">
-                    <input type="radio" name="es_pagare" value="no" class="form-radio text-red-600 h-5 w-5 border-gray-300 focus:ring-red-500">
-                    <span class="text-gray-900 font-medium">No</span>
-                </label>
-            </div>
-        `,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Confirmar',
-        cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#4F46E5',
-        preConfirm: () => {
-            const si = document.querySelector('input[name="es_pagare"][value="si"]:checked');
-            const no = document.querySelector('input[name="es_pagare"][value="no"]:checked');
-            
-            if (!si && !no) {
-                Swal.showValidationMessage('Debe seleccionar una opción');
-                return null;
-            }
-            return si ? 'si' : 'no';
-        }
-    });
+// ... (resto de tus computed properties existentes)
 
-    if (esPagare) {
-        try {
-            const res = await api.post('/secretaria-credito/finalizar-proceso', {
-                id: props.expediente.id,
-                es_pagare: esPagare
-            });
-            
-            if (res.data.success) {
-                let msg = 'Proceso finalizado correctamente.';
-                if (esPagare === 'si') {
-                    msg += ' El expediente ha pasado a Protocolos (Estado 5).';
-                } else {
-                    msg += ' El expediente ha pasado a Archivo (Estado 4).';
+// ... (resto de tus computed properties existentes)
+
+// 1. Nueva propiedad computada para detectar si ya fue enviado a archivos
+const esEnviadoAArchivos = computed(() => {
+    if (!detallesData.value?.expediente?.seguimientos || detallesData.value.expediente.seguimientos.length === 0) return false;
+    const latest = detallesData.value.expediente.seguimientos[0];
+    // Ajustar según el caso exacto de tu DB ('Si', 'si', etc)
+    return latest.enviado_a_archivos === 'Si' || latest.enviado_a_archivos === 'si';
+})
+
+// 2. Función finalizarProceso actualizada
+const finalizarProceso = async () => {
+    // 1. Extraemos la observación del último seguimiento
+    const ultimoSeguimiento = detallesData.value?.expediente?.seguimientos?.[0];
+    const observacion = ultimoSeguimiento?.observacion_envio || 'sin observación';
+    
+    let esPagareFinal = 'no';
+
+    // CASO A: No ha sido enviado a archivos (Preguntamos con radio buttons)
+    if (!esEnviadoAArchivos.value) {
+        const { value: selection } = await Swal.fire({
+            title: '¿Es un Pagaré?',
+            html: `
+                <div class="text-center">
+                    <p class="mb-4 text-gray-700">
+                        la observacion de la agrantia indica: <br>
+                        <b class="text-blue-700">"${observacion}"</b>
+                    </p>
+                    <p class="mb-4 text-sm font-semibold">¿Confirma que el documento es un pagaré?</p>
+                    <div class="flex justify-center gap-8">
+                        <label class="inline-flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="es_pagare" value="si" class="h-5 w-5 text-indigo-600">
+                            <span class="text-gray-900">Sí (Pagaré)</span>
+                        </label>
+                        <label class="inline-flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="es_pagare" value="no" class="h-5 w-5 text-red-600">
+                            <span class="text-gray-900">No (Contrato)</span>
+                        </label>
+                    </div>
+                </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Confirmar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#4F46E5',
+            preConfirm: () => {
+                const checked = document.querySelector('input[name="es_pagare"]:checked');
+                if (!checked) {
+                    Swal.showValidationMessage('Debe seleccionar una opción');
+                    return null;
                 }
-                
-                await Swal.fire('Éxito', msg, 'success');
-                emit('refresh');
-                emit('close');
+                return (checked as HTMLInputElement).value;
             }
-        } catch (error: any) {
-            console.error(error);
-            Swal.fire('Error', error.response?.data?.message || 'Error al finalizar el proceso.', 'error');
+        });
+
+        if (!selection) return;
+        esPagareFinal = selection;
+
+    } else {
+        // CASO B: Ya fue enviado a archivos (Confirmación directa)
+        const confirm = await Swal.fire({
+            title: '¿Enviar a Archivos?',
+            html: `
+                <p class="text-gray-700">
+                    en las observaciones de la garantia indica <b class="text-green-700">"${observacion}"</b>. 
+                    <br><br>¿Confirmar envío a Archivo?
+                </p>
+            `,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, Enviar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#10B981'
+        });
+
+        if (!confirm.isConfirmed) return;
+        esPagareFinal = 'no';
+    }
+
+    // 2. Envío al Backend
+    try {
+        const res = await api.post('/secretaria-credito/finalizar-proceso', {
+            id: props.expediente.id,
+            es_pagare: esPagareFinal
+        });
+        
+        if (res.data.success) {
+            Swal.fire('Éxito', 'Proceso finalizado correctamente.', 'success');
+            emit('refresh');
+            emit('close');
         }
+    } catch (error: any) {
+        Swal.fire('Error', error.response?.data?.message || 'Error al procesar.', 'error');
     }
 }
+
 
 const handleAction = async (action: string) => {
     if (action === 'aceptar') {
