@@ -20,7 +20,7 @@
               <table class="w-full text-sm text-left">
                   <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                       <tr>
-                          <th scope="col" class="px-6 py-3">ID</th>
+                          <th scope="col" class="px-6 py-3">ID Expediente</th>
                           <th scope="col" class="px-6 py-3">Código Cliente</th>
                           <th scope="col" class="px-6 py-3">Agencia</th>
                           <th scope="col" class="px-6 py-3">Asociado / Producto</th>
@@ -42,34 +42,34 @@
                               No hay expedientes en el sistema de archivo.
                           </td>
                       </tr>
-                      <tr v-for="exp in expedientes" :key="exp.id" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                      <tr v-for="exp in expedientes" :key="exp.id_seguimiento" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                           <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                              {{ exp.id }}
+                              {{ exp.nuevo_expediente?.id }}
                           </td>
                           <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                              {{ exp.codigo_cliente }}
+                              {{ exp.nuevo_expediente?.codigo_cliente }}
                           </td>
                           <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                              {{ exp.agencia?.nombre || '-' }}
+                              {{ exp.nuevo_expediente?.id_agencia || '-' }}
                           </td>
                           <!-- <td class="px-6 py-4 text-gray-500 dark:text-gray-400 max-w-[150px] truncate" :title="exp.nombre_asociado">
                               {{ exp.nombre_asociado }}
                           </td> -->
                            <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                              <span class="block text-xs font-bold">{{ exp.nombre_asociado }}</span>
-                              <span class="block">{{ exp.numero_documento }}</span>
+                              <span class="block text-xs font-bold">{{ exp.nuevo_expediente?.nombre_asociado }}</span>
+                              <span class="block">{{ exp.nuevo_expediente?.numero_documento }}</span>
                           </td>
                            <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                            <span class="block">{{ formatCurrency(exp.monto_documento) }}</span> 
-                            <span class="block text-xs font-bold">{{ exp.tasa_interes }}%</span>
+                            <span class="block">{{ formatCurrency(exp.nuevo_expediente?.monto_documento || 0) }}</span> 
+                            <span class="block text-xs font-bold">{{ exp.nuevo_expediente?.tasa_interes }}%</span>
                           </td>
                           <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                              {{ formatDate(exp.fecha_inicio) }}
+                              {{ formatDate(exp.nuevo_expediente?.fecha_inicio) }}
                           </td>
                           
                           <!-- Fecha Archivo -->
                           <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                              {{ exp.seguimientos?.[0]?.archivado_at ? formatDate(exp.seguimientos[0].archivado_at) : '-' }}
+                              {{ exp.archivado_at ? formatDate(exp.archivado_at) : '-' }}
                           </td>
                           
                           <td class="px-6 py-4">
@@ -100,7 +100,11 @@
       
       <!-- Modal Detalles (Placeholder Logic) -->
       <!-- Podrías reutilizar TrackingModal o DetallesModal aquí si fuera necesario -->
-
+      <ArchivoDetalleModal 
+        :show="showModal" 
+        :id-seguimiento="selectedId" 
+        @close="showModal = false" 
+      />
     </div>
   </template>
   
@@ -108,10 +112,13 @@
   import { ref, onMounted } from 'vue'
   import api from '@/api/axios'
   import Swal from 'sweetalert2'
+  import ArchivoDetalleModal from './components/ArchivoDetalleModal.vue'
 
   const expedientes = ref<any[]>([])
   const loading = ref(false)
   const nextPageUrl = ref<string | null>(null)
+  const showModal = ref(false)
+  const selectedId = ref<number | null>(null)
   
   const fetchExpedientes = async (url: string | null = null) => {
       loading.value = true
@@ -149,8 +156,8 @@
   }
 
   const verDetalles = (exp: any) => {
-      // Por ahora solo redirige al tracking como visualización rápida
-       window.open(`/admin/tracking/${exp.codigo_cliente}`, '_blank')
+      selectedId.value = exp.id_seguimiento
+      showModal.value = true
   }
 
   onMounted(() => {
