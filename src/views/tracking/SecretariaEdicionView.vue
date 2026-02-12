@@ -150,10 +150,15 @@
                                      <div class="flex items-center gap-3">
                                          <span class="font-bold text-gray-800 dark:text-white">{{ d.tipo_documento?.nombre || 'Documento' }}</span>
                                          <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">No: {{ d.numero }}</span>
-                                         <span v-if="d.nuevos_expedientes_count > 1" class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded border border-red-200 flex items-center gap-1">
-                                             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                             Compartido
-                                         </span>
+                                         <div v-if="d.nuevos_expedientes_count > 1" class="flex flex-col gap-1 items-start">
+                                             <span class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded border border-red-200 flex items-center gap-1">
+                                                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                                 Compartido ({{ d.nuevos_expedientes_count }})
+                                             </span>
+                                             <button @click="showSharedExpedientes(d.id, d.nuevos_expedientes_count)" class="text-[10px] text-blue-600 hover:underline flex items-center gap-1">
+                                                 Ver Lista
+                                             </button>
+                                         </div>
                                      </div>
                                      <button @click="openEditDocumento(d)" class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md text-sm font-medium hover:bg-blue-200 transition">
                                          Editar
@@ -298,6 +303,41 @@ const openEditDocumento = (doc: any) => {
     }
     selectedDocumento.value = doc
     showEditDocumento.value = true
+}
+
+const showSharedExpedientes = async (docId: number, count: number) => {
+    Swal.fire({
+        title: 'Cargando expedientes...',
+        text: 'Por favor espere',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading()
+        }
+    })
+
+    try {
+        const res = await api.get(`/expedientes/documentos/${docId}/asociados`)
+        if (res.data.success) {
+            const expedientes = res.data.data
+            
+            let htmlList = '<ul style="text-align: left; max-height: 200px; overflow-y: auto; list-style-type: none; padding: 0;">'
+            expedientes.forEach((num: string) => {
+                htmlList += `<li style="padding: 5px 10px; border-bottom: 1px solid #eee;">• ${num}</li>`
+            })
+            htmlList += '</ul>'
+
+            Swal.fire({
+                title: `Numeros de Productos Vinculados`,
+                html: htmlList,
+                confirmButtonText: 'Cerrar'
+            })
+        } else {
+            Swal.fire('Error', 'No se pudieron cargar los detalles.', 'error')
+        }
+    } catch (error) {
+        console.error(error)
+        Swal.fire('Error', 'Ocurrió un error al cargar la información.', 'error')
+    }
 }
 
 const formatCurrency = (amount: number) => {
