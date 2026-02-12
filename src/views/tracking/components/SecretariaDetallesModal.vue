@@ -2,22 +2,39 @@
     <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-5xl my-8">
             <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-700/50 rounded-t-xl">
-                <div>
-                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 mb-2">
-                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        Revisión de Secretaría
-                    </span>
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <div class="py-4 border-b border-gray-100 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-2">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">
                         Detalles del Expediente
                     </h2>
-                    <p class="text-sm text-gray-500 mt-1">
-                        Expediente: <span class="font-bold text-gray-800 dark:text-gray-300">{{ expediente?.codigo_cliente }} - {{ expediente?.nombre_asociado }}</span>
-                         <span v-if="numeroContrato" class="ml-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300">
-                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                            Contrato: {{ numeroContrato }}
-                        </span>
-                    </p>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 ring-1 ring-inset ring-blue-700/10">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Revisión de Secretaría
+                    </span>
                 </div>
+                <div class="flex flex-wrap items-center gap-x-3 mt-1.5 text-sm text-gray-500 dark:text-gray-400">
+                    <span class="flex items-center gap-1.5">
+                        No. Expediente: <span class="font-bold text-gray-900 dark:text-gray-200">{{ expediente?.id }}</span>
+                    </span>
+
+                    <span class="text-gray-300 dark:text-gray-700">|</span>
+
+                    <span class="font-medium text-gray-700 dark:text-gray-300 italic">
+                        {{ expediente?.nombre_asociado }}
+                    </span>
+
+                    <span>
+                        Producto: <span class="font-semibold text-gray-800 dark:text-gray-200">{{ expediente?.numero_documento }}</span>
+                    </span>
+
+                    <span v-if="numeroContrato" class="ml-1 px-2 py-0.5 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-bold rounded-md border border-purple-100 dark:border-purple-800">
+                        Contrato: {{ numeroContrato }}
+                    </span>
+                </div>
+            </div>
+
                 <button @click="close" class="text-gray-400 hover:text-gray-500 focus:outline-none">
                     <span class="sr-only">Cerrar</span>
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,7 +129,7 @@
                                 <div class="bg-gray-100 dark:bg-gray-700 px-4 py-2 flex justify-between items-center">
                                     <div class="flex items-center gap-2">
                                         <span class="font-bold text-gray-700 dark:text-gray-200">{{ d.tipo_documento?.nombre || 'Documento' }}</span>
-                                        <span class="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-0.5 rounded">No: {{ d.numero }}</span>
+                                        <span class="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-0.5 rounded">No. Documento: {{ d.numero }}</span>
                                     </div>
                                     <span class="text-sm text-gray-500 dark:text-gray-400">{{ d.fecha }}</span>
                                 </div>
@@ -130,12 +147,8 @@
                                     </div>
 
                                     <div>
-                                        <span class="block text-xs text-gray-500 dark:text-gray-400 uppercase">Finca / Folio / Libro</span>
-                                        <span class="text-gray-800 dark:text-gray-300">{{ d.no_finca || '-' }} / {{ d.folio || '-' }} / {{ d.libro || '-' }}</span>
-                                    </div>
-                                    <div>
-                                        <span class="block text-xs text-gray-500 dark:text-gray-400 uppercase">No. Dominio</span>
-                                        <span class="text-gray-800 dark:text-gray-300">{{ d.no_dominio || 'N/A' }}</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 uppercase">Finca / Folio / Libro / No. Dominio</span>
+                                        <span class="text-gray-800 dark:text-gray-300">{{ d.no_finca || '-' }} / {{ d.folio || '-' }} / {{ d.libro || '-' }} / {{ d.no_dominio || '-' }}</span>
                                     </div>
                                     <div>
                                         <span class="block text-xs text-gray-500 dark:text-gray-400 uppercase">Referencia</span>
