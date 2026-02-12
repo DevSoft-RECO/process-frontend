@@ -173,8 +173,8 @@
                                          {{ formatCurrency(d.monto_poliza) }}
                                      </div>
                                      <div class="md:col-span-3">
-                                         <span class="block text-xs uppercase text-gray-400">Finca / Folio / Libro</span>
-                                         {{ d.no_finca }} / {{ d.folio }} / {{ d.libro }}
+                                         <span class="block text-xs uppercase text-gray-400">Finca / Folio / Libro / No Dominio</span>
+                                         {{ d.no_finca }} / {{ d.folio }} / {{ d.libro }} / {{ d.no_dominio }}
                                      </div>
                                  </div>
                              </div>
