@@ -55,6 +55,42 @@
                   </div>
                 </div>
               </section>
+
+              <section v-if="detalle.nuevo_expediente?.detalle_garantias?.length > 0">
+                <h4 class="text-sm font-bold text-gray-400 uppercase tracking-tighter mb-3 border-b pb-1">Garantías y Observaciones</h4>
+                <div class="space-y-4">
+                  <div v-for="g in detalle.nuevo_expediente.detalle_garantias" :key="g.id" 
+                       class="p-4 border-l-4 border-blue-500 bg-gray-50 dark:bg-gray-700/50 rounded-r-lg">
+                    
+                    <h5 class="font-bold text-blue-700 dark:text-blue-300 mb-2 uppercase text-sm">
+                      {{ g.garantia?.nombre || 'Garantía' }}
+                    </h5>
+
+                    <div class="grid grid-cols-1 gap-2">
+                      <div v-if="g.codeudor1">
+                        <p class="text-[10px] font-black text-gray-500 uppercase">Codeudor 1</p>
+                        <p class="text-sm font-bold dark:text-white">{{ g.codeudor1 }}</p>
+                        <p v-if="g.observacion1" class="text-xs italic text-gray-500 mt-1">"{{ g.observacion1 }}"</p>
+                      </div>
+                      <div v-if="g.codeudor2">
+                        <p class="text-[10px] font-black text-gray-500 uppercase">Codeudor 2</p>
+                        <p class="text-sm font-bold dark:text-white">{{ g.codeudor2 }}</p>
+                        <p v-if="g.observacion2" class="text-xs italic text-gray-500 mt-1">"{{ g.observacion2 }}"</p>
+                      </div>
+                      <div v-if="g.codeudor3">
+                        <p class="text-[10px] font-black text-gray-500 uppercase">Codeudor 3</p>
+                        <p class="text-sm font-bold dark:text-white">{{ g.codeudor3 }}</p>
+                        <p v-if="g.observacion3" class="text-xs italic text-gray-500 mt-1">"{{ g.observacion3 }}"</p>
+                      </div>
+                      <div v-if="g.codeudor4">
+                        <p class="text-[10px] font-black text-gray-500 uppercase">Codeudor 4</p>
+                        <p class="text-sm font-bold dark:text-white">{{ g.codeudor4 }}</p>
+                        <p v-if="g.observacion4" class="text-xs italic text-gray-500 mt-1">"{{ g.observacion4 }}"</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
             </div>
 
             <div class="lg:col-span-2 space-y-8">
@@ -117,42 +153,6 @@
                 </div>
               </section>
 
-              <section v-if="detalle.nuevo_expediente?.detalle_garantias?.length > 0">
-                <h4 class="text-sm font-bold text-gray-400 uppercase tracking-tighter mb-3 border-b pb-1">Garantías y Observaciones</h4>
-                <div class="space-y-4">
-                  <div v-for="g in detalle.nuevo_expediente.detalle_garantias" :key="g.id" 
-                       class="p-4 border-l-4 border-blue-500 bg-gray-50 dark:bg-gray-700/50 rounded-r-lg">
-                    
-                    <h5 class="font-bold text-blue-700 dark:text-blue-300 mb-2 uppercase text-sm">
-                      {{ g.garantia?.nombre || 'Garantía' }}
-                    </h5>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <!-- Explicitly checking each field to avoid dynamic key issues if any -->
-                      <div v-if="g.codeudor1">
-                        <p class="text-[10px] font-black text-gray-500 uppercase">Codeudor 1</p>
-                        <p class="text-sm font-bold dark:text-white">{{ g.codeudor1 }}</p>
-                        <p v-if="g.observacion1" class="text-xs italic text-gray-500 mt-1">"{{ g.observacion1 }}"</p>
-                      </div>
-                      <div v-if="g.codeudor2">
-                        <p class="text-[10px] font-black text-gray-500 uppercase">Codeudor 2</p>
-                        <p class="text-sm font-bold dark:text-white">{{ g.codeudor2 }}</p>
-                        <p v-if="g.observacion2" class="text-xs italic text-gray-500 mt-1">"{{ g.observacion2 }}"</p>
-                      </div>
-                      <div v-if="g.codeudor3">
-                        <p class="text-[10px] font-black text-gray-500 uppercase">Codeudor 3</p>
-                        <p class="text-sm font-bold dark:text-white">{{ g.codeudor3 }}</p>
-                        <p v-if="g.observacion3" class="text-xs italic text-gray-500 mt-1">"{{ g.observacion3 }}"</p>
-                      </div>
-                      <div v-if="g.codeudor4">
-                        <p class="text-[10px] font-black text-gray-500 uppercase">Codeudor 4</p>
-                        <p class="text-sm font-bold dark:text-white">{{ g.codeudor4 }}</p>
-                        <p v-if="g.observacion4" class="text-xs italic text-gray-500 mt-1">"{{ g.observacion4 }}"</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
 
             </div>
           </div>
