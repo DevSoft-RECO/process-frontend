@@ -68,6 +68,7 @@
             <table class="w-full text-sm text-left">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
+                        <th scope="col" class="px-6 py-3">ID Expediente</th>
                         <th scope="col" class="px-6 py-3">Código / Cliente</th>
                         <th scope="col" class="px-6 py-3">Asociado</th>
                         <th scope="col" class="px-6 py-3">Monto</th>
@@ -92,6 +93,9 @@
                         </td>
                     </tr>
                     <tr v-for="exp in expedientes" :key="exp.codigo_cliente" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                            {{ exp.id }}
+                        </td>
                         <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
                             {{ exp.codigo_cliente }}
                         </td>
@@ -152,6 +156,7 @@ import api from '@/api/axios'
 import SecretariaDetallesModal from './components/SecretariaDetallesModal.vue'
 
 interface Expediente {
+    id: number;
     codigo_cliente: string;
     nombre_asociado: string;
     monto_documento: number;
