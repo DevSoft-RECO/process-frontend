@@ -21,11 +21,10 @@
                   <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                       <tr>
                           <th scope="col" class="px-6 py-3">ID</th>
-                          <th scope="col" class="px-6 py-3">Código</th>
+                          <th scope="col" class="px-6 py-3">Código Cliente</th>
                           <th scope="col" class="px-6 py-3">Agencia</th>
                           <th scope="col" class="px-6 py-3">Asociado / Producto</th>
-                          <th scope="col" class="px-6 py-3">Interés</th>
-                          <th scope="col" class="px-6 py-3">Monto</th>
+                          <th scope="col" class="px-6 py-3">Monto/Interés</th>
                           <th scope="col" class="px-6 py-3">Fecha Inicio</th>
                           <th scope="col" class="px-6 py-3">Fecha Archivo</th>
                           <th scope="col" class="px-6 py-3">Estado</th>
@@ -61,10 +60,8 @@
                               <span class="block">{{ exp.numero_documento }}</span>
                           </td>
                            <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                              {{ exp.tasa_interes }}%
-                          </td>
-                          <td class="px-6 py-4 font-mono text-gray-900 dark:text-white whitespace-nowrap">
-                              {{ formatCurrency(exp.monto_documento) }}
+                            <span class="block">{{ formatCurrency(exp.monto_documento) }}</span> 
+                            <span class="block text-xs font-bold">{{ exp.tasa_interes }}%</span>
                           </td>
                           <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                               {{ formatDate(exp.fecha_inicio) }}
