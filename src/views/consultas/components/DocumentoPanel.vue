@@ -40,21 +40,23 @@
                     </div>
                 </div>
                 
-                <!-- Linked Documents List (Moved Here) -->
-                    <div v-if="linkedDocs.length > 0" class="mb-6 mt-6 bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                <!-- Linked Documents List (Clickable for Edit) -->
+                    <div v-if="linkedDocs.length > 0 && docSearchStep" class="mb-6 mt-6 bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                         </svg>
-                        Documentos Asociados Actualmente
+                        Documentos Asociados (Clic para ver/editar)
                     </h3>
                     <div class="space-y-2 max-h-40 overflow-y-auto pr-2">
-                        <div v-for="ld in linkedDocs" :key="ld.id" class="flex justify-between items-center bg-white dark:bg-gray-800 p-3 rounded-md shadow-sm border border-gray-100 dark:border-gray-600">
+                        <div v-for="ld in linkedDocs" :key="ld.id" 
+                             @click="loadLinkedDoc(ld)"
+                             class="flex justify-between items-center bg-white dark:bg-gray-800 p-3 rounded-md shadow-sm border border-gray-100 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 cursor-pointer transition">
                             <div>
                                 <p class="text-sm font-bold text-gray-800 dark:text-gray-200">{{ ld.tipo_documento?.nombre || 'Documento' }}</p>
                                 <p class="text-xs text-gray-500">No: {{ ld.numero }} | Fecha: {{ ld.fecha }}</p>
                             </div>
-                            <button type="button" @click="detachDocumento(ld.id)" class="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 p-1.5 rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed" title="Desvincular">
+                            <button type="button" @click.stop="detachDocumento(ld.id)" class="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 p-1.5 rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed" title="Desvincular">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                                 </svg>
@@ -128,22 +130,37 @@
                 <!-- Step 2: Full Form (If checking passed) -->
                 <div v-else-if="!docSearchStep" class="animate-fade-in-down mt-6">
                     
-                    <div v-if="existingDocFound" :class="isDuplicate ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'" class="p-4 rounded-lg border mb-6 flex items-start gap-4">
-                        <div :class="isDuplicate ? 'bg-red-100 dark:bg-red-800 text-red-600 dark:text-red-300' : 'bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-300'" class="p-2 rounded-full shrink-0">
-                            <svg v-if="!isDuplicate" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                            </svg>
+                    <!-- BANNERS DE ESTADO -->
+                    <div v-if="existingDocFound">
+                         <!-- Banner Edición vs Lectura -->
+                         <div v-if="!isEditable" class="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800 mb-6 flex items-start gap-4">
+                            <div class="p-2 bg-amber-100 dark:bg-amber-800 rounded-full text-amber-600 dark:text-amber-300 shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-amber-800 dark:text-amber-300">Modo Lectura</h3>
+                                <p class="text-sm mt-1 text-amber-700 dark:text-amber-400">
+                                    Edición restringida. 
+                                    <span v-if="selectedDocCount > 1">El documento está vinculado a otros expedientes.</span>
+                                    <span v-else>El expediente no está en estado editable.</span>
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="font-bold" :class="isDuplicate ? 'text-red-800 dark:text-red-300' : 'text-green-800 dark:text-green-300'">
-                                {{ isDuplicate ? 'Documento YA Asociado' : 'Documento Encontrado' }}
-                            </h3>
-                            <p class="text-sm mt-1" :class="isDuplicate ? 'text-red-700 dark:text-red-400' : 'text-green-700 dark:text-green-400'">
-                                {{ isDuplicate ? 'Este documento ya se encuentra vinculado a este expediente. Volver a vincularlo no creará duplicados, pero es redundante.' : 'Este documento ya existe en el sistema. Se vinculará al expediente actual sin crear duplicados.' }}
-                            </p>
+
+                        <div v-else class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800 mb-6 flex items-start gap-4">
+                            <div class="p-2 bg-green-100 dark:bg-green-800 rounded-full text-green-600 dark:text-green-300 shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-green-800 dark:text-green-300">Modo Edición</h3>
+                                <p class="text-sm mt-1 text-green-700 dark:text-green-400">
+                                    Puede actualizar los datos de este documento. Los cambios se guardarán automáticamente.
+                                </p>
+                            </div>
                         </div>
                     </div>
 
@@ -169,14 +186,14 @@
                             <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Documento *</label>
-                                <select v-model="docForm.tipo_documento_id" :disabled="existingDocFound" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800">
+                                <select v-model="docForm.tipo_documento_id" :disabled="existingDocFound && !isEditable" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800">
                                     <option value="" disabled>Seleccione...</option>
                                     <option v-for="t in tiposDocumentoList" :key="t.id" :value="t.id">{{ t.nombre }}</option>
                                 </select>
                             </div>
                                 <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monto Póliza</label>
-                                <input v-model="docForm.monto_poliza" :disabled="existingDocFound" type="number" step="0.01" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                                <input v-model="docForm.monto_poliza" :disabled="existingDocFound && !isEditable" type="number" step="0.01" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
                             </div>
 
@@ -184,22 +201,22 @@
                             <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Registro de Propiedad *</label>
-                                <select v-model="docForm.registro_propiedad_id" :disabled="existingDocFound" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800">
+                                <select v-model="docForm.registro_propiedad_id" :disabled="existingDocFound && !isEditable" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800">
                                     <option value="" disabled>Seleccione...</option>
                                     <option v-for="r in registrosList" :key="r.id" :value="r.id">{{ r.nombre }}</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No. Finca</label>
-                                <input v-model="docForm.no_finca" :disabled="existingDocFound" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                                <input v-model="docForm.no_finca" :disabled="existingDocFound && !isEditable" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Folio</label>
-                                <input v-model="docForm.folio" :disabled="existingDocFound" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                                <input v-model="docForm.folio" :disabled="existingDocFound && !isEditable" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Libro</label>
-                                <input v-model="docForm.libro" :disabled="existingDocFound" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                                <input v-model="docForm.libro" :disabled="existingDocFound && !isEditable" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
                             </div>
 
@@ -207,19 +224,19 @@
                             <div class="space-y-4">
                                 <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Propietario / Titular</label>
-                                <input v-model="docForm.propietario" :disabled="existingDocFound" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                                <input v-model="docForm.propietario" :disabled="existingDocFound && !isEditable" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
                                 <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Autorizador / Notario</label>
-                                <input v-model="docForm.autorizador" :disabled="existingDocFound" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                                <input v-model="docForm.autorizador" :disabled="existingDocFound && !isEditable" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No. Dominio</label>
-                                <input v-model="docForm.no_dominio" :disabled="existingDocFound" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                                <input v-model="docForm.no_dominio" :disabled="existingDocFound && !isEditable" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Referencia</label>
-                                <input v-model="docForm.referencia" :disabled="existingDocFound" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                                <input v-model="docForm.referencia" :disabled="existingDocFound && !isEditable" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
                             </div>
                     </div>
@@ -227,7 +244,7 @@
                     <!-- Observaciones (Full Width) -->
                     <div class="mt-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Observaciones</label>
-                            <textarea v-model="docForm.observacion" :disabled="existingDocFound" rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800"></textarea>
+                            <textarea v-model="docForm.observacion" :disabled="existingDocFound && !isEditable" rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800"></textarea>
                     </div>
                 </div>
 
@@ -240,12 +257,12 @@
                         <button type="button" @click="close" class="px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 transition">
                             Cancelar
                         </button>
-                        <button type="submit" :disabled="submitting" class="px-5 py-2.5 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button type="submit" :disabled="submitting || (existingDocFound && isDuplicate && !isEditable)" class="px-5 py-2.5 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                             <svg v-if="submitting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            {{ existingDocFound ? 'Vincular Documento' : 'Registrar y Vincular' }}
+                            {{ existingDocFound ? (isEditable ? 'Guardar y Vincular' : (isDuplicate ? 'Referenciado (Lectura)' : 'Vincular (Lectura)')) : 'Registrar y Vincular' }}
                         </button>
                     </div>
                 </div>
@@ -255,12 +272,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 
 const props = defineProps<{
     expediente: any
+    currentState?: number // Prop for parent state (default to 0 if not passed)
 }>()
 
 const emit = defineEmits(['close', 'saved'])
@@ -276,6 +294,7 @@ const linkedDocs = ref<any[]>([])
 const existingDocFound = ref(false)
 const existingDocId = ref<number | null>(null)
 const isDuplicate = ref(false)
+const selectedDocCount = ref<number>(0) // Store the usage count
 
 const tiposDocumentoList = ref<any[]>([])
 const registrosList = ref<any[]>([])
@@ -296,8 +315,22 @@ const docForm = reactive({
     observacion: ''
 })
 
-// Initialize logic
-
+// Validation Logic for Editing
+const isEditable = computed(() => {
+    // If it's a new document (not found in system), it's always editable
+    if (!existingDocFound.value) return true
+    
+    // If existing document found:
+    // 1. Check Parent State: Must be State 2 (or state passed via props)
+    // We try to get state from prop OR from expediente object if available
+    const state = props.currentState || props.expediente?.id_estado || props.expediente?.seguimientos?.[0]?.id_estado || 0
+    
+    // 2. Check Unique Link: Count must be <= 1 (Only this expediente or none)
+    // If count > 1, it means it's shared, so editing is restricted to avoid domino effect
+    const isUnique = selectedDocCount.value <= 1
+    
+    return state === 2 && isUnique
+})
 
 // Initialize logic
 async function initModal() {
@@ -342,6 +375,7 @@ function resetForm() {
     existingDocId.value = null
     foundDocs.value = []
     isDuplicate.value = false
+    selectedDocCount.value = 0
     
     docForm.tipo_documento_id = ''
     docForm.registro_propiedad_id = ''
@@ -390,6 +424,7 @@ function selectExistingDoc(doc: any) {
     existingDocFound.value = true
     existingDocId.value = doc.id
     isDuplicate.value = doc.already_linked
+    selectedDocCount.value = doc.nuevos_expedientes_count || (doc.already_linked ? 1 : 0) // Capture count from backend
 
     docForm.tipo_documento_id = doc.tipo_documento_id
     docForm.registro_propiedad_id = doc.registro_propiedad_id
@@ -400,16 +435,51 @@ function selectExistingDoc(doc: any) {
     docForm.libro = doc.libro
     docForm.no_dominio = doc.no_dominio
     docForm.referencia = doc.referencia
+    // Ensure monto_poliza is treated as string/number correctly for input
     docForm.monto_poliza = doc.monto_poliza
     docForm.observacion = doc.observacion
 
     docSelectionStep.value = false 
 }
 
+// Handler for clicking a linked doc to edit/view
+async function loadLinkedDoc(doc: any) {
+    // Populate form basics
+    docForm.numero = doc.numero
+    docForm.fecha = doc.fecha
+    
+    // We trigger a check to get fresh metadata (like global usage count)
+    // This allows robust "isEditable" logic even for already linked docs
+    checkingDoc.value = true
+    try {
+        const res = await api.post('/documentos/check', {
+            numero: doc.numero,
+            fecha: doc.fecha,
+            nuevo_expediente_id: props.expediente?.id
+        })
+        
+        if (res.data.found && Array.isArray(res.data.data)) {
+            // Find the specific matching doc ID
+            const match = res.data.data.find((d: any) => d.id === doc.id)
+            if (match) {
+                selectExistingDoc(match)
+                // Bypass search steps since we selected directly
+                docSearchStep.value = false
+                docSelectionStep.value = false
+            }
+        }
+    } catch (e) {
+        console.error("Error loading linked doc details", e)
+    } finally {
+        checkingDoc.value = false
+    }
+}
+
 function proceedToCreate() {
     existingDocFound.value = false
     existingDocId.value = null
     isDuplicate.value = false
+    selectedDocCount.value = 0
     docSearchStep.value = false
     docSelectionStep.value = false
 }
@@ -418,7 +488,6 @@ const detachDocumento = async (docId: number) => {
     if (!props.expediente) return
 
     const result = await Swal.fire({
-        // ... (swal options)
         title: '¿Estás seguro?',
         text: "Desvincularás este documento del expediente.",
         icon: 'warning',
@@ -433,13 +502,11 @@ const detachDocumento = async (docId: number) => {
         try {
             const res = await api.delete(`/nuevos-expedientes/${props.expediente.id}/documentos/${docId}`)
             if (res.data.success) {
-                // ...
                 linkedDocs.value = linkedDocs.value.filter(d => d.id !== docId)
                 emit('saved') // Trigger refresh on parent
                 Swal.fire('Desvinculado', 'El documento ha sido quitado.', 'success')
             }
         } catch (error) {
-            // ...
              console.error(error)
             Swal.fire('Error', 'No se pudo desvincular el documento.', 'error')
         }
@@ -461,7 +528,7 @@ const submitDocumento = async () => {
         
         Swal.fire({
             icon: 'success',
-            title: existingDocFound.value ? 'Documento Vinculado' : 'Documento Registrado',
+            title: existingDocFound.value ? (isEditable.value ? 'Documento Actualizado y Vinculado' : 'Documento Vinculado') : 'Documento Registrado',
             text: 'El documento se ha asociado correctamente al expediente.',
             timer: 2000,
             showConfirmButton: false
