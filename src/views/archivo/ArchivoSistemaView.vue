@@ -4,12 +4,12 @@
       <div class="flex flex-col gap-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                Archivo Sistema
-            </h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Listado histórico completo de expedientes finalizados en sistema.
-            </p>
+            <Encabezado
+              title="Archivo Sistema"
+              subtitle="Listado histórico completo de expedientes finalizados en sistema."
+              labelIndicator="Archivo"
+              indicator-color="bg-orange-600"
+              />
           </div>
         </div>
       </div>
@@ -113,6 +113,7 @@
   import api from '@/api/axios'
   import Swal from 'sweetalert2'
   import ArchivoDetalleModal from './components/ArchivoDetalleModal.vue'
+  import Encabezado from '../../components/common/encabezado.vue'
 
   const expedientes = ref<any[]>([])
   const loading = ref(false)

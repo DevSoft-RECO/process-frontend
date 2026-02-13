@@ -2,12 +2,12 @@
   <div class="space-y-6">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Expedientes Históricos
-        </h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Listado general de expedientes importados.
-        </p>
+        <Encabezado
+          title="Expedientes Históricos"
+          subtitle="Listado general de expedientes importados."
+          labelIndicator="Expedientes"
+          indicator-color="bg-yellow-600"
+          />
       </div>
       <div class="flex flex-col md:flex-row gap-2">
          <!-- Search Input -->
@@ -150,6 +150,7 @@
 import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
+import Encabezado from '../../components/common/encabezado.vue'
 
 interface Expediente {
     codigo_cliente: number

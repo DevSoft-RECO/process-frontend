@@ -1,13 +1,19 @@
 <template>
-  <div>
-    <h1 class="text-2xl font-bold mb-6 dark:text-white flex items-center gap-2">
-        <span class="p-2 bg-purple-100 text-purple-600 rounded-lg dark:bg-purple-900/30 dark:text-purple-400">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-            </svg>
-        </span>
-        Tipos de Estado
-    </h1>
+  
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <Encabezado
+          title="Tipos de Documentos"
+          subtitle="Administración del catálogo de tipos de documentos."
+          labelIndicator="Tipos de Documentos"
+          indicator-color="bg-informatica"
+          />
+      </div>
+    </div>
+ 
+
 
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
       <div class="mb-4 flex flex-col sm:flex-row justify-between items-center bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
@@ -19,6 +25,7 @@
             Nuevo Tipo
         </button>
       </div>
+      
 
       <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -122,6 +129,7 @@
 import { ref, onMounted, nextTick } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
+import Encabezado from '../../components/common/encabezado.vue'
 
 const items = ref<any[]>([]);
 const loading = ref(false);

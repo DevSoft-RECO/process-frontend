@@ -4,12 +4,12 @@
     <div class="flex flex-col gap-6">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Buzón Secretaría Agencia
-          </h1>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Gestión de expedientes entrantes y regresados.
-          </p>
+          <Encabezado
+            title="Buzón General"
+            subtitle="Gestión de expedientes entrantes y regresados."
+            labelIndicator="Secretaria Agencia"
+            indicator-color="bg-purple-600"
+          />
         </div>
       </div>
 
@@ -154,6 +154,7 @@
 import { ref, onMounted, watch } from 'vue'
 import api from '@/api/axios'
 import SecretariaDetallesModal from './components/SecretariaDetallesModal.vue'
+import Encabezado from '../../components/common/encabezado.vue'
 
 interface Expediente {
     id: number;

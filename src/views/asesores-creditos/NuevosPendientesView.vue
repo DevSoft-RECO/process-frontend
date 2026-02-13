@@ -4,6 +4,7 @@
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <Encabezado
+            labelIndicator="Asesor de Creditos"
             title="Nuevos / Pendientes"
             subtitle="Expedientes recién ingresados o pendientes de gestión."
           />

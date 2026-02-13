@@ -2,14 +2,13 @@
     <div class="space-y-6">
         <div class="flex justify-between items-center">
             <div>
-                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                    Buzón Secretaría Créditos
-                </span>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Buzón Aceptados</h1>
-                <p class="text-sm text-gray-500 mt-1">Expedientes aceptados por Secretaría Crédito.</p>
+              <Encabezado
+                title="Buzón Aceptados"
+                subtitle="Expedientes aceptados por Secretaría Crédito.."
+                labelIndicator="Secretaria Créditos"
+                indicator-color="bg-cyan-600"
+                />
             </div>
-            
             <div class="flex items-center gap-3">
                  <button @click="fetchExpedientes" class="p-2 text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -181,6 +180,7 @@ import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 import SecretariaCreditoDetallesModal from '../tracking/components/SecretariaCreditoDetallesModal.vue' // Adjust path if moved or aliased
+import Encabezado from '../../components/common/encabezado.vue'
 
 const expedientes = ref<any[]>([])
 const loading = ref(false)

@@ -4,12 +4,12 @@
       <div class="flex flex-col gap-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                Buzón de Recibidos (Archivo)
-            </h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Expedientes enviados a archivo (Estado 4).
-            </p>
+            <Encabezado
+              title="Buzón de Recibidos (Archivo)"
+              subtitle="Expedientes enviados a archivo (Estado 4)."
+              labelIndicator="Archivo"
+              indicator-color="bg-orange-600"
+              />
           </div>
         </div>
       </div>
@@ -149,6 +149,7 @@
   import { ref, onMounted } from 'vue'
   import api from '@/api/axios'
   import Swal from 'sweetalert2'
+  import Encabezado from '../../components/common/encabezado.vue'
   
   const expedientes = ref<any[]>([])
   const loading = ref(false)

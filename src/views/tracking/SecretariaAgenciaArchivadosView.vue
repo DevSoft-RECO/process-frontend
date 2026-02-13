@@ -4,12 +4,12 @@
     <div class="flex flex-col gap-6">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Buzón Archivados Administrativamente
-          </h1>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Expedientes que han sido archivados administrativamente (sin garantía real).
-          </p>
+          <Encabezado
+            title="Buzón Archivados Administrativamente"
+            subtitle="Expedientes que han sido archivados administrativamente (sin garantía real)."
+            labelIndicator="Secretaria Agencia"
+            indicator-color="bg-purple-600"
+            />
         </div>
       </div>
     </div>
@@ -110,6 +110,7 @@ import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 import SecretariaDetallesModal from './components/SecretariaDetallesModal.vue'
+import Encabezado from '../../components/common/encabezado.vue'
 
 interface Expediente {
     id: number;

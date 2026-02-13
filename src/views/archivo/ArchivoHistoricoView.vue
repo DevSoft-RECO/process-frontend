@@ -2,12 +2,12 @@
   <div class="space-y-6">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Archivo Histórico
-        </h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Expedientes archivados históricamente.
-        </p>
+        <Encabezado
+          title="Archivo Histórico"
+          subtitle="Expedientes archivados históricamente."
+          labelIndicator="Archivo"
+          indicator-color="bg-orange-600"
+          />
       </div>
       <div class="flex flex-col md:flex-row gap-2">
          <!-- Search Input -->
@@ -171,6 +171,7 @@ import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 import ArchivoHistoricoModal from './components/ArchivoHistoricoModal.vue'
+import Encabezado from '../../components/common/encabezado.vue'
 
 interface Expediente {
     codigo_cliente: number

@@ -3,12 +3,11 @@
     <div class="flex flex-col gap-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                Retornados
-            </h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Expedientes devueltos o rechazados que requieren corrección.
-            </p>
+            <Encabezado
+              labelIndicator="Asesor de Creditos"
+              title="Retornados"
+              subtitle="Expedientes devueltos o rechazados que requieren corrección."
+            />
           </div>
           <div class="flex gap-2">
              <button @click="resetFetch" class="px-4 py-2 bg-verde-cope text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 text-sm shadow-md">
@@ -62,6 +61,7 @@ import ExpedientesTable from '../consultas/components/ExpedientesTable.vue'
 import AdjuntarModal from '../consultas/components/AdjuntarModal.vue'
 import DetallesModal from '../consultas/components/DetallesModal.vue'
 import TrackingModal from '../consultas/components/TrackingModal.vue'
+import Encabezado from '../../components/common/encabezado.vue'
 
 const expedientes = ref<any[]>([])
 const loading = ref(false)

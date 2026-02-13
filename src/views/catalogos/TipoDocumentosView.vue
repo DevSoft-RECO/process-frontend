@@ -3,12 +3,12 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Tipos de Documentos
-        </h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Administración del catálogo de tipos de documentos.
-        </p>
+        <Encabezado
+          title="Tipos de Documentos"
+          subtitle="Administración del catálogo de tipos de documentos."
+          labelIndicator="Ajustes Generales"
+          indicator-color="bg-informatica"
+          />
       </div>
       <div class="flex gap-2">
          <button @click="openModal()" class="px-4 py-2 bg-azul-cope text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2 text-sm shadow-md">
@@ -110,6 +110,7 @@
 import { ref, onMounted, reactive } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
+import Encabezado from '../../components/common/encabezado.vue'
 
 interface TipoDocumento {
     id: number
