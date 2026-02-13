@@ -15,81 +15,136 @@
     </div>
 
     <!-- Table Card -->
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <div class="bg-white/90 dark:bg-slate-900/80 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden border border-white/20 dark:border-slate-700/50">
+        <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-sm text-left border-separate border-spacing-0">
+                <thead class="bg-table-azul dark:bg-table-verde text-white">
                     <tr>
-                        <th scope="col" class="px-6 py-3">Código / Cliente</th>
-                        <th scope="col" class="px-6 py-3">Asociado</th>
-                        <th scope="col" class="px-6 py-3">Monto</th>
-                        <th scope="col" class="px-6 py-3">Fecha Aceptado</th>
-                        <th scope="col" class="px-6 py-3">Estado Actual</th>
-                        <th scope="col" class="px-6 py-3">Recibí Pagaré</th>
-                        <th scope="col" class="px-6 py-3 text-right">Acciones</th>
+                        <th scope="col" class="w-14 px-4 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 rounded-tl-2xl text-center">
+                            ID Exp
+                        </th>
+                        <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
+                            Código / CUI
+                        </th>
+                        <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
+                            Nombre Asociado
+                        </th>
+                        <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
+                            Monto / Tasa
+                        </th>
+                        <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
+                            Desembolso / Producto
+                        </th>
+                        <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
+                            Fecha Aceptado
+                        </th>
+                        <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
+                            Estado Actual
+                        </th>
+                        <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
+                            Recibí Pagaré
+                        </th>
+                        <th scope="col" class="w-20 px-2 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center rounded-tr-2xl">
+                            Acciones
+                        </th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                    <tr v-if="loading && expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                            Cargando...
+
+                <tbody class="divide-y divide-gray-100 dark:divide-slate-700/50">
+                    <tr v-if="loading && expedientes.length === 0">
+                        <td colspan="9" class="px-6 py-12 text-center text-slate-400">
+                            <div class="flex flex-col items-center gap-2">
+                                <div class="w-8 h-8 border-4 border-verde-cope border-t-transparent rounded-full animate-spin"></div>
+                                <span class="font-medium text-xs">Cargando datos...</span>
+                            </div>
                         </td>
                     </tr>
-                    <tr v-else-if="expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                        <td colspan="7" class="px-6 py-8 text-center text-gray-500">
-                            No hay expedientes archivados administrativamente.
+                    <tr v-else-if="expedientes.length === 0">
+                        <td colspan="9" class="px-6 py-12 text-center text-slate-400">
+                           No hay expedientes archivados administrativamente.
                         </td>
                     </tr>
-                    <tr v-for="exp in expedientes" :key="exp.codigo_cliente" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                            {{ exp.codigo_cliente }}
+
+                    <tr v-for="exp in expedientes" :key="exp.id" 
+                        class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                        
+                        <td class="px-4 py-4 text-center">
+                            <span class="text-slate-400 dark:text-slate-500 font-mono text-xs">{{ exp.id }}</span>
                         </td>
-                         <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
+                        
+                        <td class="px-6 py-4">
+                            <div class="text-slate-700 dark:text-slate-200 font-semibold">{{ exp.codigo_cliente }}</div>
+                            <div class="text-[10px] font-mono text-slate-400 dark:text-slate-500 mt-0.5 tracking-tighter">{{ exp.cui || '---' }}</div>
+                        </td>
+                        
+                        <td class="px-6 py-4 font-medium text-slate-900 dark:text-white">
                             {{ exp.nombre_asociado }}
                         </td>
-                        <td class="px-6 py-4 font-mono text-gray-900 dark:text-white">
-                            {{ formatCurrency(exp.monto_documento) }}
+                        
+                        <td class="px-6 py-4">
+                            <div class="font-mono font-bold text-azul-cope dark:text-blue-300">
+                                {{ formatCurrency(exp.monto_documento) }}
+                            </div>
+                            <div class="text-[11px] text-verde-cope dark:text-green-500 font-medium mt-0.5 uppercase">
+                                Tasa: {{ exp.tasa_interes || '0' }}%
+                            </div>
                         </td>
-                        <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
+
+                        <td class="px-6 py-4">
+                            <div class="text-slate-600 dark:text-slate-300 font-medium text-xs">
+                                {{ exp.fecha_inicio ? formatDate(exp.fecha_inicio) : 'N/A' }}
+                            </div>
+                            <div class="text-[10px] text-naranja-cope font-bold mt-0.5 uppercase italic">
+                                Prod: #{{ exp.numero_documento || exp.id }}
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-4 text-center text-slate-500 dark:text-slate-400 text-xs">
                             {{ exp.fechas?.f_aceptado_secretaria ? formatDate(exp.fechas.f_aceptado_secretaria) : '-' }}
                         </td>
-                        <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
-                             <div class="flex flex-col">
+
+                        <td class="px-6 py-4 text-center">
+                             <div class="flex flex-col items-center">
                                 <span v-if="exp.seguimientos?.[0]?.estado" 
-                                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 w-fit">
+                                      class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800 shadow-sm">
                                     {{ exp.seguimientos[0].estado?.nombre }}
                                 </span>
-                                <span v-else class="text-xs text-gray-400 italic">Desconocido</span>
+                                <span v-else class="text-xs text-slate-400 italic">Desconocido</span>
 
-                                <span v-if="exp.seguimientos?.[0]?.estadoSecundario || exp.seguimientos?.[0]?.estado_secundario" class="text-xs text-gray-500 mt-1 pl-1">
+                                <span v-if="exp.seguimientos?.[0]?.estadoSecundario || exp.seguimientos?.[0]?.estado_secundario" class="text-[10px] text-slate-500 mt-1">
                                     + {{ (exp.seguimientos[0].estadoSecundario || exp.seguimientos[0].estado_secundario)?.nombre }}
                                 </span>
                              </div>
                         </td>
-                         <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
-                            <span v-if="exp.seguimientos?.[0]?.recibi_pagare === 'si'" class="text-green-600 font-bold">
+
+                        <td class="px-6 py-4 text-center">
+                            <span v-if="exp.seguimientos?.[0]?.recibi_pagare === 'si'" class="text-green-600 font-bold text-xs">
                                 Sí
                             </span>
                              <button v-else-if="exp.seguimientos?.[0]?.es_un_pagare === 'si'" @click="recibirPagare(exp)" class="text-verde-cope hover:text-green-800 font-medium text-xs border border-verde-cope px-2 py-1 rounded hover:bg-green-50 transition">
                                 Recibí Pagaré
                             </button>
-                            <span v-else class="text-xs text-gray-400 italic">
+                            <span v-else class="text-xs text-slate-400 italic">
                                 -
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-right">
-                             <button @click="openDetalles(exp)" class="text-blue-600 hover:text-blue-800 font-medium text-xs">
-                                Revisar
+
+                        <td class="px-2 py-4 text-center">
+                            <button @click="openDetalles(exp)" 
+                                class="p-2 text-azul-cope hover:bg-azul-cope hover:text-white rounded-lg transition-all border border-azul-cope/20 group/btn shadow-sm"
+                                title="Revisar Expediente">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </button>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <!-- Pagination -->
-        <div v-if="nextPageUrl" class="bg-gray-50 dark:bg-gray-700 px-6 py-4 flex justify-center">
-            <button @click="loadMore" :disabled="loading" class="text-sm text-verde-cope font-bold">
-                {{ loading ? 'Cargando...' : 'Cargar más' }}
+
+        <div v-if="nextPageUrl" class="bg-slate-50/50 dark:bg-slate-800/30 px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex justify-center">
+            <button @click="loadMore" :disabled="loading" 
+                class="text-xs text-azul-cope font-bold hover:text-blue-700 transition-colors uppercase tracking-widest">
+                {{ loading ? 'Sincronizando...' : 'Cargar más' }}
             </button>
         </div>
     </div>
@@ -117,6 +172,10 @@ interface Expediente {
     codigo_cliente: string;
     nombre_asociado: string;
     monto_documento: number;
+    cui: string;
+    tasa_interes: number;
+    fecha_inicio: string;
+    numero_documento: string;
     fechas: {
         f_enviado_secretaria: string | null;
         f_retorno_asesores: string | null;
@@ -136,6 +195,8 @@ interface Expediente {
         };
     }>;
 }
+
+
 
 const expedientes = ref<Expediente[]>([])
 const loading = ref(false)
