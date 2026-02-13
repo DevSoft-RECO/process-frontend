@@ -28,7 +28,7 @@
                     <tr>
                         <th scope="col" class="px-6 py-3 w-20">ID</th>
                         <th scope="col" class="px-6 py-3">Nombre</th>
-                        <th scope="col" class="px-6 py-3 text-center">Desplegables</th>
+                        <th scope="col" class="px-6 py-3 text-center">Tiene Información Complementaria</th>
                         <th scope="col" class="px-6 py-3 text-right">Acciones</th>
                     </tr>
                 </thead>
@@ -112,7 +112,7 @@
                         class="h-4 w-4 text-verde-cope focus:ring-verde-cope border-gray-300 rounded"
                     />
                     <label for="desplegables-check" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                        Tiene Desplegables <span class="text-xs text-gray-500">(Codeudores y Observaciones)</span>
+                        Tiene Información Complementaria <span class="text-xs text-gray-500">(Codeudores y Observaciones)</span>
                     </label>
                 </div>
                 

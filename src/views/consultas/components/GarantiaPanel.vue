@@ -76,14 +76,25 @@ const form = reactive({
     observacion1: '', observacion2: '', observacion3: '', observacion4: ''
 })
 
+const selectedGarantia = computed(() => {
+    return garantiasList.value.find(g => g.id == form.garantia_id)
+})
+
 const shouldShowFields = computed(() => {
-    if (!form.garantia_id) return false
-    const selected = garantiasList.value.find(g => g.id == form.garantia_id)
-    return selected ? Boolean(selected.desplegables) : false
+    return selectedGarantia.value ? Boolean(selectedGarantia.value.desplegables) : false
+})
+
+// Watcher to clear fields if warranty type changes to one without desplegables
+watch(() => form.garantia_id, (newVal) => {
+    const selected = garantiasList.value.find(g => g.id == newVal)
+    if (selected && !selected.desplegables) {
+        // Clear fields immediately in UI state to match backend logic
+        form.codeudor1 = ''; form.codeudor2 = ''; form.codeudor3 = ''; form.codeudor4 = ''
+        form.observacion1 = ''; form.observacion2 = ''; form.observacion3 = ''; form.observacion4 = ''
+    }
 })
 
 const fetchGarantias = async () => {
-    if (garantiasList.value.length > 0) return
     try {
         const res = await api.get('/garantias')
         if (res.data.success) {
@@ -105,6 +116,11 @@ const populateForm = (exp: any) => {
     if (exp?.garantias && exp.garantias.length > 0) {
         const existing = exp.garantias[0]
         form.garantia_id = existing.id
+        
+        // Only populate if current selection supports it (though watcher handles change, load needs check)
+        // We wait for list to be loaded to check 'desplegables' property if needed, 
+        // but typically we just load what's saved.
+        
         if (existing.pivot) {
                 form.codeudor1 = existing.pivot.codeudor1 || ''
                 form.codeudor2 = existing.pivot.codeudor2 || ''
@@ -119,9 +135,9 @@ const populateForm = (exp: any) => {
 }
 
 // Watch for changes in expediente to repopulate or init
-watch(() => props.expediente, (newVal) => {
+watch(() => props.expediente, async (newVal) => {
     if (newVal) {
-        fetchGarantias()
+        await fetchGarantias() // Ensure list is loaded first
         populateForm(newVal)
     }
 }, { immediate: true })
@@ -146,9 +162,6 @@ const submit = async () => {
             showConfirmButton: false
         })
         emit('saved')
-        // We don't close here, we let the parent decide or just emit saved
-        // But the original behavior was to close.
-        // close() -- Removed to keep open
     } catch (error: any) {
         console.error(error)
         Swal.fire('Error', error.response?.data?.message || 'No se pudo guardar.', 'error')
