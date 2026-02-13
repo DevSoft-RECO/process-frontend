@@ -123,11 +123,18 @@ const fetchExpedientes = async () => {
     loading.value = true
     try {
         const res = await api.get('/abogado/devueltos')
-        if (res.data.success) {
+        
+        // Laravel Paginate devuelve los datos en la propiedad 'data'
+        // Si tu controlador devuelve return response()->json($expedientes), 
+        // entonces el array está en res.data.data
+        if (res.data && res.data.data) {
             expedientes.value = res.data.data
+        } else {
+            expedientes.value = []
         }
     } catch (error) {
-        console.error(error)
+        console.error("Error cargando expedientes:", error)
+        expedientes.value = []
     } finally {
         loading.value = false
     }
@@ -137,7 +144,7 @@ const filteredExpedientes = computed(() => {
     if (!search.value) return expedientes.value
     const s = search.value.toLowerCase()
     return expedientes.value.filter(e => 
-        e.codigo_cliente.toString().includes(s) || 
+        e.id.toString().includes(s) || 
         e.nombre_asociado?.toLowerCase().includes(s)
     )
 })
