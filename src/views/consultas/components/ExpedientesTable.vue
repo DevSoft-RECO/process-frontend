@@ -5,7 +5,7 @@
                 <thead class="bg-table-azul dark:bg-table-verde text-white">
                     <tr>
                         <th scope="col" class="w-14 px-4 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 rounded-tl-2xl text-center">
-                            ID
+                            ID Exp
                         </th>
                         <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
                             Código Cliente / CUI
@@ -14,7 +14,7 @@
                             Nombre Asociado
                         </th>
                         <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
-                            Fecha / No. Producto
+                            Fecha Desembolso / No. Producto
                         </th>
                         <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-right">
                             Monto / Tasa
@@ -39,7 +39,7 @@
                         class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors duration-150">
                         
                         <td class="px-4 py-4 text-center">
-                            <span class="text-slate-400 dark:text-slate-500 font-mono text-xs">
+                            <span class="text-slate-700 dark:text-slate-500 font-mono text-xs">
                                 {{ exp.id }}
                             </span>
                         </td>
