@@ -1,296 +1,370 @@
 <template>
     <div class="space-y-6">
-      <!-- Header -->
-      <div class="flex flex-col gap-6">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <Encabezado
-              title="Buzón de Recibidos (Archivo)"
-              subtitle="Expedientes enviados a archivo (Estado 4)."
-              labelIndicator="Archivo"
-              indicator-color="bg-orange-600"
-              />
-          </div>
+        <div class="flex flex-col gap-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                 <Encabezado
+                    title="Buzón de Recibidos (Archivo)"
+                    subtitle="Expedientes enviados a archivo (Estado 4)."
+                    labelIndicator="Archivo"
+                    indicator-color="bg-orange-600"
+                />
+            </div>
         </div>
-      </div>
-  
-      <!-- Table Card -->
-      <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-          <div class="overflow-x-auto">
-              <table class="w-full text-sm text-left">
-                  <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                      <tr>
-                          <th scope="col" class="px-6 py-3">Código / Expediente</th>
-                          <th scope="col" class="px-6 py-3">Nombre Corto Asociado</th>
-                          <th scope="col" class="px-6 py-3">Interés</th>
-                          <th scope="col" class="px-6 py-3">Monto</th>
-                          <th scope="col" class="px-6 py-3">Fecha Envío Archivo</th>
-                          <th scope="col" class="px-6 py-3">Observación Garantía</th>
-                          <th scope="col" class="px-6 py-3">Garantía Real</th>
-                          <th scope="col" class="px-6 py-3">Contrato</th>
-                          <th scope="col" class="px-6 py-3">Recibido en Archivo</th>
-                          <th scope="col" class="px-6 py-3 text-right">Acciones</th>
-                      </tr>
-                  </thead>
-                  <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                      <tr v-if="loading && expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                          <td colspan="10" class="px-6 py-4 text-center text-gray-500">
-                              Cargando...
-                          </td>
-                      </tr>
-                      <tr v-else-if="expedientes.length === 0" class="bg-white dark:bg-gray-800">
-                          <td colspan="10" class="px-6 py-8 text-center text-gray-500">
-                              No hay expedientes en archivo.
-                          </td>
-                      </tr>
-                      <tr v-for="exp in expedientes" :key="exp.codigo_cliente" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                          <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                              {{ exp.codigo_cliente }}
-                          </td>
-                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400 max-w-[150px] truncate" :title="exp.nombre_asociado">
-                              {{ exp.nombre_asociado }}
-                          </td>
-                           <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                              {{ exp.tasa_interes }}%
-                          </td>
-                          <td class="px-6 py-4 font-mono text-gray-900 dark:text-white whitespace-nowrap">
-                              {{ formatCurrency(exp.monto_documento) }}
-                          </td>
-                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                              {{ exp.fechas?.f_enviado_archivos ? formatDate(exp.fechas.f_enviado_archivos) : '-' }}
-                          </td>
-                          
-                          <!-- Observación Garantía (Envío) -->
-                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400 max-w-[150px]">
-                              <div 
-                                v-if="exp.seguimientos?.[0]?.observacion_envio"
-                                @click="showObservation(exp.seguimientos[0].observacion_envio)"
-                                class="truncate cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                                title="Clic para ver completo"
-                              >
-                                {{ exp.seguimientos[0].observacion_envio }}
-                              </div>
-                              <span v-else>-</span>
-                          </td>
-                          
-                            <td class="px-6 py-4">
-                                <span v-if="exp.seguimientos?.[0]?.recibi_garantia_real" 
-                                    class="text-green-600 font-medium text-xs block truncate">
-                                    {{ exp.seguimientos[0].recibi_garantia_real }}
-                                </span>
-                                <button v-else-if="exp.seguimientos?.[0]?.enviado_a_archivos === 'Si'"
-                                        @click="recibirGarantia(exp)"
-                                        class="px-2 py-1 text-xs font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700">
-                                    Recibir Garantía
-                                </button>
-                                <span v-else class="text-gray-400 text-xs italic">No aplica</span>
+
+        <!-- Table Card -->
+        <div class="bg-white/90 dark:bg-slate-900/80 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden border border-white/20 dark:border-slate-700/50">
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-sm text-left border-separate border-spacing-0">
+                    <thead class="bg-table-azul dark:bg-table-verde text-white">
+                        <tr>
+                            <th scope="col" class="w-14 px-4 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 rounded-tl-2xl text-center">
+                                ID Exp
+                            </th>
+                            <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
+                                Código / CUI
+                            </th>
+                            <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
+                                Nombre Asociado
+                            </th>
+                            <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
+                                Monto / Tasa
+                            </th>
+                            <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
+                                Desembolso / Producto
+                            </th>
+                            <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
+                                Fecha Envío
+                            </th>
+                            <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
+                                Garantía
+                            </th>
+                             <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
+                                Contrato
+                            </th>
+                            <th scope="col" class="w-20 px-2 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center rounded-tr-2xl">
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-slate-700/50">
+                        <tr v-if="loading && expedientes.length === 0">
+                            <td colspan="10" class="px-6 py-12 text-center text-slate-400">
+                                <div class="flex flex-col items-center gap-2">
+                                    <div class="w-8 h-8 border-4 border-verde-cope border-t-transparent rounded-full animate-spin"></div>
+                                    <span class="font-medium text-xs">Cargando expedientes...</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-else-if="expedientes.length === 0">
+                             <td colspan="10" class="px-6 py-12 text-center text-slate-400">
+                                <div class="flex flex-col items-center justify-center">
+                                    <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <p class="text-base font-medium text-slate-500 dark:text-slate-400">No hay expedientes en archivo.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-for="exp in expedientes" :key="exp.codigo_cliente" class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                            <td class="px-4 py-4 text-center">
+                                <span class="text-slate-400 dark:text-slate-500 font-mono text-xs">{{ exp.id }}</span>
                             </td>
 
-                            <td class="px-6 py-4">
+                             <td class="px-6 py-4">
+                                <div class="text-slate-700 dark:text-slate-200 font-semibold">{{ exp.codigo_cliente }}</div>
+                                <div class="text-[12px] font-mono text-slate-400 dark:text-slate-500 mt-0.5 tracking-tighter">{{ exp.cui || '---' }}</div>
+                            </td>
+
+                            <td class="px-6 py-4 font-medium text-slate-900 dark:text-white" :title="exp.nombre_asociado">
+                                {{ exp.nombre_asociado }}
+                            </td>
+                            
+                             <td class="px-6 py-4">
+                                <div class="font-mono font-bold text-azul-cope dark:text-blue-300">
+                                    {{ formatCurrency(exp.monto_documento) }}
+                                </div>
+                                <div class="text-[11px] text-verde-cope dark:text-green-500 font-medium mt-0.5 uppercase">
+                                    Tasa: {{ exp.tasa_interes || '0' }}%
+                                </div>
+                            </td>
+
+                             <td class="px-6 py-4">
+                                <div class="text-slate-600 dark:text-slate-300 font-medium text-xs">
+                                    {{ exp.fecha_inicio ? formatDate(exp.fecha_inicio) : 'N/A' }}
+                                </div>
+                                <div class="text-[11px] text-verde-cope font-bold mt-0.5 uppercase italic">
+                                    Prod: #{{ exp.numero_documento || exp.id }}
+                                </div>
+                            </td>
+
+                             <td class="px-6 py-4 text-center">
+                                <div class="text-slate-600 dark:text-slate-300 font-medium text-xs">
+                                    {{ exp.fechas?.f_enviado_archivos ? formatDate(exp.fechas.f_enviado_archivos) : '-' }}
+                                </div>
+                            </td>
+                            
+                            <!-- Garantía Real -->
+                            <td class="px-6 py-4 text-center align-middle">
+                                <div class="flex flex-col items-center gap-1">
+                                    <!-- Observation Preview -->
+                                    <div 
+                                        v-if="exp.seguimientos?.[0]?.observacion_envio"
+                                        @click="showObservation(exp.seguimientos[0].observacion_envio)"
+                                        class="text-[10px] text-slate-400 hover:text-indigo-600 cursor-pointer truncate max-w-[100px]"
+                                        title="Ver observación"
+                                    >
+                                        Obs: {{ exp.seguimientos[0].observacion_envio }}
+                                    </div>
+
+                                    <!-- Status/Action -->
+                                    <span v-if="exp.seguimientos?.[0]?.recibi_garantia_real" 
+                                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 truncate max-w-[120px]"
+                                        :title="exp.seguimientos[0].recibi_garantia_real">
+                                        {{ exp.seguimientos[0].recibi_garantia_real }}
+                                    </span>
+                                    <button v-else-if="exp.seguimientos?.[0]?.enviado_a_archivos === 'Si'"
+                                            @click="recibirGarantia(exp)"
+                                            class="px-2 py-1 text-[10px] font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 transition-colors shadow-sm">
+                                        Recibir Garantía
+                                    </button>
+                                    <span v-else class="text-slate-400 text-[10px] italic">No aplica</span>
+                                </div>
+                            </td>
+
+                            <!-- Contrato -->
+                             <td class="px-6 py-4 text-center align-middle">
                                 <span v-if="exp.seguimientos?.[0]?.es_un_pagare === 'Pendiente' || exp.seguimientos?.[0]?.es_un_pagare === null" 
-                                    class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">
+                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
                                     En Proceso...
                                 </span>
 
                                 <button v-else-if="exp.seguimientos?.[0]?.es_un_pagare === 'no' && !exp.seguimientos?.[0]?.recibi_contrato"
                                         @click="recibirContratoAction(exp)"
-                                        class="bg-blue-600 text-white px-2 py-1 rounded text-xs">
+                                        class="px-2 py-1 text-[10px] font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors shadow-sm">
                                     Recibir Contrato
                                 </button>
                                 
-                                <span v-else class="text-gray-500 text-xs">
-                                    {{ exp.seguimientos[0].recibi_contrato || 'No aplica' }}
+                                <span v-else class="text-slate-500 text-xs">
+                                    {{ exp.seguimientos?.[0]?.recibi_contrato || 'No aplica' }}
                                 </span>
                             </td>
 
-                          <!-- Fecha Recibido (Archivado) -->
-                          <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                              {{ exp.seguimientos?.[0]?.archivado_at ? formatDate(exp.seguimientos[0].archivado_at) : '-' }}
-                          </td>
-
-                          <td class="px-6 py-4 text-right">
-                               <button 
-                                  v-if="exp.seguimientos?.[0]?.archivado_at"
-                                  disabled
-                                  class="text-gray-400 font-medium text-xs whitespace-nowrap cursor-not-allowed"
-                               >
-                                  Completado
-                              </button>
-                               <button 
-                                  v-else
-                                  @click="archivarAction(exp)" 
-                                  :disabled="!canArchive(exp)"
-                                  :class="[
-                                    'font-medium text-xs whitespace-nowrap',
-                                    canArchive(exp) 
-                                        ? 'text-blue-600 hover:text-blue-800' 
-                                        : 'text-gray-300 cursor-not-allowed'
-                                  ]"
-                                  :title="!canArchive(exp) ? 'El expediente debe estar en Integración (Estado 11)' : ''"
-                               >
-                                  Archivar Expediente
-                              </button>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
-          </div>
-          <!-- Pagination -->
-          <div v-if="nextPageUrl" class="bg-gray-50 dark:bg-gray-700 px-6 py-4 flex justify-center">
-              <button @click="loadMore" :disabled="loading" class="text-sm text-verde-cope font-bold">
-                  {{ loading ? 'Cargando...' : 'Cargar más' }}
-              </button>
-          </div>
-      </div>
+                            <td class="px-2 py-4 text-center">
+                                <div class="flex justify-center">
+                                    <button 
+                                        v-if="exp.seguimientos?.[0]?.archivado_at"
+                                        disabled
+                                        class="p-2 text-green-600 bg-green-50 rounded-lg border border-green-200 cursor-not-allowed opacity-75"
+                                        title="Completado"
+                                    >
+                                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                     <button 
+                                        v-else
+                                        @click="archivarAction(exp)" 
+                                        :disabled="!canArchive(exp)"
+                                        :class="[
+                                            'p-2 rounded-lg transition-all border group/btn shadow-sm',
+                                            canArchive(exp) 
+                                                ? 'text-azul-cope hover:bg-azul-cope hover:text-white border-azul-cope/20' 
+                                                : 'text-slate-300 border-slate-200 cursor-not-allowed bg-slate-50'
+                                        ]"
+                                        :title="!canArchive(exp) ? 'Debe completar Garantía/Contrato' : 'Archivar Expediente'"
+                                     >
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+             <!-- Paginación -->
+            <div v-if="nextPageUrl" class="bg-slate-50/50 dark:bg-slate-800/30 px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex justify-center">
+                <button @click="loadMore" :disabled="loading" class="text-sm text-azul-cope font-bold hover:text-blue-800 transition-colors">
+                    {{ loading ? 'Cargando...' : 'Cargar más expedientes' }}
+                </button>
+            </div>
+        </div>
     </div>
-  </template>
+</template>
   
-  <script setup lang="ts">
-  import { ref, onMounted } from 'vue'
-  import api from '@/api/axios'
-  import Swal from 'sweetalert2'
-  import Encabezado from '../../components/common/encabezado.vue'
-  
-  const expedientes = ref<any[]>([])
-  const loading = ref(false)
-  const nextPageUrl = ref<string | null>(null)
-  
-  const fetchExpedientes = async (url: string | null = null) => {
-      loading.value = true
-      try {
-          const endpoint = url || '/archivo/buzon-recibidos'
-          const res = await api.get(endpoint)
-  
-          if (res.data.success) {
-              if (!url) {
-                  expedientes.value = res.data.data.data
-              } else {
-                  expedientes.value = [...expedientes.value, ...res.data.data.data]
-              }
-              nextPageUrl.value = res.data.data.next_page_url
-          }
-      } catch (error) {
-          console.error(error)
-          Swal.fire('Error', 'No se pudieron cargar los expedientes.', 'error')
-      } finally {
-          loading.value = false
-      }
-  }
-  
-  const loadMore = () => {
-      if (nextPageUrl.value) fetchExpedientes(nextPageUrl.value)
-  }
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import api from '@/api/axios'
+import Swal from 'sweetalert2'
+import Encabezado from '../../components/common/encabezado.vue'
 
-    const canArchive = (exp: any) => {
-        const s = exp.seguimientos?.[0];
-        if (!s) return false;
+interface Expediente {
+    id: number;
+    codigo_cliente: string;
+    nombre_asociado: string;
+    monto_documento: number;
+    cui: string;
+    tasa_interes: number;
+    fecha_inicio: string;
+    numero_documento: string;
+    fechas: {
+        f_enviado_archivos: string | null;
+    } | null;
+    seguimientos?: Array<{
+        observacion_envio?: string;
+        recibi_garantia_real?: string;
+        es_un_pagare?: string;
+        recibi_contrato?: string;
+        archivado_at?: string;
+        enviado_a_archivos?: string;
+    }>;
+}
+  
+const expedientes = ref<Expediente[]>([])
+const loading = ref(false)
+const nextPageUrl = ref<string | null>(null)
+  
+const fetchExpedientes = async (url: string | null = null) => {
+    loading.value = true
+    try {
+        const endpoint = url || '/archivo/buzon-recibidos'
+        const res = await api.get(endpoint)
 
-        // 1. Si el flujo no ha decidido, BLOQUEO TOTAL
-        if (s.es_un_pagare === 'Pendiente' || s.es_un_pagare === null) {
-            return false;
+        if (res.data.success) {
+            if (!url) {
+                expedientes.value = res.data.data.data
+            } else {
+                expedientes.value = [...expedientes.value, ...res.data.data.data]
+            }
+            nextPageUrl.value = res.data.data.next_page_url
         }
-
-        // 2. Definimos si falta algo por recibir
-        const faltaGarantia = (s.enviado_a_archivos === 'Si' && !s.recibi_garantia_real);
-        const faltaContrato = (s.es_un_pagare === 'no' && !s.recibi_contrato);
-
-        // Solo habilitar si NO falta nada
-        return !faltaGarantia && !faltaContrato;
+    } catch (error) {
+        console.error(error)
+        Swal.fire('Error', 'No se pudieron cargar los expedientes.', 'error')
+    } finally {
+        loading.value = false
     }
+}
   
-  const archivarAction = async (exp: any) => {
-      const result = await Swal.fire({
-          title: '¿Archivar Expediente?',
-          text: `¿Estás seguro de archivar el expediente ${exp.codigo_cliente}? Se creará un registro histórico.`,
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Sí, archivar',
-          cancelButtonText: 'Cancelar',
-          confirmButtonColor: '#003366'
-      })
+const loadMore = () => {
+    if (nextPageUrl.value) fetchExpedientes(nextPageUrl.value)
+}
 
-      if (result.isConfirmed) {
-          try {
-              const res = await api.post(`/archivo/archivar/${exp.id}`)
-              if (res.data.success) {
-                  Swal.fire('Éxito', res.data.message, 'success')
-                  fetchExpedientes() // Refresh to update button state
-              }
-          } catch (error: any) {
-              console.error(error)
-              const msg = error.response?.data?.message || 'No se pudo archivar el expediente.'
-              Swal.fire('Error', msg, 'error')
-          }
-      }
-  }
+const canArchive = (exp: Expediente) => {
+    const s = exp.seguimientos?.[0];
+    if (!s) return false;
+
+    // 1. Si el flujo no ha decidido, BLOQUEO TOTAL
+    if (s.es_un_pagare === 'Pendiente' || s.es_un_pagare === null) {
+        return false;
+    }
+
+    // 2. Definimos si falta algo por recibir
+    const faltaGarantia = (s.enviado_a_archivos === 'Si' && !s.recibi_garantia_real);
+    const faltaContrato = (s.es_un_pagare === 'no' && !s.recibi_contrato);
+
+    // Solo habilitar si NO falta nada
+    return !faltaGarantia && !faltaContrato;
+}
   
-  const formatCurrency = (amount: number) => {
-      return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
-  }
+const archivarAction = async (exp: Expediente) => {
+    const result = await Swal.fire({
+        title: '¿Archivar Expediente?',
+        text: `¿Estás seguro de archivar el expediente ${exp.codigo_cliente}? Se creará un registro histórico.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, archivar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#003366'
+    })
 
-  const formatDate = (dateString: string) => {
-      if (!dateString) return '-'
-      return new Date(dateString).toLocaleString()
-  }
+    if (result.isConfirmed) {
+        try {
+            const res = await api.post(`/archivo/archivar/${exp.id}`)
+            if (res.data.success) {
+                Swal.fire('Éxito', res.data.message, 'success')
+                fetchExpedientes() // Refresh to update button state
+            }
+        } catch (error: any) {
+            console.error(error)
+            const msg = error.response?.data?.message || 'No se pudo archivar el expediente.'
+            Swal.fire('Error', msg, 'error')
+        }
+    }
+}
   
-  const showObservation = (text: string) => {
-      Swal.fire({
-          title: 'Observación Garantía',
-          text: text,
-          icon: 'info',
-          confirmButtonText: 'Cerrar'
-      })
-  }
+const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
+}
 
-  const recibirGarantia = async (exp: any) => {
-      const result = await Swal.fire({
-          title: '¿Confirmar recepción?',
-          text: `¿Has recibido la Garantía Real del expediente ${exp.codigo_cliente}?`,
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonText: 'Sí, recibir',
-          cancelButtonText: 'Cancelar'
-      })
+const formatDate = (dateString: string) => {
+    if (!dateString) return '-'
+    if (dateString.includes('T') || dateString.includes(' ')) {
+         return new Date(dateString).toLocaleDateString('es-ES')
+    }
+    return new Date(dateString + 'T00:00:00').toLocaleDateString('es-ES')
+}
+  
+const showObservation = (text: string) => {
+    Swal.fire({
+        title: 'Observación Garantía',
+        text: text,
+        icon: 'info',
+        confirmButtonText: 'Cerrar'
+    })
+}
 
-      if (result.isConfirmed) {
-          try {
-              const res = await api.post(`/archivo/recibir-garantia/${exp.id}`)
-              if (res.data.success) {
-                  Swal.fire('Éxito', res.data.message, 'success')
-                  fetchExpedientes() // Refresh
-              }
-          } catch (error) {
-              console.error(error)
-              Swal.fire('Error', 'No se pudo registrar la recepción.', 'error')
-          }
-      }
-  }
+const recibirGarantia = async (exp: Expediente) => {
+    const result = await Swal.fire({
+        title: '¿Confirmar recepción?',
+        text: `¿Has recibido la Garantía Real del expediente ${exp.codigo_cliente}?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, recibir',
+        cancelButtonText: 'Cancelar'
+    })
 
-  const recibirContratoAction = async (exp: any) => {
-      const result = await Swal.fire({
-          title: '¿Confirmar recepción?',
-          text: `¿Has recibido el Contrato del expediente ${exp.codigo_cliente}?`,
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonText: 'Sí, recibir',
-          cancelButtonText: 'Cancelar'
-      })
+    if (result.isConfirmed) {
+        try {
+            const res = await api.post(`/archivo/recibir-garantia/${exp.id}`)
+            if (res.data.success) {
+                Swal.fire('Éxito', res.data.message, 'success')
+                fetchExpedientes() // Refresh
+            }
+        } catch (error) {
+            console.error(error)
+            Swal.fire('Error', 'No se pudo registrar la recepción.', 'error')
+        }
+    }
+}
 
-      if (result.isConfirmed) {
-          try {
-              const res = await api.post(`/archivo/recibir-contrato/${exp.id}`)
-              if (res.data.success) {
-                  Swal.fire('Éxito', res.data.message, 'success')
-                  fetchExpedientes() // Refresh
-              }
-          } catch (error) {
-              console.error(error)
-              Swal.fire('Error', 'No se pudo registrar la recepción.', 'error')
-          }
-      }
-  }
+const recibirContratoAction = async (exp: Expediente) => {
+    const result = await Swal.fire({
+        title: '¿Confirmar recepción?',
+        text: `¿Has recibido el Contrato del expediente ${exp.codigo_cliente}?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, recibir',
+        cancelButtonText: 'Cancelar'
+    })
 
-  onMounted(() => {
-      fetchExpedientes()
-  })
-  </script>
+    if (result.isConfirmed) {
+        try {
+            const res = await api.post(`/archivo/recibir-contrato/${exp.id}`)
+            if (res.data.success) {
+                Swal.fire('Éxito', res.data.message, 'success')
+                fetchExpedientes() // Refresh
+            }
+        } catch (error) {
+            console.error(error)
+            Swal.fire('Error', 'No se pudo registrar la recepción.', 'error')
+        }
+    }
+}
+
+onMounted(() => {
+    fetchExpedientes()
+})
+</script>
