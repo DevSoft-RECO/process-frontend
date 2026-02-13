@@ -3,23 +3,16 @@
     <div class="relative">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <div class="flex items-center gap-3">
-            <div class="w-1.5 h-8 bg-verde-cope rounded-full shadow-[0_0_10px_rgba(50,148,77,0.5)]"></div>
-            <h1 class="text-3xl font-extrabold tracking-tight text-white drop-shadow-md">
-                Nuevos / Pendientes
-            </h1>
-          </div>
-          
-          <p class="text-sm text-blue-200/70 dark:text-gray-400 mt-2 ml-4 flex items-center gap-2">
-            <span class="w-1 h-1 bg-blue-400 rounded-full"></span>
-            Expedientes recién ingresados o pendientes de gestión.
-          </p>
+          <Encabezado
+            title="Nuevos / Pendientes"
+            subtitle="Expedientes recién ingresados o pendientes de gestión."
+          />
         </div>
 
         <div class="flex items-center gap-3">
            <button 
             @click="resetFetch" 
-            class="group px-5 py-2.5 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl 
+            class="group px-5 py-2.5 bg-naranja-cope backdrop-blur-md border border-white/20 text-white rounded-xl 
                    hover:bg-verde-cope hover:border-verde-cope transition-all duration-300 
                    flex items-center gap-2 text-sm font-bold shadow-lg"
            >
@@ -84,6 +77,7 @@ import ExpedientesTable from '../consultas/components/ExpedientesTable.vue'
 import AdjuntarModal from '../consultas/components/AdjuntarModal.vue'
 import DetallesModal from '../consultas/components/DetallesModal.vue'
 import TrackingModal from '../consultas/components/TrackingModal.vue'
+import Encabezado from '../../components/common/encabezado.vue'
 
 // State
 const expedientes = ref<any[]>([])
