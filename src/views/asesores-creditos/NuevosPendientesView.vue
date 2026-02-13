@@ -1,24 +1,42 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex flex-col gap-4">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+<div class="space-y-6">
+    <div class="relative">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div class="flex items-center gap-3">
+            <div class="w-1.5 h-8 bg-verde-cope rounded-full shadow-[0_0_10px_rgba(50,148,77,0.5)]"></div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white drop-shadow-md">
                 Nuevos / Pendientes
             </h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Expedientes recién ingresados o pendientes de gestión.
-            </p>
           </div>
-          <div class="flex gap-2">
-             <button @click="resetFetch" class="px-4 py-2 bg-verde-cope text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 text-sm shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                </svg>
-                Refrescar
-             </button>
-          </div>
+          
+          <p class="text-sm text-blue-200/70 dark:text-gray-400 mt-2 ml-4 flex items-center gap-2">
+            <span class="w-1 h-1 bg-blue-400 rounded-full"></span>
+            Expedientes recién ingresados o pendientes de gestión.
+          </p>
         </div>
+
+        <div class="flex items-center gap-3">
+           <button 
+            @click="resetFetch" 
+            class="group px-5 py-2.5 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl 
+                   hover:bg-verde-cope hover:border-verde-cope transition-all duration-300 
+                   flex items-center gap-2 text-sm font-bold shadow-lg"
+           >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke-width="2" 
+                stroke="currentColor" 
+                class="w-4 h-4 group-hover:rotate-180 transition-transform duration-500"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+              Refrescar
+           </button>
+        </div>
+      </div>
     </div>
 
     <!-- Table Component -->
