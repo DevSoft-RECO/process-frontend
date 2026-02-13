@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <Encabezado
-          title="Sincronizar Agencias"
+          title="Sincronización de Agencias"
           subtitle="Administración para la sincronización de agencias desde la App Madre."
           labelIndicator="Ajustes Generales"
           indicator-color="bg-informatica"

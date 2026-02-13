@@ -108,7 +108,7 @@ const fetchItems = async () => {
   loading.value = true;
   try {
     const { data } = await api.get('/registros-propiedad');
-    items.value = data;
+    items.value = data.data;
   } catch (error) {
     console.error(error);
   } finally {
