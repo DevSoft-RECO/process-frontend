@@ -1,132 +1,153 @@
 <template>
     <div class="space-y-6">
-        <div class="flex justify-between items-center">
-            <div>
-              <Encabezado
-                title="Buzón Completados"
-                subtitle="Expedientes finalizados y completados por el área de Créditos."
-                labelIndicator="Secretaria Créditos"
-                indicator-color="bg-cyan-600"
+        <div class="flex flex-col gap-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                 <Encabezado
+                    title="Buzón Completados"
+                    subtitle="Expedientes finalizados y completados por el área de Créditos."
+                    labelIndicator="Secretaria Créditos"
+                    indicator-color="bg-cyan-600"
                 />
-            </div>
-            
-            <div class="flex items-center gap-3">
-                 <button @click="fetchExpedientes" class="p-2 text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition shadow-sm" title="Refrescar listado">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                </button>
-                <router-link :to="{ name: 'secretaria-credito-buzon' }" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                    Volver al Buzón
-                </router-link>
-            </div>
-        </div>
-
-        <!-- Filtros y Búsqueda -->
-         <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row gap-4 justify-between items-center">
-            <div class="relative w-full md:max-w-md">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                     <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                
+                <div class="flex items-center gap-3">
+                     <button @click="fetchExpedientes" class="p-2 text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition shadow-sm" title="Refrescar listado">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
+                    <router-link :to="{ name: 'secretaria-credito-buzon' }" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        Volver al Buzón
+                    </router-link>
                 </div>
-                <input 
-                    v-model="search"
-                    @input="debouncedSearch"
-                    type="text" 
-                    placeholder="Buscar por id expediente" 
-                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-verde-cope focus:border-verde-cope sm:text-sm transition-colors"
-                >
+            </div>
+
+            <!-- Filtros y Búsqueda -->
+             <div class="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row gap-4 justify-between items-center">
+                <div class="relative w-full md:max-w-md">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                         <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input 
+                        v-model="search"
+                        @input="debouncedSearch"
+                        type="text" 
+                        placeholder="Buscar por id expediente..." 
+                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-verde-cope focus:border-verde-cope sm:text-sm transition-colors"
+                    >
+                </div>
             </div>
         </div>
 
         <!-- Tabla -->
-         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-700/50">
+         <div class="bg-white/90 dark:bg-slate-900/80 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden border border-white/20 dark:border-slate-700/50">
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-sm text-left border-separate border-spacing-0">
+                    <thead class="bg-table-azul dark:bg-table-verde text-white">
                         <tr>
-                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Id Expediente</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Código / Cliente</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Asociado</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fecha Ingreso</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tasa Interés</th>
-                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Monto</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Completado</th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Acciones</th>
+                            <th scope="col" class="w-14 px-4 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 rounded-tl-2xl text-center">
+                                ID Exp
+                            </th>
+                            <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
+                                Código / CUI
+                            </th>
+                            <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
+                                Nombre Asociado
+                            </th>
+                            <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
+                                Monto / Tasa
+                            </th>
+                            <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
+                                Desembolso / Producto
+                            </th>
+                             <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
+                                Fecha Completado
+                            </th>
+                            <th scope="col" class="w-20 px-2 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center rounded-tr-2xl">
+                                Acciones
+                            </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        <tr v-if="loading" class="animate-pulse">
-                            <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">Cargando expedientes completados...</td>
+                    <tbody class="divide-y divide-gray-100 dark:divide-slate-700/50">
+                        <tr v-if="loading && expedientes.length === 0">
+                             <td colspan="7" class="px-6 py-12 text-center text-slate-400">
+                                <div class="flex flex-col items-center gap-2">
+                                    <div class="w-8 h-8 border-4 border-verde-cope border-t-transparent rounded-full animate-spin"></div>
+                                    <span class="font-medium text-xs">Cargando expedientes completados...</span>
+                                </div>
+                            </td>
                         </tr>
                         <tr v-else-if="expedientes.length === 0">
-                            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="7" class="px-6 py-12 text-center text-slate-400">
                                 <div class="flex flex-col items-center justify-center">
                                     <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <p class="text-base font-medium text-gray-900 dark:text-gray-200">No hay expedientes completados</p>
+                                    <p class="text-base font-medium text-slate-500 dark:text-slate-400">No hay expedientes completados</p>
                                     <p class="text-sm mt-1">No se encontraron expedientes en estado finalizado.</p>
                                 </div>
                             </td>
                         </tr>
-                         <tr v-for="exp in expedientes" :key="exp.codigo_cliente" class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="ml-4">
-                                        <div class="text-sm font-bold text-gray-900 dark:text-white">{{ exp.id }}</div>
-                                    </div>
-                                </div>
+                        <tr v-for="exp in expedientes" :key="exp.codigo_cliente" class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                            <td class="px-4 py-4 text-center">
+                                <span class="text-slate-400 dark:text-slate-500 font-mono text-xs">{{ exp.id }}</span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="ml-4">
-                                        <div class="text-sm font-bold text-gray-900 dark:text-white">{{ exp.codigo_cliente }}</div>
-                                    </div>
-                                </div>
+                            
+                             <td class="px-6 py-4">
+                                <div class="text-slate-700 dark:text-slate-200 font-semibold">{{ exp.codigo_cliente }}</div>
+                                <div class="text-[12px] font-mono text-slate-400 dark:text-slate-500 mt-0.5 tracking-tighter">{{ exp.cui || '---' }}</div>
                             </td>
+
+                            <td class="px-6 py-4 font-medium text-slate-900 dark:text-white">
+                                {{ exp.nombre_asociado }}
+                            </td>
+
                             <td class="px-6 py-4">
-                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ exp.nombre_asociado }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-700 dark:text-gray-300">
-                                    {{ exp.fechas?.f_aceptado_secretaria_credito ? new Date(exp.fechas.f_aceptado_secretaria_credito).toLocaleDateString() : 'N/A' }}
-                                    <div v-if="exp.fechas?.f_aceptado_secretaria_credito" class="text-xs text-gray-500">
-                                        {{ new Date(exp.fechas.f_aceptado_secretaria_credito).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }}
-                                    </div>
+                                <div class="font-mono font-bold text-azul-cope dark:text-blue-300">
+                                    {{ formatCurrency(exp.monto_documento) }}
+                                </div>
+                                <div class="text-[11px] text-verde-cope dark:text-green-500 font-medium mt-0.5 uppercase">
+                                    Tasa: {{ exp.tasa_interes || '0' }}%
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-700 dark:text-gray-300">
-                                    {{ exp.tasa_interes }}%
+                            
+                             <td class="px-6 py-4">
+                                <div class="text-slate-600 dark:text-slate-300 font-medium text-xs">
+                                    {{ exp.fecha_inicio ? formatDate(exp.fecha_inicio) : 'N/A' }}
+                                </div>
+                                <div class="text-[12px] text-verde-cope font-bold mt-0.5 uppercase italic">
+                                    Prod: #{{ exp.numero_documento || exp.id }}
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 dark:text-gray-200 font-mono">{{ formatCurrency(exp.monto_documento) }}</div>
-                            </td>
-                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 dark:text-gray-200">
+
+                             <td class="px-6 py-4 text-center">
+                                <div class="text-slate-600 dark:text-slate-300 font-medium text-xs">
                                     {{ exp.seguimientos?.[0]?.archivado_at ? new Date(exp.seguimientos[0].archivado_at).toLocaleDateString() : 'N/A' }}
-                                    <div v-if="exp.seguimientos?.[0]?.archivado_at" class="text-xs text-gray-500">
-                                        {{ new Date(exp.seguimientos[0].archivado_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }}
-                                    </div>
+                                </div>
+                                <div v-if="exp.seguimientos?.[0]?.archivado_at" class="text-[12px] text-slate-400 mt-0.5">
+                                    {{ new Date(exp.seguimientos[0].archivado_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }}
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+
+                            <td class="px-2 py-4 text-center">
                                 <button 
                                     @click="openDetails(exp)"
-                                    class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 font-medium bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-md transition-colors"
-                                >
-                                    Ver Detalles
+                                    class="p-2 text-azul-cope hover:bg-azul-cope hover:text-white rounded-lg transition-all border border-azul-cope/20 group/btn shadow-sm"
+                                    title="Ver Detalles">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
                                 </button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
              <!-- Paginación -->
-             <div v-if="pagination.total > 0" class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between sm:px-6">
+             <div v-if="pagination.total > 0" class="bg-slate-50/50 dark:bg-slate-800/30 px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
                 <!-- Mobile pagination -->
                 <div class="flex-1 flex justify-between sm:hidden">
                     <button 
@@ -147,8 +168,8 @@
                  <!-- Desktop pagination -->
                 <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                     <div>
-                        <p class="text-sm text-gray-700 dark:text-gray-300">
-                            Mostrando <span class="font-medium">{{ pagination.from }}</span> a <span class="font-medium">{{ pagination.to }}</span> de <span class="font-medium">{{ pagination.total }}</span> resultados
+                        <p class="text-xs text-slate-500 dark:text-slate-400">
+                            Mostrando <span class="font-bold text-slate-700 dark:text-slate-300">{{ pagination.from }}</span> a <span class="font-bold text-slate-700 dark:text-slate-300">{{ pagination.to }}</span> de <span class="font-bold text-slate-700 dark:text-slate-300">{{ pagination.total }}</span> resultados
                         </p>
                     </div>
                     <div>
@@ -199,7 +220,24 @@ import Swal from 'sweetalert2'
 import SecretariaCreditoDetallesModal from '../tracking/components/SecretariaCreditoDetallesModal.vue' 
 import Encabezado from '../../components/common/encabezado.vue'
 
-const expedientes = ref<any[]>([])
+interface Expediente {
+    id: number;
+    codigo_cliente: string;
+    nombre_asociado: string;
+    monto_documento: number;
+    cui: string;
+    tasa_interes: number;
+    fecha_inicio: string;
+    numero_documento: string;
+    fechas: {
+        f_aceptado_secretaria_credito: string | null;
+    } | null;
+    seguimientos?: Array<{
+        archivado_at?: string;
+    }>;
+}
+
+const expedientes = ref<Expediente[]>([])
 const loading = ref(false)
 const search = ref('')
 const pagination = ref({
@@ -259,6 +297,14 @@ const changePage = (page: number) => {
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
+}
+
+const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A'
+    if (dateString.includes('T')) {
+         return new Date(dateString).toLocaleDateString('es-ES')
+    }
+    return new Date(dateString + 'T00:00:00').toLocaleDateString('es-ES')
 }
 
 const openDetails = (expediente: any) => {
