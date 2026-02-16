@@ -8,6 +8,19 @@
                     labelIndicator="Archivo"
                     indicator-color="bg-orange-600"
                 />
+                 <div class="flex items-center gap-2">
+                    <label class="text-sm font-medium text-gray-600 dark:text-gray-300">Filtrar por Agencia:</label>
+                    <select 
+                        v-model="selectedAgencia" 
+                        @change="fetchExpedientes()"
+                        class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 min-w-[200px]"
+                    >
+                        <option value="todas">Todas las Agencias</option>
+                        <option v-for="agencia in agencias" :key="agencia.id" :value="agencia.id">
+                            {{ agencia.nombre }}
+                        </option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -240,12 +253,41 @@ interface Expediente {
 const expedientes = ref<Expediente[]>([])
 const loading = ref(false)
 const nextPageUrl = ref<string | null>(null)
+
+// Filters
+const agencias = ref<any[]>([])
+const selectedAgencia = ref('todas')
+
+const fetchAgencias = async () => {
+    try {
+        const res = await api.get('/agencias')
+        if (res.data.success) {
+            agencias.value = res.data.data
+        } else {
+             // Fallback for resource standard response handling if needed
+              if (Array.isArray(res.data)) {
+                 agencias.value = res.data;
+             } else if (res.data.data && Array.isArray(res.data.data)) {
+                 agencias.value = res.data.data;
+             }
+        }
+    } catch (error) {
+        console.error("Error cargando agencias:", error)
+    }
+}
   
 const fetchExpedientes = async (url: string | null = null) => {
     loading.value = true
     try {
-        const endpoint = url || '/archivo/buzon-recibidos'
-        const res = await api.get(endpoint)
+        let endpoint = url || '/archivo/buzon-recibidos'
+        
+        // Append filter params
+        const params: any = {}
+        if (selectedAgencia.value && selectedAgencia.value !== 'todas') {
+            params.id_agencia = selectedAgencia.value
+        }
+
+        const res = await api.get(endpoint, { params })
 
         if (res.data.success) {
             if (!url) {
@@ -397,6 +439,7 @@ const handleConfirmReceiveFromModal = async () => {
 }
 
 onMounted(() => {
+    fetchAgencias()
     fetchExpedientes()
 })
 </script>
