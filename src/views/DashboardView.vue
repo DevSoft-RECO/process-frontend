@@ -77,9 +77,9 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Pipeline (2/3 width) -->
+            <!-- Process Distribution (2/3 width) -->
             <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Pipeline de Procesos</h3>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Distribución por Etapas</h3>
                 <div class="space-y-4">
                     <div v-for="(item, index) in pipeline" :key="index" class="relative">
                         <div class="flex justify-between items-center mb-1">
@@ -122,7 +122,32 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Advisor Performance -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 overflow-hidden">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Rendimiento por Asesor</h3>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Rendimiento por Asesor</h3>
+                    <div class="flex items-center gap-2" v-if="advisors.last_page > 1">
+                        <button 
+                            @click="changeAdvisorPage(advisors.current_page - 1)" 
+                            :disabled="advisors.current_page === 1"
+                            class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                            {{ advisors.current_page }} / {{ advisors.last_page }}
+                        </span>
+                        <button 
+                            @click="changeAdvisorPage(advisors.current_page + 1)" 
+                            :disabled="advisors.current_page === advisors.last_page"
+                            class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm text-left">
                         <thead class="bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400">
@@ -226,7 +251,7 @@ import DashboardService from '@/services/DashboardService'
 const loading = ref(false)
 const kpi = ref({ total_active: 0, total_finalized: 0, total_amount: 0, avg_days_open: 0 })
 const pipeline = ref<any[]>([])
-const advisors = ref<{ data: any[], current_page: number, total: number }>({ data: [], current_page: 1, total: 0 })
+const advisors = ref<{ data: any[], current_page: number, total: number, last_page: number }>({ data: [], current_page: 1, total: 0, last_page: 1 })
 const rejections = ref<any[]>([])
 const agencies = ref<any[]>([])
 const trends = ref<any[]>([])
@@ -237,7 +262,7 @@ const loadAll = async () => {
         const [kpiRes, pipeRes, advRes, rejRes, agRes, trRes] = await Promise.all([
             DashboardService.getKpi(),
             DashboardService.getPipeline(),
-            DashboardService.getAdvisors(),
+            DashboardService.getAdvisors(1),
             DashboardService.getRejections(),
             DashboardService.getAgencies(),
             DashboardService.getTrends()
@@ -252,6 +277,19 @@ const loadAll = async () => {
 
     } catch (e) {
         console.error("Error loading dashboard data", e)
+    } finally {
+        loading.value = false
+    }
+}
+
+const changeAdvisorPage = async (page: number) => {
+    if (page < 1 || page > advisors.value.last_page) return
+    loading.value = true
+    try {
+        const res = await DashboardService.getAdvisors(page)
+        advisors.value = res
+    } catch (e) {
+        console.error("Error changing advisor page", e)
     } finally {
         loading.value = false
     }

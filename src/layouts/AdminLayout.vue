@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen bg-[#0F172A] dark:from-slate-950 dark:to-slate-900 text-gray-800 dark:text-gray-100 font-sans overflow-hidden transition-colors duration-300">
+  <div class="h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-300">
 
     <AdminSidebar />
 
@@ -20,7 +20,6 @@
     <UploadWidget /> 
   </div>
 </template>
-
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue' // Agregamos onUnmounted
 import AdminSidebar from "../components/layout/AdminSidebar.vue"

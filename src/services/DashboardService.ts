@@ -54,8 +54,8 @@ export default {
         const res = await api.get('/dashboard/pipeline')
         return res.data
     },
-    async getAdvisors(): Promise<AdvisorData[]> {
-        const res = await api.get('/dashboard/advisors')
+    async getAdvisors(page = 1): Promise<AdvisorData> {
+        const res = await api.get(`/dashboard/advisors?page=${page}`)
         return res.data
     },
     async getRejections(): Promise<RejectionData[]> {
