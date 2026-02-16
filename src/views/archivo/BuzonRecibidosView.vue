@@ -219,6 +219,7 @@ interface Expediente {
         recibi_contrato?: string;
         archivado_at?: string;
         enviado_a_archivos?: string;
+        numero_contrato?: string;
     }>;
 }
   
@@ -341,13 +342,18 @@ const recibirGarantia = async (exp: Expediente) => {
 }
 
 const recibirContratoAction = async (exp: Expediente) => {
+    const contrato = exp.seguimientos?.[0]?.numero_contrato || 'Sin Número';
     const result = await Swal.fire({
         title: '¿Confirmar recepción?',
-        text: `¿Has recibido el Contrato del expediente ${exp.codigo_cliente}?`,
+        html: `
+            <p>Estas por recibir el contrato: <b class="text-blue-600 text-lg">${contrato}</b></p>
+            <p class="text-sm text-gray-600 mt-2">Del expediente id: <b>${exp.id}</b></p>
+        `,
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Sí, recibir',
-        cancelButtonText: 'Cancelar'
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#2563EB'
     })
 
     if (result.isConfirmed) {
