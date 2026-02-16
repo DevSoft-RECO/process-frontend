@@ -288,6 +288,14 @@ const search = async () => {
             // Seteamos detallesData y los modales ya tendrán qué listar y editar
             detallesData.value = res.data.data
             currentExpedienteId.value = res.data.data.expediente.id
+
+            // Alerta de precacuión para Créditos
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atención: Edición Delicada',
+                text: 'Proceda cuidadosamente con la edición. Tenga en cuenta que los cambios son irreversibles y afectarán a todos los expedientes asociados a las garantías modificadas.',
+                confirmButtonText: 'Entendido, proceder'
+            })
         } else {
              Swal.fire({
                 icon: 'warning',
