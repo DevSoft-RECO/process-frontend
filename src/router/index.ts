@@ -260,6 +260,14 @@ const routes: RouteRecordRaw[] = [
                 meta: {
                     title: 'Retornados'
                 }
+            },
+            {
+                path: 'configuracion/traslado-expedientes',
+                name: 'admin-traslado-expedientes',
+                component: () => import('@/views/admin/configuracion/TrasladoExpedientesView.vue'),
+                meta: {
+                    title: 'Traslado de Expedientes/Cartera'
+                }
             }
 
         ]

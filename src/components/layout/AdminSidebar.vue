@@ -430,6 +430,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Tipos de Estado',
                     route: '/admin/catalogos/tipo-estados'
+                },
+                {
+                    label: 'Traslado de Expedientes',
+                    route: '/admin/configuracion/traslado-expedientes'
                 }
             ]
         },
