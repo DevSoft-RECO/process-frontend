@@ -95,14 +95,8 @@
                                         <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{ g.nombre }}</h4>
                                         <span class="text-xs text-gray-500">ID: {{ g.id }}</span>
                                     </div>
-                                    <div class="flex gap-2">
-                                        <button @click="openEditGarantia(g)" class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md text-sm font-medium hover:bg-blue-200 transition">
-                                            Editar Detalles
-                                        </button>
-                                        <button @click="openChangeType(g)" class="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-md text-sm font-medium hover:bg-orange-200 transition">
-                                            Cambiar Tipo
-                                        </button>
-                                    </div>
+                                    <!-- Edición de garantías deshabilitada para Archivo -->
+                                    <div class="hidden"></div>
                                 </div>
                                 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-100 dark:border-gray-600" v-if="g.pivot">
@@ -204,23 +198,7 @@
         </div>
 
         <!-- Modals -->
-        <EditGarantiaModal 
-            v-if="showEditGarantia"
-            :show="showEditGarantia"
-            :expedienteId="currentExpedienteId"
-            :garantia="selectedGarantia"
-            @close="showEditGarantia = false"
-            @refresh="search"
-        />
 
-        <ChangeGarantiaTypeModal
-            v-if="showChangeType"
-            :show="showChangeType"
-            :expedienteId="currentExpedienteId"
-            :garantia="selectedGarantia"
-            @close="showChangeType = false"
-            @refresh="search"
-        />
 
         <EditDocumentModal
             v-if="showEditDocumento"
@@ -238,9 +216,7 @@ import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
-import EditGarantiaModal from '../tracking/components/EditGarantiaModal.vue'
 import EditDocumentModal from '../tracking/components/EditDocumentModal.vue'
-import ChangeGarantiaTypeModal from '../tracking/components/ChangeGarantiaTypeModal.vue'
 
 const searchQuery = ref('')
 const searching = ref(false)
@@ -248,10 +224,7 @@ const hasSearched = ref(false)
 const detallesData = ref<any>(null)
 
 // Modals State
-const showEditGarantia = ref(false)
-const showChangeType = ref(false)
 const showEditDocumento = ref(false)
-const selectedGarantia = ref<any>(null)
 const selectedDocumento = ref<any>(null)
 const currentExpedienteId = ref<string | null>(null)
 
@@ -268,9 +241,34 @@ const search = async () => {
         })
 
         if (res.data.success) {
+            const exp = res.data.data.expediente
+            const userStore = useAuthStore()
+
+            // Validación de estado para Archivo: 
+            // Se permite editar si id_estado es 4 O id_estado_secundario es 4.
+            const isEditable = (exp.id_estado === 4 || exp.id_estado_secundario === 4)
+
+            if (!isEditable && !userStore.hasRole('Super Admin')) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Expediente Fuera de Etapa',
+                    text: 'El expediente no se encuentra en la etapa de Archivo (Estado 4 o Secundario 4). Cualquier cambio debe solicitarlo a Informática.',
+                    confirmButtonText: 'Entendido'
+                })
+                return
+            }
+
             // Seteamos detallesData y los modales ya tendrán qué listar y editar
             detallesData.value = res.data.data
             currentExpedienteId.value = res.data.data.expediente.id
+
+            // Alerta de precacuión (mismo mensaje que Créditos)
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atención: Edición Delicada',
+                text: 'Proceda cuidadosamente con la edición. Tenga en cuenta que los cambios son irreversibles y afectarán a todos los expedientes asociados a las garantías modificadas.',
+                confirmButtonText: 'Entendido, proceder'
+            })
         }
     } catch (error: any) {
         if (error.response?.status !== 404) {
@@ -281,15 +279,7 @@ const search = async () => {
     }
 }
 
-const openEditGarantia = (g: any) => {
-    selectedGarantia.value = g
-    showEditGarantia.value = true
-}
 
-const openChangeType = (g: any) => {
-    selectedGarantia.value = g
-    showChangeType.value = true
-}
 
 const openEditDocumento = (doc: any) => {
     // Check if user has permission to override restriction

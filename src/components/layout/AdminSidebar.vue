@@ -380,6 +380,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Archivo Histórico',
                     route: '/admin/archivo/historico'
+                },
+                {
+                    label: 'Edición de Expedientes',
+                    route: '/admin/archivo/edicion'
                 }
             ]
         },
