@@ -143,7 +143,7 @@
                                 <h3 class="font-bold text-amber-800 dark:text-amber-300">Modo Lectura</h3>
                                 <p class="text-sm mt-1 text-amber-700 dark:text-amber-400">
                                     Edición restringida. 
-                                    <span v-if="selectedDocCount > 1">El documento está vinculado a otros expedientes.</span>
+                                    <span v-if="selectedDocCount > 1">El documento está vinculado a otros expedientes Contactese con la secretaria Agencia o creditos si su ususario es secretaria de agencia.</span>
                                     <span v-else>El expediente no está en estado editable.</span>
                                 </p>
                             </div>
@@ -329,7 +329,8 @@ const isEditable = computed(() => {
     // If count > 1, it means it's shared, so editing is restricted to avoid domino effect
     const isUnique = selectedDocCount.value <= 1
     
-    return state === 2 && isUnique
+    // Allow if Retornado (2) OR No Tracking/Initial (0)
+    return (state === 2 || state === 0 || !props.expediente?.seguimientos?.length) && isUnique
 })
 
 // Initialize logic
