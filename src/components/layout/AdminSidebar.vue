@@ -340,7 +340,7 @@ const menuItems = computed(() => {
                 },
                 {
                     label: 'Edición de Expedientes',
-                    route: '/admin/tracking/secretaria-edicion'
+                    route: '/admin/secretaria-credito/edicion'
                 }
             ]
         },

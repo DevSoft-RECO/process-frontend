@@ -134,9 +134,25 @@ const routes: RouteRecordRaw[] = [
             {
                 path: 'tracking/secretaria-edicion',
                 name: 'admin-tracking-secretaria-edicion',
-                component: () => import('@/views/tracking/SecretariaEdicionView.vue'),
+                component: () => import('@/views/editar_expedientes/SecretariaEdicionView.vue'),
                 meta: {
                     title: 'Edición de Expedientes'
+                }
+            },
+            {
+                path: 'secretaria-credito/edicion',
+                name: 'secretaria-credito-edicion',
+                component: () => import('@/views/editar_expedientes/SecretariaCreditosEdicionView.vue'),
+                meta: {
+                    title: 'Edición Créditos'
+                }
+            },
+            {
+                path: 'archivo/edicion',
+                name: 'archivo-edicion',
+                component: () => import('@/views/editar_expedientes/ArchivoEdicionView.vue'),
+                meta: {
+                    title: 'Edición Archivo'
                 }
             },
             {

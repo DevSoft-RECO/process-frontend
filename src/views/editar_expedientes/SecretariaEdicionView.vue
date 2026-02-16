@@ -10,7 +10,7 @@
                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                     </span>
-                    Edición de Expedientes (Secretaría Agencia y Créditos)
+                    Edición de Expedientes de Secretaría Agencia 
                 </h1>
                 <p class="mt-2 text-gray-600 dark:text-gray-400 text-lg">
                     Búsqueda y modificación de garantías y documentos.
@@ -236,11 +236,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
-import EditGarantiaModal from './components/EditGarantiaModal.vue'
-import EditDocumentModal from './components/EditDocumentModal.vue'
-import ChangeGarantiaTypeModal from './components/ChangeGarantiaTypeModal.vue'
+import EditGarantiaModal from '../tracking/components/EditGarantiaModal.vue'
+import EditDocumentModal from '../tracking/components/EditDocumentModal.vue'
+import ChangeGarantiaTypeModal from '../tracking/components/ChangeGarantiaTypeModal.vue'
 
 const searchQuery = ref('')
 const searching = ref(false)
@@ -268,14 +269,51 @@ const search = async () => {
         })
 
         if (res.data.success) {
+            const exp = res.data.data.expediente
+            const userStore = useAuthStore()
+
+            // Validación de estado: Solo se permiten ediciones en estados 1, 2 y 3.
+            // Si el estado es mayor a 3 y el usuario NO es Super Admin, se bloquea.
+            if (exp.id_estado > 3 && !userStore.hasRole('Super Admin')) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Expediente Avanzado',
+                    text: 'El expediente ha avanzado a la siguiente estación. Si requiere modificaciones, por favor escale el problema con la Secretaría de Créditos.',
+                    confirmButtonText: 'Entendido'
+                })
+                // No asignamos detallesData para no mostrar la información
+                return
+            }
+
+            // Validación de documentos compartidos:
+            // Si algún documento tiene expedientes_asociados_count > 0, se bloquea la edición.
+            // (A menos que sea Super Admin)
+            const hasSharedDocuments = res.data.data.documentos.some((doc: any) => doc.expedientes_asociados_count > 0)
+            
+            if (hasSharedDocuments && !userStore.hasRole('Super Admin')) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Documentos Compartidos',
+                    text: 'Este expediente contiene documentos compartidos con otros expedientes. Por seguridad, la edición está restringida. Por favor escale el caso a Secretaría de Créditos.',
+                    confirmButtonText: 'Entendido'
+                })
+                return
+            }
+
             // Seteamos detallesData y los modales ya tendrán qué listar y editar
             detallesData.value = res.data.data
             currentExpedienteId.value = res.data.data.expediente.id
+        } else {
+             Swal.fire({
+                icon: 'warning',
+                title: 'Expediente no encontrado o no autorizado',
+                text: 'El expediente que buscas no pertenece a tu agencia. Verifica el número de producto o de expediente correcto.',
+                confirmButtonText: 'Entendido'
+            })
         }
     } catch (error: any) {
-        if (error.response?.status !== 404) {
-            Swal.fire('Error', 'Error al procesar la búsqueda.', 'error')
-        }
+        console.error(error)
+        Swal.fire('Error', 'Error al procesar la búsqueda.', 'error')
     } finally {
         searching.value = false
     }
@@ -292,18 +330,8 @@ const openChangeType = (g: any) => {
 }
 
 const openEditDocumento = (doc: any) => {
-    // Check if user has permission to override restriction
-    const canOverride = useAuthStore().hasPermission('editar_documentos_restringidos')
-
-    if (doc.nuevos_expedientes_count > 1 && !canOverride) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Edición Restringida',
-            text: 'Este documento está asociado a múltiples expedientes. Para corregirlo, debe comunicarse con Informática. Una vez corregido puede continuar con el proceso.',
-            confirmButtonText: 'Entendido'
-        })
-        return
-    }
+    // La restricción de agencia ya se maneja en el backend.
+    // Se elimina la restricción de documentos compartidos para esta vista.
     selectedDocumento.value = doc
     showEditDocumento.value = true
 }
