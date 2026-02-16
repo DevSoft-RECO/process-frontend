@@ -191,6 +191,22 @@
                         </div>
                     </div>
 
+                   <!-- Sección Observación Legal -->
+                   <div v-if="observacionLegal" class="pb-6">
+                       <div class="flex items-center gap-3 mb-6">
+                           <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                               </svg>
+                               Observación Legal
+                           </h3>
+                           <div class="h-px flex-1 bg-gray-200 dark:bg-gray-700"></div>
+                       </div>
+                       <div class="bg-purple-50 dark:bg-purple-900/10 p-6 rounded-xl border border-purple-100 dark:border-purple-800/30">
+                           <p class="text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">{{ observacionLegal }}</p>
+                       </div>
+                   </div>
+
                 </div>
             </div>
 
@@ -266,6 +282,19 @@ const numeroContrato = computed(() => {
     if (!detallesData.value?.expediente?.seguimientos || detallesData.value.expediente.seguimientos.length === 0) return null;
     const latest = detallesData.value.expediente.seguimientos[0];
     return latest.numero_contrato;
+})
+
+const observacionLegal = computed(() => {
+    // Busca en los seguimientos si hay una observación legal.
+    // Asumimos que la observación legal más relevante es la última (la actual o la que se trajo de secretaria)
+    if (!detallesData.value?.expediente?.seguimientos) return null;
+    
+    // Podríamos buscar el primer seguimiento que tenga observación legal, o simplemente el último estado.
+    // Dado que se copia de registro en registro si persistiera, o se vincula al expediente.
+    // En el modelo actual, `observacion_legal` está en la tabla `seguimiento_expedientes`.
+    // Verificamos el seguimiento más reciente (index 0 porque viene desc).
+    const latest = detallesData.value.expediente.seguimientos[0];
+    return latest?.observacion_legal || null;
 })
 
 const hasReceived = computed(() => {
