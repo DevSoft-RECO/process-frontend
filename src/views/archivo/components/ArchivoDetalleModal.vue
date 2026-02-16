@@ -164,7 +164,17 @@
         </div>
       </div>
 
-      <div class="p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-700 flex justify-end">
+      <div class="p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-700 flex justify-between items-center">
+        <div v-if="showReceiveAction">
+             <button @click="confirmReceive" class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg font-bold transition hover:bg-indigo-700 shadow-md flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                Confirmar Recepción de Garantía
+            </button>
+        </div>
+        <div v-else></div> <!-- Spacer -->
+
         <button @click="close" class="px-8 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg font-bold transition hover:scale-105 active:scale-95 shadow-md">
           Cerrar Vista
         </button>
@@ -182,9 +192,10 @@ const apiUrl = import.meta.env.VITE_API_URL
 const props = defineProps<{
   show: boolean
   idSeguimiento: number | null
+  showReceiveAction?: boolean
 }>()
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'confirm-receive'])
 const loading = ref(false)
 const detalle = ref<any>(null)
 
@@ -214,6 +225,10 @@ watch(() => props.show, (isShown) => {
 const close = () => {
   detalle.value = null
   emit('close')
+}
+
+const confirmReceive = () => {
+    emit('confirm-receive')
 }
 
 const formatCurrency = (amount: any) => {

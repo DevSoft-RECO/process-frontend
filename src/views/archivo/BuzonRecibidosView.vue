@@ -105,29 +105,33 @@
                             
                             <!-- Garantía Real -->
                             <td class="px-6 py-4 text-center align-middle">
-                                <div class="flex flex-col items-center gap-1">
-                                    <!-- Observation Preview -->
-                                    <div 
-                                        v-if="exp.seguimientos?.[0]?.observacion_envio"
-                                        @click="showObservation(exp.seguimientos[0].observacion_envio)"
-                                        class="text-[10px] text-slate-400 hover:text-indigo-600 cursor-pointer truncate max-w-[100px]"
-                                        title="Ver observación"
-                                    >
-                                        Obs: {{ exp.seguimientos[0].observacion_envio }}
-                                    </div>
-
+                                <div class="flex flex-col items-center gap-2">
                                     <!-- Status/Action -->
                                     <span v-if="exp.seguimientos?.[0]?.recibi_garantia_real" 
                                         class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 truncate max-w-[120px]"
                                         :title="exp.seguimientos[0].recibi_garantia_real">
                                         {{ exp.seguimientos[0].recibi_garantia_real }}
                                     </span>
+                                    
                                     <button v-else-if="exp.seguimientos?.[0]?.enviado_a_archivos === 'Si'"
-                                            @click="recibirGarantia(exp)"
-                                            class="px-2 py-1 text-[10px] font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 transition-colors shadow-sm">
-                                        Recibir Garantía
+                                            @click="openRecibirGarantiaModal(exp)"
+                                            class="px-3 py-1.5 text-[11px] font-bold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-1">
+                                        <span>Recibir Garantía</span>
                                     </button>
+                                    
                                     <span v-else class="text-slate-400 text-[10px] italic">No aplica</span>
+
+                                     <!-- Observation Icon (Less intrusive) -->
+                                    <button 
+                                        v-if="exp.seguimientos?.[0]?.observacion_envio"
+                                        @click="showObservation(exp.seguimientos[0].observacion_envio)"
+                                        class="text-orange-500 hover:text-orange-600 transition-colors"
+                                        title="Ver observación de envío"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </button>
                                 </div>
                             </td>
 
@@ -191,6 +195,14 @@
                 </button>
             </div>
         </div>
+
+        <ArchivoDetalleModal 
+            :show="showDetalleModal"
+            :id-seguimiento="selectedSeguimientoId"
+            :show-receive-action="true"
+            @close="showDetalleModal = false"
+            @confirm-receive="handleConfirmReceiveFromModal"
+        />
     </div>
 </template>
   
@@ -199,6 +211,7 @@ import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 import Encabezado from '../../components/common/encabezado.vue'
+import ArchivoDetalleModal from './components/ArchivoDetalleModal.vue'
 
 interface Expediente {
     id: number;
@@ -213,6 +226,7 @@ interface Expediente {
         f_enviado_archivos: string | null;
     } | null;
     seguimientos?: Array<{
+        id_seguimiento: number;
         observacion_envio?: string;
         recibi_garantia_real?: string;
         es_un_pagare?: string;
@@ -317,29 +331,8 @@ const showObservation = (text: string) => {
     })
 }
 
-const recibirGarantia = async (exp: Expediente) => {
-    const result = await Swal.fire({
-        title: '¿Confirmar recepción?',
-        text: `¿Has recibido la Garantía Real del expediente ${exp.codigo_cliente}?`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, recibir',
-        cancelButtonText: 'Cancelar'
-    })
+// Removed unused recibirGarantia
 
-    if (result.isConfirmed) {
-        try {
-            const res = await api.post(`/archivo/recibir-garantia/${exp.id}`)
-            if (res.data.success) {
-                Swal.fire('Éxito', res.data.message, 'success')
-                fetchExpedientes() // Refresh
-            }
-        } catch (error) {
-            console.error(error)
-            Swal.fire('Error', 'No se pudo registrar la recepción.', 'error')
-        }
-    }
-}
 
 const recibirContratoAction = async (exp: Expediente) => {
     const contrato = exp.seguimientos?.[0]?.numero_contrato || 'Sin Número';
@@ -367,6 +360,40 @@ const recibirContratoAction = async (exp: Expediente) => {
             console.error(error)
             Swal.fire('Error', 'No se pudo registrar la recepción.', 'error')
         }
+    }
+}
+
+
+// Modal Logic
+const showDetalleModal = ref(false)
+const selectedSeguimientoId = ref<number | null>(null)
+const selectedExpedienteForReceive = ref<Expediente | null>(null)
+
+const openRecibirGarantiaModal = (exp: Expediente) => {
+    if (!exp.seguimientos?.[0]) return
+    selectedExpedienteForReceive.value = exp
+    selectedSeguimientoId.value = exp.seguimientos[0].id_seguimiento
+    showDetalleModal.value = true
+}
+
+const handleConfirmReceiveFromModal = async () => {
+    if (!selectedExpedienteForReceive.value) return
+    
+    // Close modal first or keep open? User might want to see success.
+    // Let's call the API.
+    try {
+        const exp = selectedExpedienteForReceive.value
+        // Logic from receivingGarantia
+        const res = await api.post(`/archivo/recibir-garantia/${exp.id}`)
+        
+        if (res.data.success) {
+            Swal.fire('Éxito', res.data.message, 'success')
+            showDetalleModal.value = false
+            fetchExpedientes() // Refresh
+        }
+    } catch (error) {
+        console.error(error)
+        Swal.fire('Error', 'No se pudo registrar la recepción.', 'error')
     }
 }
 
