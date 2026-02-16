@@ -155,6 +155,38 @@
                         </div>
                          <p v-else class="text-sm text-gray-500 italic bg-gray-50 dark:bg-gray-800/50 p-3 rounded">No hay documentos vinculados.</p>
                     </div>
+                    
+                    <!-- Observación Legal -->
+                    <div v-if="isAccepted">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b pb-2 dark:border-gray-700">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                            </svg>
+                            Observación Legal
+                        </h3>
+                         <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Agregar / Editar Observación Legal</label>
+                            <div class="flex gap-2">
+                                <textarea 
+                                    v-model="observacionLegal" 
+                                    rows="2" 
+                                    class="flex-1 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50"
+                                    placeholder="Ingrese observación legal aquí..."
+                                ></textarea>
+                                <button 
+                                    @click="guardarObservacionLegal" 
+                                    :disabled="savingLegal"
+                                    class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2 disabled:opacity-50 h-fit self-end"
+                                >
+                                    <svg v-if="savingLegal" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span v-else>Guardar</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -242,6 +274,8 @@ const emit = defineEmits(['close', 'refresh'])
 const loadingDetalles = ref(false)
 const detallesData = ref<any>({})
 const bufetes = ref<any[]>([]) // Store bufetes list
+const observacionLegal = ref('')
+const savingLegal = ref(false)
 
 watch(() => props.show, (newVal) => {
     if (newVal && props.expediente) {
@@ -267,6 +301,12 @@ const fetchDetalles = async () => {
         const res = await api.get(`/nuevos-expedientes/${props.expediente.id}/detalles`)
         if (res.data.success) {
             detallesData.value = res.data.data
+            // Populate observation if exists in the LAST entry of seguimiento (or first since desc)
+            if (detallesData.value.expediente?.seguimientos?.length > 0) {
+                observacionLegal.value = detallesData.value.expediente.seguimientos[0].observacion_legal || ''
+            } else {
+                observacionLegal.value = ''
+            }
         }
     } catch (error) {
         console.error(error)
@@ -395,6 +435,18 @@ const esEnviadoAArchivos = computed(() => {
     const latest = detallesData.value.expediente.seguimientos[0];
     // Ajustar según el caso exacto de tu DB ('Si', 'si', etc)
     return latest.enviado_a_archivos === 'Si' || latest.enviado_a_archivos === 'si';
+})
+
+// Check if expediente is in "Accepted" state (Assuming state >= 3, or specifically checked for in the acceptance flow)
+const isAccepted = computed(() => {
+    if (loadingDetalles.value) return false;
+    const segs = detallesData.value?.expediente?.seguimientos;
+    if (!segs || segs.length === 0) return false;
+    
+    // Explicitly convert to number and check
+    const estado = Number(segs[0].id_estado);
+    const validStates = [7]; // Accepted states
+    return validStates.includes(estado);
 })
 
 // 2. Función finalizarProceso actualizada
@@ -561,6 +613,32 @@ const handleAction = async (action: string) => {
             }
         }
         return;
+    }
+}
+
+const guardarObservacionLegal = async () => {
+    if (!observacionLegal.value.trim()) {
+        Swal.fire('Atención', 'Debe escribir una observación para guardar.', 'warning')
+        return
+    }
+
+    savingLegal.value = true
+    try {
+        const res = await api.post('/seguimiento/observacion-legal', {
+            expediente_id: props.expediente.id,
+            observacion_legal: observacionLegal.value
+        })
+
+        if (res.data.success) {
+            Swal.fire('Guardado', 'Observación legal actualizada.', 'success')
+            // Update local state to reflect saved (optional, mostly static)
+            // Emit refresh if needed, usually not strictly necessary for this field unless parent lists it
+        }
+    } catch (error: any) {
+        console.error(error)
+        Swal.fire('Error', error.response?.data?.message || 'No se pudo guardar la observación.', 'error')
+    } finally {
+        savingLegal.value = false
     }
 }
 </script>
