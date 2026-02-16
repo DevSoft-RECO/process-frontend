@@ -114,6 +114,12 @@
                         <textarea v-model="formSeguimiento.observacion_rechazo" rows="2" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50"></textarea>
                     </div>
 
+                    <!-- Observación Legal -->
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observación Legal</label>
+                        <textarea v-model="formSeguimiento.observacion_legal" rows="2" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50"></textarea>
+                    </div>
+
                     <!-- Observación Envio -->
                      <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observación Envío</label>
