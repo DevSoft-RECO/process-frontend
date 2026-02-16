@@ -434,6 +434,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Traslado de Expedientes',
                     route: '/admin/configuracion/traslado-expedientes'
+                },
+                {
+                    label: 'Editar Seguimiento',
+                    route: '/admin/configuracion/editar-seguimiento'
                 }
             ]
         },

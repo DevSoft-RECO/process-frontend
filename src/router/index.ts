@@ -268,6 +268,14 @@ const routes: RouteRecordRaw[] = [
                 meta: {
                     title: 'Traslado de Expedientes/Cartera'
                 }
+            },
+            {
+                path: 'configuracion/editar-seguimiento',
+                name: 'admin-editar-seguimiento',
+                component: () => import('@/views/admin/configuracion/EditarSeguimientoView.vue'),
+                meta: {
+                    title: 'Editar Seguimiento (Admin)'
+                }
             }
 
         ]
