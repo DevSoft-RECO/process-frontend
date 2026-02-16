@@ -41,7 +41,7 @@
       class="flex-1 py-6 px-3 space-y-2 custom-scrollbar"
       :class="layoutStore.isCollapsed ? 'overflow-visible' : 'overflow-y-auto'"
     >
-      <template v-for="item in menuItems" :key="item.id">
+      <template v-for="(item, index) in menuItems" :key="item.id">
 
         <div v-if="!item.children" class="relative group">
             <RouterLink
@@ -67,11 +67,15 @@
 
             <div
                 v-if="layoutStore.isCollapsed"
-                class="absolute left-full top-0 ml-2 px-3 py-2 bg-verde-cope text-white text-sm font-bold rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 whitespace-nowrap pointer-events-none"
+                class="absolute left-full ml-2 px-3 py-2 bg-verde-cope text-white text-sm font-bold rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 whitespace-nowrap pointer-events-none"
                 style="width: max-content;"
+                :class="index >= menuItems.length - 3 ? 'bottom-0 origin-bottom-left' : 'top-0 origin-top-left'"
             >
                 {{ item.label }}
-                <div class="absolute top-3 -left-1 w-2 h-2 bg-verde-cope transform rotate-45"></div>
+                <div 
+                    class="absolute -left-1 w-2 h-2 bg-verde-cope transform rotate-45"
+                    :class="index >= menuItems.length - 3 ? 'bottom-3' : 'top-3'"
+                ></div>
             </div>
         </div>
 
@@ -106,17 +110,17 @@
             <!-- POP-OVER FLOTANTE (SOLO CUANDO COLAPSADO) -->
             <div
                 v-if="layoutStore.isCollapsed"
-                class="absolute left-full top-0 ml-4 w-64
+                class="absolute left-full ml-4 w-64
                        bg-azul-cope dark:bg-gray-800
                        border-l-4 border-verde-cope
                        rounded-xl shadow-2xl
                        opacity-0 invisible
                        group-hover:opacity-100 group-hover:visible
                        transition-all duration-300 ease-out
-                       origin-top-left
                        group-hover:scale-100 scale-95
                        group-hover:translate-x-1
                        z-50"
+                :class="index >= menuItems.length - 3 ? 'bottom-0 origin-bottom-left' : 'top-0 origin-top-left'"
             >
                  <div class="px-3 py-2 text-xs font-semibold text-verde-cope uppercase tracking-wider border-b border-white/10 dark:border-gray-700 mb-1">
                     {{ item.label }}
@@ -138,10 +142,11 @@
 
                  <!-- Colita / Flecha apuntando al botón padre (Verde para efecto 'llave' { ) -->
                  <div
-                   class="absolute left-0 top-5 -translate-x-1/2
+                   class="absolute left-0 -translate-x-1/2
                           w-3 h-3 bg-verde-cope
                           border-l border-b border-white/10
                           rotate-45"
+                    :class="index >= menuItems.length - 3 ? 'bottom-5' : 'top-5'"
                  ></div>
             </div>
 
