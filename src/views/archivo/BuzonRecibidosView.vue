@@ -326,7 +326,6 @@ const showObservation = (text: string) => {
     Swal.fire({
         title: 'Observación Garantía',
         text: text,
-        icon: 'info',
         confirmButtonText: 'Cerrar'
     })
 }
