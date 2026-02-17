@@ -173,6 +173,9 @@
 import { ref, onMounted, reactive } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
+import { useAuthStore } from '@/stores/auth'; // Import auth store
+
+const authStore = useAuthStore(); // Use auth store
 
 // State
 const searchTerm = ref('');
@@ -263,10 +266,25 @@ const submitRequest = async () => {
     return;
   }
 
+  // Get agency ID from auth store
+  // Trying common property names found in the project or generic 'agencia_id'
+  const agencyId = authStore.user?.id_agencia || authStore.user?.agencia_id || authStore.user?.agencia?.id;
+
+  if (!agencyId) {
+      Swal.fire('Error', 'No se pudo identificar la agencia del usuario. Verifique su sesión.', 'error');
+      return;
+  }
+
+  // Add agency ID to payload
+  const payload = {
+      ...formData,
+      id_agencia: agencyId
+  };
+
   loadingSubmit.value = true;
 
   try {
-    await api.post('/solicitudes-retiro', formData);
+    await api.post('/solicitudes-retiro', payload);
     
     Swal.fire('Éxito', 'Solicitud enviada correctamente', 'success');
     resetForm();
