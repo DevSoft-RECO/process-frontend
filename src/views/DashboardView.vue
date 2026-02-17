@@ -64,7 +64,7 @@
             <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border-l-4 border-orange-500">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tiempo Promedio</p>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tiempo Promedio de apertura a cierre</p>
                         <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ kpi.avg_days_open }} <span class="text-sm font-normal text-gray-500">días</span></h3>
                     </div>
                     <div class="p-2 bg-orange-50 dark:bg-orange-900/30 rounded-lg text-orange-600 dark:text-orange-400">
