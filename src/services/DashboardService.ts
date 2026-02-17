@@ -34,10 +34,18 @@ interface RejectionData {
 }
 
 interface AgencyData {
-    agency: string
-    active: number
-    finalized: number
+    data: {
+        agency: string
+        active: number
+        rejected_cases: number
+        total: number
+        rejection_rate: number
+        success_rate: number
+    }[]
+    current_page: number
+    per_page: number
     total: number
+    last_page: number
 }
 
 interface TrendData {
@@ -63,8 +71,8 @@ export default {
         const res = await api.get('/dashboard/rejections')
         return res.data
     },
-    async getAgencies(): Promise<AgencyData[]> {
-        const res = await api.get('/dashboard/agencies')
+    async getAgencies(page = 1): Promise<AgencyData> {
+        const res = await api.get(`/dashboard/agencies?page=${page}`)
         return res.data
     },
     async getTrends(): Promise<TrendData[]> {
