@@ -38,6 +38,20 @@
          </span>
       </div>
 
+      <!-- Detalles del Documento (Info Adicional) -->
+      <div v-if="documentInfo" class="bg-gray-50 p-4 rounded border border-gray-200 text-sm grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div><span class="font-bold">Propietario:</span> {{ documentInfo.propietario }}</div>
+          <div><span class="font-bold">Autorizador:</span> {{ documentInfo.autorizador }}</div>
+          <div><span class="font-bold">Monto Póliza:</span> {{ documentInfo.monto_poliza }}</div>
+          
+          <div><span class="font-bold">No. Finca:</span> {{ documentInfo.no_finca }}</div>
+          <div><span class="font-bold">Folio:</span> {{ documentInfo.folio }}</div>
+          <div><span class="font-bold">Libro:</span> {{ documentInfo.libro }}</div>
+
+          <div><span class="font-bold">Tipo:</span> {{ documentInfo.tipo_documento?.nombre || 'N/A' }}</div>
+          <div class="col-span-2"><span class="font-bold">Registro:</span> {{ documentInfo.registro_propiedad?.nombre || 'N/A' }}</div>
+      </div>
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700">Número de Documento</label>
@@ -168,6 +182,7 @@ const isManual = ref(false);
 const loadingSubmit = ref(false);
 const history = ref([]);
 const loadingHistory = ref(false);
+const documentInfo = ref(null); // Nuevo estado para la info del documento
 
 const formData = reactive({
   id_expediente: null,
@@ -187,6 +202,7 @@ const searchDocument = async () => {
 
   loadingSearch.value = true;
   showForm.value = false;
+  documentInfo.value = null; // Reset info
   resetFormData();
 
   try {
@@ -211,12 +227,14 @@ const searchDocument = async () => {
       formData.titulo_nombre = response.data.data.titulo_nombre;
       formData.id_expediente = response.data.data.id_expediente;
       formData.es_manual = false;
+      documentInfo.value = response.data.data.documento_info; // Guardar info
       showForm.value = true;
     } else {
       // Manual
       isManual.value = true;
       formData.numero_documento = response.data.data.numero_documento; // Preserva lo buscado
       formData.es_manual = true;
+      documentInfo.value = null;
       showForm.value = true;
       Swal.fire({
         icon: 'info',
