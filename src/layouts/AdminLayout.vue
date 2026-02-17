@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-300">
+  <div class="h-screen bg-gradient-to-br from-gray-100 to-blue-100 dark:bg-gradient-to-br dark:from-slate-950 dark:to-slate-900 text-slate-800 dark:text-slate-100 font-sans overflow-hidden transition-colors duration-300">
 
     <AdminSidebar />
 
