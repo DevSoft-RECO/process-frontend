@@ -69,5 +69,9 @@ export default {
     async getTrends(): Promise<TrendData[]> {
         const res = await api.get('/dashboard/trends')
         return res.data
+    },
+    async getProcessingTimes(): Promise<any> {
+        const res = await api.get('/dashboard/processing-times')
+        return res.data
     }
 }

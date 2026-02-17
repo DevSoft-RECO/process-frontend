@@ -76,6 +76,9 @@
             </div>
         </div>
 
+        <!-- Processing Times -->
+        <ProcessingTimesWidget :times="times" />
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Process Distribution (2/3 width) -->
             <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
@@ -247,6 +250,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import DashboardService from '@/services/DashboardService'
+import ProcessingTimesWidget from './dashboard/ProcessingTimesWidget.vue'
 
 const loading = ref(false)
 const kpi = ref({ total_active: 0, total_finalized: 0, total_amount: 0, avg_days_open: 0 })
@@ -255,17 +259,19 @@ const advisors = ref<{ data: any[], current_page: number, total: number, last_pa
 const rejections = ref<any[]>([])
 const agencies = ref<any[]>([])
 const trends = ref<any[]>([])
+const times = ref({ creation_to_secretary: 0, secretary_internal: 0, secretary_to_lawyer: 0, lawyer_return: 0 })
 
 const loadAll = async () => {
     loading.value = true
     try {
-        const [kpiRes, pipeRes, advRes, rejRes, agRes, trRes] = await Promise.all([
+        const [kpiRes, pipeRes, advRes, rejRes, agRes, trRes, timeRes] = await Promise.all([
             DashboardService.getKpi(),
             DashboardService.getPipeline(),
             DashboardService.getAdvisors(1),
             DashboardService.getRejections(),
             DashboardService.getAgencies(),
-            DashboardService.getTrends()
+            DashboardService.getTrends(),
+            DashboardService.getProcessingTimes()
         ])
 
         kpi.value = kpiRes
@@ -274,6 +280,7 @@ const loadAll = async () => {
         rejections.value = rejRes
         agencies.value = agRes
         trends.value = trRes
+        times.value = timeRes
 
     } catch (e) {
         console.error("Error loading dashboard data", e)
