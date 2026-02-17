@@ -158,6 +158,7 @@
                                 <th class="px-4 py-3 rounded-l-lg">Asesor</th>
                                 <th class="px-4 py-3 text-center">Activos</th>
                                 <th class="px-4 py-3 text-center">Rechazos Hist.</th>
+                                <th class="px-4 py-3 text-center">Tasa Exito</th>
                                 <th class="px-4 py-3 text-right rounded-r-lg">Tasa Rechazo</th>
                             </tr>
                         </thead>
@@ -173,6 +174,13 @@
                                 </td>
                                 <td class="px-4 py-3 text-center text-red-600 dark:text-red-400 font-medium">
                                     {{ adv.rejected_cases }}
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <span class="font-bold" :class="{'text-red-600': adv.success_rate < 70, 'text-yellow-600': adv.success_rate >= 70 && adv.success_rate < 90, 'text-green-600': adv.success_rate >= 90}">
+                                            {{ adv.success_rate }}%
+                                        </span>
+                                    </div>
                                 </td>
                                 <td class="px-4 py-3 text-right">
                                     <div class="flex items-center justify-end gap-2">

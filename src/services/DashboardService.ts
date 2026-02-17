@@ -19,6 +19,7 @@ interface AdvisorData {
         rejected_cases: number
         total_cases: number
         rejection_rate: number
+        success_rate: number
     }[]
     current_page: number
     per_page: number
