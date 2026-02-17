@@ -10,7 +10,7 @@
           v-model="searchTerm" 
           @keyup.enter="searchDocument"
           type="text" 
-          placeholder="Ingrese Número de Documento" 
+          placeholder="Ingrese Número de Producto" 
           class="flex-1 border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
         >
         <button 
@@ -200,7 +200,7 @@ const searchDocument = async () => {
          icon: 'error',
          title: 'Operación Bloqueada',
          text: response.data.message,
-         footer: 'El documento está asociado a un expediente activo.'
+         footer: 'Siempre verifique que el numero de producto ingresado sea el correcto.'
        });
        return;
     }
