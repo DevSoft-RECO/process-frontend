@@ -35,7 +35,7 @@
           {{ currentRouteTitle }}
         </h1>
         <span class="text-[10px] font-bold text-slate-200 uppercase tracking-widest">
-          Sistema Centralizado
+          Sistema de Administracion de Expedientes de Creditos
         </span>
       </div>
     </div>

@@ -40,7 +40,7 @@ const routes: RouteRecordRaw[] = [
                 name: 'dashboard',
                 component: DashboardView,
                 meta: {
-                    title: 'Sistema de Administracion de Expedientes de Creditos'
+                    title: 'SADEC'
                 }
             },
             {
