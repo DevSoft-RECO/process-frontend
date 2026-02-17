@@ -244,6 +244,24 @@ const routes: RouteRecordRaw[] = [
                 }
             },
 
+            // Retiro de Garantías
+            {
+                path: 'retiro-garantias/solicitar',
+                name: 'retiro-garantias-solicitar',
+                component: () => import('@/views/retiro-garantias/SolicitudRetiroView.vue'),
+                meta: {
+                    title: 'Solicitud de Retiro'
+                }
+            },
+            {
+                path: 'retiro-garantias/buzon',
+                name: 'retiro-garantias-buzon',
+                component: () => import('@/views/retiro-garantias/BuzonSolicitudesView.vue'),
+                meta: {
+                    title: 'Buzón de Solicitudes (Archivo)'
+                }
+            },
+
             // Asesores de Crédito
             {
                 path: 'asesores/nuevos',
