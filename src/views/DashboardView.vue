@@ -125,30 +125,43 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Advisor Performance -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 overflow-hidden">
-                <div class="flex justify-between items-center mb-4">
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white">Rendimiento por Asesor</h3>
-                    <div class="flex items-center gap-2" v-if="advisors.last_page > 1">
-                        <button 
-                            @click="changeAdvisorPage(advisors.current_page - 1)" 
-                            :disabled="advisors.current_page === 1"
-                            class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    
+                     <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <select 
+                            v-model="selectedAgency" 
+                            @change="filterAdvisors"
+                            class="text-sm border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                            </svg>
-                        </button>
-                        <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                            {{ advisors.current_page }} / {{ advisors.last_page }}
-                        </span>
-                        <button 
-                            @click="changeAdvisorPage(advisors.current_page + 1)" 
-                            :disabled="advisors.current_page === advisors.last_page"
-                            class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </button>
+                            <option :value="null">Todas las Agencias</option>
+                            <option v-for="agency in agenciesList" :key="agency.id" :value="agency.id">
+                                {{ agency.nombre }}
+                            </option>
+                        </select>
+                         <div class="flex items-center gap-2" v-if="advisors.last_page > 1">
+                            <button 
+                                @click="changeAdvisorPage(advisors.current_page - 1)" 
+                                :disabled="advisors.current_page === 1"
+                                class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                            </button>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                {{ advisors.current_page }} / {{ advisors.last_page }}
+                            </span>
+                            <button 
+                                @click="changeAdvisorPage(advisors.current_page + 1)" 
+                                :disabled="advisors.current_page === advisors.last_page"
+                                class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="overflow-x-auto">
@@ -299,30 +312,46 @@ const rejections = ref<any[]>([])
 const agencies = ref<{ data: any[], current_page: number, total: number, last_page: number }>({ data: [], current_page: 1, total: 0, last_page: 1 })
 const trends = ref<any[]>([])
 const times = ref({ creation_to_secretary: 0, secretary_internal: 0, secretary_to_lawyer: 0, lawyer_return: 0 })
+const agenciesList = ref<{ id: number, nombre: string }[]>([])
+const selectedAgency = ref<number | null>(null)
 
 const loadAll = async () => {
     loading.value = true
     try {
-        const [kpiRes, pipeRes, advRes, rejRes, agRes, trRes, timeRes] = await Promise.all([
+        const [kpiRes, pipeRes, advRes, rejRes, agRes, trRes, timeRes, agListRes] = await Promise.all([
             DashboardService.getKpi(),
             DashboardService.getPipeline(),
-            DashboardService.getAdvisors(1),
+            DashboardService.getAdvisors(1), // Initial load without filter
             DashboardService.getRejections(),
             DashboardService.getAgencies(1),
             DashboardService.getTrends(),
-            DashboardService.getProcessingTimes()
+            DashboardService.getProcessingTimes(),
+            DashboardService.getAgenciesList()
         ])
 
         kpi.value = kpiRes
         pipeline.value = pipeRes
-        advisors.value = advRes // Matches paginated structure now
+        advisors.value = advRes
         rejections.value = rejRes
         agencies.value = agRes
         trends.value = trRes
         times.value = timeRes
+        agenciesList.value = agListRes
 
     } catch (e) {
         console.error("Error loading dashboard data", e)
+    } finally {
+        loading.value = false
+    }
+}
+
+const filterAdvisors = async () => {
+    loading.value = true
+    try {
+        const res = await DashboardService.getAdvisors(1, selectedAgency.value)
+        advisors.value = res
+    } catch (e) {
+        console.error("Error filtering advisors", e)
     } finally {
         loading.value = false
     }
@@ -332,7 +361,7 @@ const changeAdvisorPage = async (page: number) => {
     if (page < 1 || page > advisors.value.last_page) return
     loading.value = true
     try {
-        const res = await DashboardService.getAdvisors(page)
+        const res = await DashboardService.getAdvisors(page, selectedAgency.value)
         advisors.value = res
     } catch (e) {
         console.error("Error changing advisor page", e)

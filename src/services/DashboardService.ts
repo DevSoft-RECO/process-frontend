@@ -63,8 +63,12 @@ export default {
         const res = await api.get('/dashboard/pipeline')
         return res.data
     },
-    async getAdvisors(page = 1): Promise<AdvisorData> {
-        const res = await api.get(`/dashboard/advisors?page=${page}`)
+    async getAdvisors(page = 1, agencyId?: number | null): Promise<AdvisorData> {
+        let url = `/dashboard/advisors?page=${page}`
+        if (agencyId) {
+            url += `&agency_id=${agencyId}`
+        }
+        const res = await api.get(url)
         return res.data
     },
     async getRejections(): Promise<RejectionData[]> {
@@ -73,6 +77,10 @@ export default {
     },
     async getAgencies(page = 1): Promise<AgencyData> {
         const res = await api.get(`/dashboard/agencies?page=${page}`)
+        return res.data
+    },
+    async getAgenciesList(): Promise<{ id: number, nombre: string }[]> {
+        const res = await api.get('/dashboard/agencies-list')
         return res.data
     },
     async getTrends(): Promise<TrendData[]> {
