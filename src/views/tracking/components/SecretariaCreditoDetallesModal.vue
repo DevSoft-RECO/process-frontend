@@ -243,7 +243,7 @@
                             <path v-if="esEnviadoAArchivos" stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                             <path v-else stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
-                        {{ esEnviadoAArchivos ? 'Enviar a Archivos' : 'Revisar y finalizar' }}
+                        {{ esEnviadoAArchivos ? 'Enviar a Archivos' : 'Revisar Contrato y finalizar' }}
                     </button>
 
                 <!-- Acción: Adjuntar (Si es estado 10 y NO tiene contrato y NO está cargando) -->
@@ -475,9 +475,8 @@ const finalizarProceso = async () => {
             'Pagaré': 'Pagaré'
         },
         inputPlaceholder: 'Seleccione una opción',
-        icon: 'info',
         showCancelButton: true,
-        confirmButtonText: 'Finalizar y Archivar',
+        confirmButtonText: 'Finalizar y enviar a Archivos',
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#4F46E5',
         inputValidator: (value) => {
