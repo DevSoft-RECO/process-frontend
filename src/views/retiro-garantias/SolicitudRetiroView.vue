@@ -128,8 +128,11 @@
             class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-white"
           >
             <option value="Temporal">Temporal</option>
-            <option value="Definitivo">Definitivo</option>
+            <option value="Definitivo" :disabled="isSelectionLinked">Definitivo</option>
           </select>
+          <p v-if="isSelectionLinked" class="text-xs text-red-600 mt-1">
+             * Retiro definitivo no permitido por vinculación activa.
+          </p>
         </div>
       </div>
 
@@ -215,7 +218,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, computed } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
 import { useAuthStore } from '@/stores/auth'; // Import auth store
@@ -310,13 +313,20 @@ const searchDocument = async () => {
   }
 };
 
+const isSelectionLinked = computed(() => {
+    if (!formData.numero_documento) return false;
+    const doc = documentsList.value.find(d => d.numero === formData.numero_documento);
+    return doc ? doc.tiene_otros_activos : false;
+});
+
 const selectDocument = (doc) => {
     formData.numero_documento = doc.numero;
     if (doc.tiene_otros_activos) {
+        formData.tipo_retiro = 'Temporal';
         Swal.fire({
             icon: 'warning',
             title: 'Advertencia',
-            text: 'Esta garantía está vinculada a otros expedientes activos. Asegúrese de revisar los amarres antes de proceder.',
+            text: 'Esta garantía está vinculada a otros expedientes activos. Solo se permite retiro TEMPORAL.',
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
