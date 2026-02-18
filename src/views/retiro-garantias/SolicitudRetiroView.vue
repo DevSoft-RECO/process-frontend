@@ -312,19 +312,17 @@ const searchDocument = async () => {
       
       showForm.value = true;
     } else {
-      // Manual
-      isManual.value = true;
-      formData.numero_documento = response.data.data.numero_documento; // Preserva lo buscado
-      formData.es_manual = true;
+      // Documento NO encontrado
+      showForm.value = false;
       documentInfo.value = null;
       documentsList.value = [];
-      showForm.value = true;
+      resetFormData();
+      
       Swal.fire({
-        icon: 'info',
-        title: 'Documento no encontrado',
-        text: 'Se ha habilitado la carga manual de datos.',
-        timer: 2000,
-        showConfirmButton: false
+        icon: 'warning',
+        title: 'No encontrado',
+        text: 'El número de producto que busca no se encuentra en el sistema. Verifique y vuelva a intentarlo.',
+        confirmButtonText: 'Entendido'
       });
     }
 

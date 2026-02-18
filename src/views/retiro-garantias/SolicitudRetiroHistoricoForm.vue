@@ -13,11 +13,6 @@
      <div class="bg-purple-50 p-4 rounded border border-purple-200">
          <h3 class="font-bold text-purple-800 mb-2">Información de Garantías</h3>
          <p class="text-sm text-gray-700 whitespace-pre-line">{{ documentData.datos_garantia || 'Sin detalles registrados.' }}</p>
-         
-         <div class="mt-4 pt-4 border-t border-purple-200 text-sm">
-             <span class="font-bold">Observaciones Originales:</span>
-             <p class="text-gray-600 mt-1">{{ documentData.observaciones || 'Sin observaciones.' }}</p>
-         </div>
      </div>
 
      <div class="alert bg-blue-50 text-blue-800 p-3 rounded text-sm mt-4">
