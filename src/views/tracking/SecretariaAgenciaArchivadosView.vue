@@ -41,9 +41,7 @@
                         <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
                             Estado Actual
                         </th>
-                        <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
-                            Recibí Pagaré
-                        </th>
+
                         <th scope="col" class="w-20 px-2 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center rounded-tr-2xl">
                             Acciones
                         </th>
@@ -117,17 +115,7 @@
                              </div>
                         </td>
 
-                        <td class="px-6 py-4 text-center">
-                            <span v-if="exp.seguimientos?.[0]?.recibi_pagare === 'si'" class="text-green-600 font-bold text-xs">
-                                Sí
-                            </span>
-                             <button v-else-if="exp.seguimientos?.[0]?.es_un_pagare === 'si'" @click="recibirPagare(exp)" class="text-verde-cope hover:text-green-800 font-medium text-xs border border-verde-cope px-2 py-1 rounded hover:bg-green-50 transition">
-                                Recibí Pagaré
-                            </button>
-                            <span v-else class="text-xs text-slate-400 italic">
-                                -
-                            </span>
-                        </td>
+
 
                         <td class="px-2 py-4 text-center">
                             <button @click="openDetalles(exp)" 
@@ -163,7 +151,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
-import Swal from 'sweetalert2'
+
 import SecretariaDetallesModal from './components/SecretariaDetallesModal.vue'
 import Encabezado from '../../components/common/encabezado.vue'
 
@@ -185,8 +173,7 @@ interface Expediente {
         estado?: {
             nombre: string;
         };
-        recibi_pagare?: string;
-        es_un_pagare?: string;
+
         estadoSecundario?: {
             nombre: string;
         };
@@ -237,39 +224,7 @@ const loadMore = () => {
     if (nextPageUrl.value) fetchExpedientes(nextPageUrl.value)
 }
 
-const recibirPagare = async (exp: any) => {
-    const result = await Swal.fire({
-        title: '¿Confirmar recepción?',
-        text: `¿Confirma que ha recibido el pagaré físico del expediente ${exp.codigo_cliente}?`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, recibí pagaré',
-        cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#10B981'
-    })
 
-    if (result.isConfirmed) {
-        try {
-            const res = await api.post('/secretaria-agencia/recibir-pagare', {
-                id: exp.id
-            })
-
-            if (res.data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Éxito',
-                    text: 'Pagaré marcado como recibido.',
-                    timer: 1500,
-                    showConfirmButton: false
-                })
-                fetchExpedientes()
-            }
-        } catch (error) {
-            console.error(error)
-            Swal.fire('Error', 'No se pudo registrar la recepción.', 'error')
-        }
-    }
-}
 
 const openDetalles = (expor: any) => {
     selectedExpediente.value = expor
