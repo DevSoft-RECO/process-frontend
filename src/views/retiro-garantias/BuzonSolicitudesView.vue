@@ -71,6 +71,12 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button 
+                  @click="openDetailModal(req)"
+                  class="mr-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  <i class="fas fa-eye"></i> Ver
+                </button>
+                <button 
                   v-if="req.estado_actual === 1"
                   @click="dispatchRequest(req)" 
                   class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
@@ -84,11 +90,76 @@
         </table>
       </div>
     </div>
+
+    <!-- Detail Modal -->
+    <div v-if="showDetailModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold text-gray-800">Detalles de la Garantía</h3>
+          <button @click="closeDetailModal" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div v-if="selectedDocument" class="space-y-4">
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div class="bg-gray-50 p-3 rounded">
+                <span class="block font-bold text-gray-600">Número de Documento</span>
+                <span class="text-gray-900">{{ selectedDocument.numero }}</span>
+              </div>
+              <div class="bg-gray-50 p-3 rounded">
+                 <span class="block font-bold text-gray-600">Título / Nombre</span>
+                 <span class="text-gray-900">{{ currentRequest?.titulo_nombre }}</span>
+              </div>
+              <div class="bg-gray-50 p-3 rounded">
+                 <span class="block font-bold text-gray-600">Propietario</span>
+                 <span class="text-gray-900">{{ selectedDocument.propietario }}</span>
+              </div>
+              <div class="bg-gray-50 p-3 rounded">
+                 <span class="block font-bold text-gray-600">Autorizador</span>
+                 <span class="text-gray-900">{{ selectedDocument.autorizador }}</span>
+              </div>
+               <div class="bg-gray-50 p-3 rounded">
+                 <span class="block font-bold text-gray-600">Monto Póliza</span>
+                 <span class="text-gray-900">{{ selectedDocument.monto_poliza }}</span>
+              </div>
+              <div class="bg-gray-50 p-3 rounded">
+                 <span class="block font-bold text-gray-600">Tipo Documento</span>
+                 <span class="text-gray-900">{{ selectedDocument.tipo_documento?.nombre || 'N/A' }}</span>
+              </div>
+               <div class="col-span-2 bg-gray-50 p-3 rounded flex space-x-4">
+                 <div><span class="font-bold text-gray-600">Finca:</span> {{ selectedDocument.no_finca }}</div>
+                 <div><span class="font-bold text-gray-600">Folio:</span> {{ selectedDocument.folio }}</div>
+                 <div><span class="font-bold text-gray-600">Libro:</span> {{ selectedDocument.libro }}</div>
+              </div>
+              <div class="col-span-2 bg-gray-50 p-3 rounded">
+                 <span class="block font-bold text-gray-600">Registro de Propiedad</span>
+                 <span class="text-gray-900">{{ selectedDocument.registro_propiedad?.nombre || 'N/A' }}</span>
+              </div>
+           </div>
+           
+           <div class="text-xs text-gray-500 mt-2">
+             * Información recuperada del sistema basada en el número de documento.
+           </div>
+        </div>
+        <div v-else class="text-center py-8 text-gray-500">
+           <i class="fas fa-exclamation-triangle text-yellow-500 text-2xl mb-2"></i>
+           <p>No se encontró información detallada para este documento en el sistema.</p>
+           <p class="text-xs">Es posible que sea un registro manual o antiguo.</p>
+        </div>
+
+        <div class="mt-6 flex justify-end">
+          <button @click="closeDetailModal" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
 
@@ -96,6 +167,9 @@ import Swal from 'sweetalert2';
 const requests = ref([]);
 const loading = ref(false);
 const filterState = ref(1); // Default: Pendientes
+const showDetailModal = ref(false);
+const selectedDocument = ref(null);
+const currentRequest = ref(null);
 
 // Methods
 const loadRequests = async () => {
@@ -111,6 +185,27 @@ const loadRequests = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const openDetailModal = async (req) => {
+  currentRequest.value = req;
+  selectedDocument.value = null; // Limpiar previo
+  showDetailModal.value = true; // Mostrar modal
+
+  await nextTick(); // Esperar renderizado del modal
+
+  if (req.documento) {
+      // Asignar datos con copia para reactividad
+      selectedDocument.value = { ...req.documento };
+  } else {
+      selectedDocument.value = null;
+  }
+};
+
+const closeDetailModal = () => {
+  showDetailModal.value = false;
+  selectedDocument.value = null;
+  currentRequest.value = null;
 };
 
 const dispatchRequest = async (req) => {

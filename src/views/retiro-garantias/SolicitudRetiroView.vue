@@ -38,21 +38,66 @@
          </span>
       </div>
 
-      <!-- Detalles del Documento (Info Adicional) -->
-      <div v-if="documentInfo" class="bg-gray-50 p-4 rounded border border-gray-200 text-sm grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div><span class="font-bold">Propietario:</span> {{ documentInfo.propietario }}</div>
-          <div><span class="font-bold">Autorizador:</span> {{ documentInfo.autorizador }}</div>
-          <div><span class="font-bold">Monto Póliza:</span> {{ documentInfo.monto_poliza }}</div>
-          
-          <div><span class="font-bold">No. Finca:</span> {{ documentInfo.no_finca }}</div>
-          <div><span class="font-bold">Folio:</span> {{ documentInfo.folio }}</div>
-          <div><span class="font-bold">Libro:</span> {{ documentInfo.libro }}</div>
+      <!-- Lista de Documentos Encontrados -->
+      <div v-if="documentsList.length > 0" class="space-y-4">
+          <div class="bg-blue-50 p-3 rounded border border-blue-200">
+              <h3 class="font-bold text-blue-800">Garantías Asociadas al Expediente</h3>
+              <p class="text-sm text-blue-600">Seleccione la garantía que desea retirar.</p>
+              <p v-if="expedienteActive" class="text-xs text-red-600 font-bold mt-1">
+                  <i class="fas fa-exclamation-circle"></i> Advertencia: El expediente asociado aún se encuentra ACTIVO.
+              </p>
+          </div>
 
-          <div><span class="font-bold">Tipo:</span> {{ documentInfo.tipo_documento?.nombre || 'N/A' }}</div>
-          <div class="col-span-2"><span class="font-bold">Registro:</span> {{ documentInfo.registro_propiedad?.nombre || 'N/A' }}</div>
+          <div class="grid grid-cols-1 gap-4">
+              <div v-for="doc in documentsList" :key="doc.id" 
+                   class="border rounded-lg p-4 bg-gray-50 hover:bg-white transition-colors relative"
+                   :class="{'border-blue-500 ring-2 ring-blue-200': formData.numero_documento === doc.numero, 'border-gray-200': formData.numero_documento !== doc.numero}"
+              >
+                  <div class="flex justify-between items-start">
+                      <div class="flex-1">
+                          <div class="flex items-center space-x-2">
+                              <span class="font-bold text-lg text-gray-800">{{ doc.numero }}</span>
+                              <span v-if="doc.tiene_otros_activos" class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded font-bold cursor-help" title="Amarrado a otros expedientes activos">
+                                  <i class="fas fa-link"></i> Vinculado a otros
+                              </span>
+                          </div>
+                          <div class="text-sm text-gray-600 mt-1">
+                              <p><span class="font-semibold">Tipo:</span> {{ doc.tipo_documento?.nombre || 'N/A' }}</p>
+                              <p><span class="font-semibold">Propietario:</span> {{ doc.propietario }}</p>
+                              <p><span class="font-semibold">Monto:</span> {{ doc.monto_poliza }}</p>
+                          </div>
+                      </div>
+                      <div class="flex flex-col space-y-2">
+                           <button 
+                              @click="selectDocument(doc)"
+                              class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
+                              :class="{'bg-green-600 hover:bg-green-700': formData.numero_documento === doc.numero}"
+                           >
+                              <i class="fas" :class="formData.numero_documento === doc.numero ? 'fa-check' : 'fa-hand-pointer'"></i>
+                              {{ formData.numero_documento === doc.numero ? 'Seleccionado' : 'Seleccionar' }}
+                           </button>
+
+                           <button 
+                              v-if="doc.tiene_otros_activos"
+                              @click="showActiveLinks(doc)"
+                              class="bg-red-50 text-red-600 border border-red-200 px-3 py-1 rounded hover:bg-red-100 text-xs"
+                           >
+                              <i class="fas fa-eye"></i> Ver Vinculados
+                           </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
       </div>
+      
+      <!-- Detalle Simple (Solo para Manual o sin lista) -->
+      <div v-if="isManual || (documentInfo && documentsList.length === 0)" class="bg-gray-50 p-4 rounded border border-gray-200 text-sm grid grid-cols-1 md:grid-cols-3 gap-4">
+           <div><span class="font-bold">Propietario:</span> {{ documentInfo?.propietario || 'N/A' }}</div>
+      </div>
+      
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
         <div>
           <label class="block text-sm font-medium text-gray-700">Número de Documento</label>
           <input 
@@ -186,6 +231,8 @@ const loadingSubmit = ref(false);
 const history = ref([]);
 const loadingHistory = ref(false);
 const documentInfo = ref(null); // Nuevo estado para la info del documento
+const documentsList = ref([]);
+const expedienteActive = ref(false);
 
 const formData = reactive({
   id_expediente: null,
@@ -206,6 +253,8 @@ const searchDocument = async () => {
   loadingSearch.value = true;
   showForm.value = false;
   documentInfo.value = null; // Reset info
+  documentsList.value = [];
+  expedienteActive.value = false;
   resetFormData();
 
   try {
@@ -214,23 +263,27 @@ const searchDocument = async () => {
     });
 
     if (response.data.error) {
-       // Bloqueado
+       // Bloqueado (Solo Casos críticos como sin seguimiento)
        Swal.fire({
          icon: 'error',
          title: 'Operación Bloqueada',
          text: response.data.message,
-         footer: 'Siempre verifique que el numero de producto ingresado sea el correcto.'
+         footer: 'El expediente no tiene garantías asociadas o no existe seguimiento.'
        });
        return;
     }
 
     if (response.data.found) {
       isManual.value = false;
-      formData.numero_documento = response.data.data.numero_documento;
-      formData.titulo_nombre = response.data.data.titulo_nombre;
+      // Pre-fill expediente data
       formData.id_expediente = response.data.data.id_expediente;
+      formData.titulo_nombre = response.data.data.titulo_nombre; // Keep existing title if any
       formData.es_manual = false;
-      documentInfo.value = response.data.data.documento_info; // Guardar info
+      
+      // Load documents list
+      documentsList.value = response.data.data.documentos || [];
+      expedienteActive.value = response.data.data.expediente_activo;
+      
       showForm.value = true;
     } else {
       // Manual
@@ -238,6 +291,7 @@ const searchDocument = async () => {
       formData.numero_documento = response.data.data.numero_documento; // Preserva lo buscado
       formData.es_manual = true;
       documentInfo.value = null;
+      documentsList.value = [];
       showForm.value = true;
       Swal.fire({
         icon: 'info',
@@ -256,10 +310,50 @@ const searchDocument = async () => {
   }
 };
 
+const selectDocument = (doc) => {
+    formData.numero_documento = doc.numero;
+    if (doc.tiene_otros_activos) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: 'Esta garantía está vinculada a otros expedientes activos. Asegúrese de revisar los amarres antes de proceder.',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 5000
+        });
+    }
+};
+
+const showActiveLinks = (doc) => {
+    if (!doc.otros_activos_lista || doc.otros_activos_lista.length === 0) return;
+
+    const listaHtml = doc.otros_activos_lista.map(exp => 
+        `<li class="text-left mb-1">
+            <span class="font-bold text-red-600">${exp.numero}</span> - ${exp.nombre}
+         </li>`
+    ).join('');
+
+    Swal.fire({
+        title: 'Expedientes Activos Vinculados',
+        html: `
+            <p class="mb-4 text-sm text-gray-600">El documento No. <strong>${doc.numero}</strong> está vinculado a los siguientes expedientes:</p>
+            <ul class="list-disc list-inside bg-gray-50 p-4 rounded border border-gray-200 text-sm">
+                ${listaHtml}
+            </ul>
+        `,
+        confirmButtonText: 'Entendido'
+    });
+};
+
 const submitRequest = async () => {
   if (!formData.justificacion) {
     Swal.fire('Atención', 'Debe ingresar una justificación', 'warning');
     return;
+  }
+  if (!formData.numero_documento) {
+      Swal.fire('Atención', 'Debe seleccionar una garantía o ingresar un número de documento', 'warning');
+      return;
   }
   if (isManual.value && !formData.titulo_nombre) {
     Swal.fire('Atención', 'Debe ingresar el Título o Nombre Asociado', 'warning');
@@ -267,7 +361,6 @@ const submitRequest = async () => {
   }
 
   // Get agency ID from auth store
-  // Trying common property names found in the project or generic 'agencia_id'
   const agencyId = authStore.user?.id_agencia || authStore.user?.agencia_id || authStore.user?.agencia?.id;
 
   if (!agencyId) {
@@ -324,6 +417,7 @@ const resetForm = () => {
   showForm.value = false;
   searchTerm.value = '';
   resetFormData();
+  documentsList.value = [];
 };
 
 const formatDate = (dateString) => {
