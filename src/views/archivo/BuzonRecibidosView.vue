@@ -157,12 +157,7 @@
                                     En Proceso...
                                 </span>
 
-                                <!-- Si es Pagaré (no requiere contrato) -->
-                                <span v-else-if="exp.seguimientos?.[0]?.tipo_contrato === 'Pagaré'" class="text-slate-400 text-[10px] italic">
-                                    No aplica ({{ exp.seguimientos?.[0]?.tipo_contrato }})
-                                </span>
-
-                                <!-- Si es Escritura o Doc Privado y NO ha recibido contrato -->
+                                <!-- Si es Escritura o Doc Privado o Pagaré y NO ha recibido contrato -->
                                 <button v-else-if="!exp.seguimientos?.[0]?.recibi_contrato"
                                         @click="recibirContratoAction(exp)"
                                         class="px-2 py-1 text-[10px] font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors shadow-sm">
@@ -329,9 +324,8 @@ const canArchive = (exp: Expediente) => {
 
     // 2. Definimos si falta algo por recibir
     const faltaGarantia = (s.enviado_a_archivos === 'Si' && !s.recibi_garantia_real);
-    // Verificar si es Pagaré, si lo es, no requiere contrato.
-    const esPagare = s.tipo_contrato === 'Pagaré';
-    const faltaContrato = (!esPagare && !s.recibi_contrato);
+    // Verify contract requirement for ALL types (Pagaré included)
+    const faltaContrato = !s.recibi_contrato;
 
     // Solo habilitar si NO falta nada
     return !faltaGarantia && !faltaContrato;
