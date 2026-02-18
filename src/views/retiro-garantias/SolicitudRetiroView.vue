@@ -221,6 +221,58 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Pagination Controls -->
+      <div v-if="lastPage > 1" class="bg-gray-50 px-4 py-3 border-t border-gray-200 flex items-center justify-between sm:px-6">
+          <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                  <p class="text-sm text-gray-700">
+                      Mostrando página <span class="font-medium">{{ currentPage }}</span> de <span class="font-medium">{{ lastPage }}</span>
+                      (<span class="font-medium">{{ totalHistory }}</span> resultados)
+                  </p>
+              </div>
+              <div>
+                  <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                      <button 
+                          @click="loadHistory(currentPage - 1)"
+                          :disabled="currentPage === 1"
+                          class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                          <span class="sr-only">Anterior</span>
+                          <i class="fas fa-chevron-left"></i>
+                      </button>
+                      <button 
+                          @click="loadHistory(currentPage + 1)"
+                          :disabled="currentPage === lastPage"
+                          class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                          <span class="sr-only">Siguiente</span>
+                          <i class="fas fa-chevron-right"></i>
+                      </button>
+                  </nav>
+              </div>
+          </div>
+           <!-- Mobile Pagination -->
+           <div class="flex items-center justify-between sm:hidden w-full">
+               <button 
+                  @click="loadHistory(currentPage - 1)"
+                  :disabled="currentPage === 1"
+                  class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              >
+                  Anterior
+              </button>
+              <span class="text-sm text-gray-700">
+                  {{ currentPage }} / {{ lastPage }}
+              </span>
+              <button 
+                  @click="loadHistory(currentPage + 1)"
+                  :disabled="currentPage === lastPage"
+                  class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              >
+                  Siguiente
+              </button>
+           </div>
+      </div>
     </div>
   </div>
 </template>
@@ -244,6 +296,9 @@ const isHistorico = ref(false); // Nuevo estado
 const loadingSubmit = ref(false);
 const history = ref([]);
 const loadingHistory = ref(false);
+const currentPage = ref(1);
+const lastPage = ref(1);
+const totalHistory = ref(0);
 const documentInfo = ref(null); // Nuevo estado para la info del documento
 const documentsList = ref([]);
 const expedienteActive = ref(false);
@@ -412,7 +467,9 @@ const submitRequest = async () => {
     
     Swal.fire('Éxito', 'Solicitud enviada correctamente', 'success');
     resetForm();
-    loadHistory();
+    Swal.fire('Éxito', 'Solicitud enviada correctamente', 'success');
+    resetForm();
+    loadHistory(1);
 
   } catch (error) {
     console.error(error);
@@ -423,11 +480,22 @@ const submitRequest = async () => {
   }
 };
 
-const loadHistory = async () => {
+const loadHistory = async (page = 1) => {
   loadingHistory.value = true;
   try {
-    const response = await api.get('/solicitudes-retiro/agencia');
+    const agencyId = authStore.user?.id_agencia || authStore.user?.agencia_id || authStore.user?.agencia?.id;
+    const response = await api.get('/solicitudes-retiro/agencia', {
+      params: { 
+          id_agencia: agencyId,
+          page: page 
+      }
+    });
+
     history.value = response.data.data;
+    currentPage.value = response.data.current_page;
+    lastPage.value = response.data.last_page;
+    totalHistory.value = response.data.total;
+    
   } catch (error) {
     console.error(error);
   } finally {
@@ -446,7 +514,8 @@ const resetFormData = () => {
 
 const handleSuccess = () => {
     resetForm();
-    loadHistory();
+    resetForm();
+    loadHistory(1);
 };
 
 const resetForm = () => {
