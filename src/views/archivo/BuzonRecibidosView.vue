@@ -150,12 +150,20 @@
 
                             <!-- Contrato -->
                              <td class="px-6 py-4 text-center align-middle">
-                                <span v-if="exp.seguimientos?.[0]?.es_un_pagare === 'Pendiente' || exp.seguimientos?.[0]?.es_un_pagare === null" 
+                                <!-- Lógica anterior: es_un_pagare === 'Pendiente' || null -->
+                                <!-- Lógica nueva: sin tipo_contrato o null -->
+                                <span v-if="!exp.seguimientos?.[0]?.tipo_contrato" 
                                     class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
                                     En Proceso...
                                 </span>
 
-                                <button v-else-if="exp.seguimientos?.[0]?.es_un_pagare === 'no' && !exp.seguimientos?.[0]?.recibi_contrato"
+                                <!-- Si es Pagaré (no requiere contrato) -->
+                                <span v-else-if="exp.seguimientos?.[0]?.tipo_contrato === 'Pagaré'" class="text-slate-400 text-[10px] italic">
+                                    No aplica ({{ exp.seguimientos?.[0]?.tipo_contrato }})
+                                </span>
+
+                                <!-- Si es Escritura o Doc Privado y NO ha recibido contrato -->
+                                <button v-else-if="!exp.seguimientos?.[0]?.recibi_contrato"
                                         @click="recibirContratoAction(exp)"
                                         class="px-2 py-1 text-[10px] font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors shadow-sm">
                                     Recibir Contrato
@@ -242,7 +250,7 @@ interface Expediente {
         id_seguimiento: number;
         observacion_envio?: string;
         recibi_garantia_real?: string;
-        es_un_pagare?: string;
+        tipo_contrato?: string; // Reemplazamos es_un_pagare por tipo_contrato
         recibi_contrato?: string;
         archivado_at?: string;
         enviado_a_archivos?: string;
@@ -314,13 +322,16 @@ const canArchive = (exp: Expediente) => {
     if (!s) return false;
 
     // 1. Si el flujo no ha decidido, BLOQUEO TOTAL
-    if (s.es_un_pagare === 'Pendiente' || s.es_un_pagare === null) {
+    // Usamos tipo_contrato en lugar de es_un_pagare
+    if (!s.tipo_contrato) {
         return false;
     }
 
     // 2. Definimos si falta algo por recibir
     const faltaGarantia = (s.enviado_a_archivos === 'Si' && !s.recibi_garantia_real);
-    const faltaContrato = (s.es_un_pagare === 'no' && !s.recibi_contrato);
+    // Verificar si es Pagaré, si lo es, no requiere contrato.
+    const esPagare = s.tipo_contrato === 'Pagaré';
+    const faltaContrato = (!esPagare && !s.recibi_contrato);
 
     // Solo habilitar si NO falta nada
     return !faltaGarantia && !faltaContrato;
@@ -377,15 +388,25 @@ const showObservation = (text: string) => {
 
 const recibirContratoAction = async (exp: Expediente) => {
     const contrato = exp.seguimientos?.[0]?.numero_contrato || 'Sin Número';
+    const tipo = exp.seguimientos?.[0]?.tipo_contrato || 'Desconocido';
+    
     const result = await Swal.fire({
         title: '¿Confirmar recepción?',
         html: `
-            <p>Estas por recibir el contrato: <b class="text-blue-600 text-lg">${contrato}</b></p>
-            <p class="text-sm text-gray-600 mt-2">Del expediente id: <b>${exp.id}</b></p>
+            <div class="text-left">
+                <p class="mb-2">Estás por recibir el siguiente documento:</p>
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    <p class="text-sm text-gray-700">Tipo de Contrato:</p>
+                    <p class="font-bold text-blue-800 text-lg mb-2">${tipo}</p>
+                    
+                    <p class="text-sm text-gray-700">Número:</p>
+                    <p class="font-bold text-gray-900 font-mono">${contrato}</p>
+                </div>
+                <p class="text-xs text-gray-500 mt-3 text-center">Del expediente id: <b>${exp.id}</b></p>
+            </div>
         `,
-        icon: 'question',
         showCancelButton: true,
-        confirmButtonText: 'Sí, recibir',
+        confirmButtonText: 'Sí, recibir documento',
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#2563EB'
     })
