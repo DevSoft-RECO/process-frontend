@@ -24,8 +24,16 @@
       </div>
     </div>
 
-    <!-- Request Form Section -->
-    <div v-if="showForm" class="bg-white p-6 rounded-lg shadow space-y-4 animate-fade-in-down">
+    <!-- Historic Request Form Section -->
+    <SolicitudRetiroHistoricoForm
+      v-if="showForm && isHistorico"
+      :documentData="documentInfo"
+      @cancel="resetForm"
+      @success="handleSuccess"
+    />
+
+    <!-- Request Form Section (Standard) -->
+    <div v-if="showForm && !isHistorico" class="bg-white p-6 rounded-lg shadow space-y-4 animate-fade-in-down">
       <div class="flex justify-between items-center">
         <h2 class="text-lg font-semibold text-gray-700">
           {{ isManual ? 'Nueva Solicitud (Carga Manual)' : 'Datos del Documento' }}
@@ -223,6 +231,8 @@ import api from '@/api/axios';
 import Swal from 'sweetalert2';
 import { useAuthStore } from '@/stores/auth'; // Import auth store
 
+import SolicitudRetiroHistoricoForm from './SolicitudRetiroHistoricoForm.vue';
+
 const authStore = useAuthStore(); // Use auth store
 
 // State
@@ -230,6 +240,7 @@ const searchTerm = ref('');
 const loadingSearch = ref(false);
 const showForm = ref(false);
 const isManual = ref(false);
+const isHistorico = ref(false); // Nuevo estado
 const loadingSubmit = ref(false);
 const history = ref([]);
 const loadingHistory = ref(false);
@@ -277,7 +288,19 @@ const searchDocument = async () => {
     }
 
     if (response.data.found) {
+      // START: Historic Handling
+      if (response.data.source === 'historico') {
+          isHistorico.value = true;
+          isManual.value = false;
+          // Set document info for the historic component
+          documentInfo.value = response.data.data;
+          showForm.value = true;
+          return;
+      }
+      // END: Historic Handling
+
       isManual.value = false;
+      isHistorico.value = false;
       // Pre-fill expediente data
       formData.id_expediente = response.data.data.id_expediente;
       formData.titulo_nombre = response.data.data.titulo_nombre; // Keep existing title if any
@@ -423,11 +446,17 @@ const resetFormData = () => {
   formData.es_manual = false;
 };
 
+const handleSuccess = () => {
+    resetForm();
+    loadHistory();
+};
+
 const resetForm = () => {
   showForm.value = false;
   searchTerm.value = '';
   resetFormData();
   documentsList.value = [];
+  isHistorico.value = false; // Reset historic flag
 };
 
 const formatDate = (dateString) => {
