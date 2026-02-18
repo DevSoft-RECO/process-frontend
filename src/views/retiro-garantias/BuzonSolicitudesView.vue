@@ -37,6 +37,7 @@
           <thead class="bg-gray-50 sticky top-0">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Origen</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Agencia</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitante</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
@@ -48,18 +49,29 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-if="loading">
-              <td colspan="8" class="px-6 py-4 text-center text-gray-500">Cargando solicitudes...</td>
+              <td colspan="9" class="px-6 py-4 text-center text-gray-500">Cargando solicitudes...</td>
             </tr>
             <tr v-else-if="requests.length === 0">
-              <td colspan="8" class="px-6 py-4 text-center text-gray-500">No hay solicitudes en este estado.</td>
+              <td colspan="9" class="px-6 py-4 text-center text-gray-500">No hay solicitudes en este estado.</td>
             </tr>
             <tr v-for="req in requests" :key="req.id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(req.fecha_solicitud) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <!-- Origen Logic -->
+                  <span v-if="req.id_expediente" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      Sistema
+                  </span>
+                  <span v-else-if="req.es_manual" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                      Manual
+                  </span>
+                  <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                      Histórico
+                  </span>
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ req.agencia?.nombre || 'N/A' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ req.solicitante?.name || 'N/A' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ req.numero_documento }}
-                <span v-if="req.es_manual" class="ml-1 text-xs text-yellow-600 bg-yellow-100 px-1 rounded">Manual</span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ req.titulo_nombre }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-bold" 
@@ -102,7 +114,26 @@
         </div>
 
         <div v-if="selectedDocument" class="space-y-4">
-           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+           <!-- CASO HISTÓRICO -->
+           <div v-if="selectedDocument._isHistoric" class="bg-purple-50 p-4 rounded border border-purple-200">
+               <div class="flex items-center space-x-2 mb-2">
+                   <span class="px-2 py-0.5 rounded bg-purple-200 text-purple-800 text-xs font-bold">Histórico</span>
+                   <h4 class="font-bold text-gray-800">Detalles Recuperados</h4>
+               </div>
+               
+               <div class="mb-3">
+                   <p class="text-xs font-bold text-gray-500 uppercase">Datos de Garantía</p>
+                   <p class="text-sm text-gray-800 whitespace-pre-line">{{ selectedDocument.datos_garantia || 'Sin datos registrados.' }}</p>
+               </div>
+
+               <div>
+                   <p class="text-xs font-bold text-gray-500 uppercase">Observaciones Originales</p>
+                   <p class="text-sm text-gray-800">{{ selectedDocument.observacion || 'Sin observaciones.' }}</p>
+               </div>
+           </div>
+
+           <!-- CASO SISTEMA (Nuevo Expediente) -->
+           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div class="bg-gray-50 p-3 rounded">
                 <span class="block font-bold text-gray-600">Número de Documento</span>
                 <span class="text-gray-900">{{ selectedDocument.numero }}</span>
@@ -194,10 +225,20 @@ const openDetailModal = async (req) => {
 
   await nextTick(); // Esperar renderizado del modal
 
-  if (req.documento) {
-      // Asignar datos con copia para reactividad
+  if (req.id_expediente && req.documento) {
+      // SISTEMA: Asignar datos de documento real
       selectedDocument.value = { ...req.documento };
+      selectedDocument.value._isHistoric = false;
+  } else if (!req.id_expediente && req.expediente_historico) {
+      // HISTÓRICO: Asignar datos planos
+      selectedDocument.value = { 
+          numero: req.numero_documento,
+          datos_garantia: req.expediente_historico.datos_garantia,
+          observacion: req.expediente_historico.observacion,
+          _isHistoric: true
+      };
   } else {
+      // Fallback
       selectedDocument.value = null;
   }
 };
