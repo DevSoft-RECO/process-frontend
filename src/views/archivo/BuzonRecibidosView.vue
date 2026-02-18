@@ -340,7 +340,7 @@ const canArchive = (exp: Expediente) => {
 const archivarAction = async (exp: Expediente) => {
     const result = await Swal.fire({
         title: '¿Archivar Expediente?',
-        text: `¿Estás seguro de archivar el expediente ${exp.codigo_cliente}? Se creará un registro histórico.`,
+        text: `¿Estás seguro de archivar el expediente con id #${exp.id} del producto ${exp.numero_documento} ? Se creará un registro histórico.`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Sí, archivar',
