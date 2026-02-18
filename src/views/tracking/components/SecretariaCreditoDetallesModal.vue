@@ -450,84 +450,54 @@ const isAccepted = computed(() => {
 })
 
 // 2. Función finalizarProceso actualizada
+// 2. Función finalizarProceso actualizada
 const finalizarProceso = async () => {
     // 1. Extraemos la observación del último seguimiento
     const ultimoSeguimiento = detallesData.value?.expediente?.seguimientos?.[0];
     const observacion = ultimoSeguimiento?.observacion_envio || 'sin observación';
     
-    let esPagareFinal = 'no';
-
-    // CASO A: No ha sido enviado a archivos (Preguntamos con radio buttons)
-    if (!esEnviadoAArchivos.value) {
-        const { value: selection } = await Swal.fire({
-            title: '¿Es un Pagaré?',
-            html: `
-                <div class="text-center">
-                    <p class="mb-4 text-gray-700">
-                        la observacion de la agrantia indica: <br>
-                        <b class="text-blue-700">"${observacion}"</b>
-                    </p>
-                    <p class="mb-4 text-sm font-semibold">¿Confirma que el documento es un pagaré?</p>
-                    <div class="flex justify-center gap-8">
-                        <label class="inline-flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="es_pagare" value="si" class="h-5 w-5 text-indigo-600">
-                            <span class="text-gray-900">Sí (Pagaré)</span>
-                        </label>
-                        <label class="inline-flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="es_pagare" value="no" class="h-5 w-5 text-red-600">
-                            <span class="text-gray-900">No (Contrato)</span>
-                        </label>
-                    </div>
-                </div>
-            `,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Confirmar',
-            cancelButtonText: 'Cancelar',
-            confirmButtonColor: '#4F46E5',
-            preConfirm: () => {
-                const checked = document.querySelector('input[name="es_pagare"]:checked');
-                if (!checked) {
-                    Swal.showValidationMessage('Debe seleccionar una opción');
-                    return null;
-                }
-                return (checked as HTMLInputElement).value;
-            }
-        });
-
-        if (!selection) return;
-        esPagareFinal = selection;
-
-    } else {
-        // CASO B: Ya fue enviado a archivos (Confirmación directa)
-        const confirm = await Swal.fire({
-            title: '¿Enviar a Archivos?',
-            html: `
-                <p class="text-gray-700">
-                    en las observaciones de la garantia indica <b class="text-green-700">"${observacion}"</b>. 
-                    <br><br>¿Confirmar envío a Archivo?
+    // Prompt para seleccionar Tipo de Contrato
+    const { value: tipoContrato } = await Swal.fire({
+        title: 'Finalizar Revisión',
+        html: `
+            <div class="text-left">
+                <p class="mb-4 text-gray-700 text-sm">
+                    Observación de la garantía: <br>
+                    <b class="text-blue-700">"${observacion}"</b>
                 </p>
-            `,
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, Enviar',
-            cancelButtonText: 'Cancelar',
-            confirmButtonColor: '#10B981'
-        });
+                <p class="mb-2 font-medium text-gray-800">Seleccione el Tipo de Contrato:</p>
+            </div>
+        `,
+        input: 'select',
+        inputOptions: {
+            'Escritura Pública': 'Escritura Pública',
+            'Documento Privado': 'Documento Privado',
+            'Pagaré': 'Pagaré'
+        },
+        inputPlaceholder: 'Seleccione una opción',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Finalizar y Archivar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#4F46E5',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Debe seleccionar un tipo de contrato';
+            }
+        }
+    });
 
-        if (!confirm.isConfirmed) return;
-        esPagareFinal = 'no';
-    }
+    if (!tipoContrato) return;
 
     // 2. Envío al Backend
     try {
         const res = await api.post('/secretaria-credito/finalizar-proceso', {
             id: props.expediente.id,
-            es_pagare: esPagareFinal
+            tipo_contrato: tipoContrato
         });
         
         if (res.data.success) {
-            Swal.fire('Éxito', 'Proceso finalizado correctamente.', 'success');
+            Swal.fire('Éxito', 'Expediente finalizado y enviado a archivo.', 'success');
             emit('refresh');
             emit('close');
         }
