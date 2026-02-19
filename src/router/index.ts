@@ -342,6 +342,22 @@ const routes: RouteRecordRaw[] = [
                 meta: {
                     title: 'Buzón de Confirmaciones'
                 }
+            },
+            {
+                path: 'confirmacion-documentos/resultados',
+                name: 'admin-confirmacion-resultados',
+                component: () => import('@/views/confirmacion-documentos/ResultadosConfirmacionView.vue'),
+                meta: {
+                    title: 'Resultados de Confirmación'
+                }
+            },
+            {
+                path: 'confirmacion-documentos/historico',
+                name: 'admin-confirmacion-historico',
+                component: () => import('@/views/confirmacion-documentos/HistoricoConfirmacionesView.vue'),
+                meta: {
+                    title: 'Histórico de Confirmaciones'
+                }
             }
 
         ]

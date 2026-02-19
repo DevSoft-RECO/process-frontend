@@ -459,6 +459,14 @@ const menuItems = computed(() => {
                 {
                     label: 'Buzón Confirmaciones',
                     route: '/admin/confirmacion-documentos/buzon'
+                },
+                {
+                    label: 'Resultados',
+                    route: '/admin/confirmacion-documentos/resultados'
+                },
+                {
+                    label: 'Histórico',
+                    route: '/admin/confirmacion-documentos/historico'
                 }
             ]
         },
