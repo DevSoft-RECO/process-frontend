@@ -77,6 +77,13 @@
     </div>
 
     <!-- Validation Modal replaced by SweetAlert -->
+    <ConfirmationModal 
+      :show="showModal" 
+      :request="selectedRequest"
+      @close="showModal = false"
+      @saved="handleSaved"
+      @document-registered="handleRegistered"
+    />
   </div>
 </template>
 
@@ -84,9 +91,12 @@
 import { ref, onMounted } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
+import ConfirmationModal from './ConfirmationModal.vue';
 
 const requests = ref([]);
 const loading = ref(false);
+const showModal = ref(false);
+const selectedRequest = ref(null);
 
 const loadRequests = async () => {
     loading.value = true;
@@ -103,8 +113,10 @@ const loadRequests = async () => {
 
 const formatDate = (dateString) => {
     if (!dateString) return '-';
-    const [year, month, day] = dateString.split('-');
-    return `${day}/${month}/${year}`;
+    // Handle both YYYY-MM-DD and ISO string
+    const date = new Date(dateString);
+    if (isNaN(date)) return dateString;
+    return date.toLocaleDateString(); 
 };
 
 const formatDateTime = (dateString) => {
@@ -113,97 +125,34 @@ const formatDateTime = (dateString) => {
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 };
 
-const openValidationModal = async (req) => {
-    const htmlContent = `
-        <div class="text-left text-sm bg-gray-50 p-3 rounded mb-4 border">
-            <div class="grid grid-cols-2 gap-2">
-                <div class="col-span-2 border-b pb-2 mb-2">
-                    <strong>Tipo Documento:</strong> ${req.tipo_documento || '-'}<br>
-                    <strong>Registro Propiedad:</strong> ${req.registro_propiedad || '-'}
-                </div>
-
-                <div><strong>No. Documento:</strong> <br>${req.numero}</div>
-                <div><strong>Fecha Doc:</strong> <br>${formatDate(req.fecha)}</div>
-                
-                <div><strong>Monto Póliza:</strong> <br>${req.monto_poliza ? 'Q ' + req.monto_poliza : '-'}</div>
-                <div><strong>Referencia:</strong> <br>${req.referencia || '-'}</div>
-
-                <div class="col-span-2"><strong>Propietario:</strong> <br>${req.propietario || '-'}</div>
-                <div class="col-span-2"><strong>Autorizador:</strong> <br>${req.autorizador || '-'}</div>
-                
-                <div class="col-span-2 mt-2 pt-2 border-t border-gray-200 grid grid-cols-4 gap-2 text-center">
-                    <div><strong>Finca</strong><br>${req.no_finca || '-'}</div>
-                    <div><strong>Folio</strong><br>${req.folio || '-'}</div>
-                    <div><strong>Libro</strong><br>${req.libro || '-'}</div>
-                    <div><strong>Dominio</strong><br>${req.no_dominio || '-'}</div>
-                </div>
-                
-                <div class="col-span-2 mt-2 pt-2 border-t border-gray-200">
-                    <strong>Observación del Documento:</strong> <br>
-                    <span class="italic text-gray-600">${req.observacion || '(Sin observación)'}</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="text-center mb-4">
-            <h3 class="font-bold text-gray-800 mb-2">¿Existe el documento físico en archivo?</h3>
-            <div class="flex justify-center gap-4">
-                <label class="cursor-pointer border p-2 rounded hover:bg-green-50 has-[:checked]:bg-green-100 has-[:checked]:border-green-500 transition-colors">
-                    <input type="radio" name="swal-confirmacion" value="SI" class="mr-2">
-                    <span class="font-bold text-green-700">SÍ EXISTE</span>
-                </label>
-                <label class="cursor-pointer border p-2 rounded hover:bg-red-50 has-[:checked]:bg-red-100 has-[:checked]:border-red-500 transition-colors">
-                    <input type="radio" name="swal-confirmacion" value="NO" class="mr-2">
-                    <span class="font-bold text-red-700">NO EXISTE</span>
-                </label>
-            </div>
-        </div>
-
-        <div class="text-left">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Observación de Confirmación</label>
-            <textarea id="swal-observacion" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" rows="2" placeholder="Detalles extra..."></textarea>
-        </div>
-    `;
-
-    const { value: formValues } = await Swal.fire({
-        title: 'Validación Física',
-        html: htmlContent,
-        showCancelButton: true,
-        confirmButtonText: 'Guardar Validación',
-        cancelButtonText: 'Cancelar',
-        width: '600px',
-        focusConfirm: false,
-        preConfirm: () => {
-            const confirmacion = document.querySelector('input[name="swal-confirmacion"]:checked')?.value;
-            const observacion = document.getElementById('swal-observacion').value;
-
-            if (!confirmacion) {
-                Swal.showValidationMessage('Debe seleccionar SI o NO');
-                return false;
-            }
-
-            return {
-                confirmacion: confirmacion,
-                observacion_confirmacion: observacion
-            };
-        }
-    });
-
-    if (formValues) {
-        await submitValidation(req.id, formValues);
-    }
+const openValidationModal = (req) => {
+    selectedRequest.value = req;
+    showModal.value = true;
 };
 
-const submitValidation = async (id, data) => {
+const handleSaved = async ({ id, data }) => {
     try {
         await api.put(`/confirmacion-documentos/${id}`, data);
-        
-        await Swal.fire('Éxito', 'Documento validado correctamente', 'success');
+        Swal.fire('Éxito', 'Documento validado correctamente', 'success');
+        showModal.value = false;
         loadRequests();
     } catch (error) {
         console.error(error);
         Swal.fire('Error', 'No se pudo guardar la validación', 'error');
     }
+};
+
+const handleRegistered = () => {
+    // Document registered successfully, now it exists.
+    // Refresh list to update status icons
+    loadRequests();
+    // Modal stays open so user can confirm validation now (as EXISTING)
+    Swal.fire({
+        title: 'Registrado',
+        text: 'El documento ha sido creado. Ahora puede proceder a Validar indicando que SÍ EXISTE.',
+        icon: 'success',
+        timer: 3000
+    });
 };
 
 onMounted(() => {
