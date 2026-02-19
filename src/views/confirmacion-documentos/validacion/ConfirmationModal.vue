@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div v-if="show" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-bold text-gray-800">
@@ -106,11 +106,14 @@
 
                <div class="col-span-2">
                   <label class="block font-medium text-gray-700">Observación del Documento</label>
-                  <textarea v-model="form.observacion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" rows="2"></textarea>
+                  <textarea v-model="form.observacion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500" rows="2"></textarea>
               </div>
           </div>
 
-          <div class="mt-4 flex justify-end">
+          <div class="mt-4 flex justify-end gap-3">
+              <button @click="close" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                Cancelar
+              </button>
               <button 
                 @click="registerDocument" 
                 :disabled="registering"
@@ -207,11 +210,14 @@ const form = ref({
 const loadCatalogs = async () => {
     try {
         const [tiposRes, registrosRes] = await Promise.all([
-            api.get('/tipo-documentos'),
+            api.get('/tipo-documentos?all=true'),
             api.get('/registros-propiedad')
         ]);
-        catalogos.value.tipos = tiposRes.data;
-        catalogos.value.registros = registrosRes.data;
+        
+        // Ensure we retrieve the data array correctly
+        catalogos.value.tipos = tiposRes.data.data || tiposRes.data;
+        catalogos.value.registros = registrosRes.data.data || registrosRes.data;
+
     } catch (e) {
         console.error("Error loading catalogs", e);
     }
