@@ -202,6 +202,31 @@
       
       <!-- SENT TAB CONTENTS -->
       <div v-if="activeTab === 'sent'" class="flex-1 overflow-auto flex flex-col">
+        <!-- Sub-tabs for Sent Requests -->
+        <div class="px-4 border-b border-gray-200 bg-gray-50 flex space-x-4">
+             <button 
+                @click="sentFilter = 'all'" 
+                class="py-2 text-sm font-medium border-b-2 transition-colors"
+                :class="sentFilter === 'all' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+             >
+                Todos
+             </button>
+             <button 
+                @click="sentFilter = 'Temporal'" 
+                class="py-2 text-sm font-medium border-b-2 transition-colors"
+                :class="sentFilter === 'Temporal' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+             >
+                Enviados Temporales
+             </button>
+             <button 
+                @click="sentFilter = 'Definitivo'" 
+                class="py-2 text-sm font-medium border-b-2 transition-colors"
+                :class="sentFilter === 'Definitivo' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+             >
+                Enviados Definitivos
+             </button>
+        </div>
+
         <div class="flex-1 overflow-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50 sticky top-0">
@@ -218,10 +243,10 @@
             <tr v-if="loadingHistory">
               <td colspan="6" class="px-6 py-4 text-center text-gray-500">Cargando historial...</td>
             </tr>
-            <tr v-else-if="history.length === 0">
-              <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay solicitudes registradas.</td>
+            <tr v-else-if="filteredHistory.length === 0">
+              <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay solicitudes registradas con este filtro.</td>
             </tr>
-            <tr v-for="item in history" :key="item.id" class="hover:bg-gray-50">
+            <tr v-for="item in filteredHistory" :key="item.id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(item.fecha_solicitud) }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.numero_documento }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.titulo_nombre }}</td>
@@ -249,7 +274,7 @@
               <div>
                   <p class="text-sm text-gray-700">
                       Mostrando página <span class="font-medium">{{ currentPage }}</span> de <span class="font-medium">{{ lastPage }}</span>
-                      (<span class="font-medium">{{ totalHistory }}</span> resultados)
+                      (<span class="font-medium">{{ totalHistory }}</span> resultados totales)
                   </p>
               </div>
               <div>
@@ -340,6 +365,15 @@
                     >
                         <i class="fas fa-check-circle mr-1"></i> Recibir
                     </button>
+                    <!-- Return to Archive Action (Only for Temporal and Received) -->
+                    <button 
+                        v-if="item.estado_actual === 4 && item.tipo_retiro === 'Temporal'"
+                        @click="returnToArchive(item)"
+                        class="ml-2 bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1 rounded text-xs font-bold border border-gray-300 transition-colors"
+                        title="Reingresar al Archivo (Devolución)"
+                    >
+                        <i class="fas fa-archive mr-1"></i> Reingresar
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -391,6 +425,7 @@ const authStore = useAuthStore(); // Use auth store
 
 // State
 const activeTab = ref('sent');
+const sentFilter = ref('all'); // 'all' | 'Temporal' | 'Definitivo'
 const searchTerm = ref('');
 const loadingSearch = ref(false);
 const showForm = ref(false);
@@ -423,6 +458,11 @@ const formData = reactive({
   tipo_retiro: 'Temporal',
   justificacion: '',
   es_manual: false
+});
+
+const filteredHistory = computed(() => {
+    if (sentFilter.value === 'all') return history.value;
+    return history.value.filter(item => item.tipo_retiro === sentFilter.value);
 });
 
 // Methods
@@ -715,9 +755,37 @@ const confirmReceipt = async (item) => {
     }
 };
 
+const returnToArchive = async (item) => {
+    const result = await Swal.fire({
+        title: '¿Reingresar al Archivo?',
+        html: `Está a punto de devolver la garantía <strong>${item.numero_documento}</strong> al archivo (histórico).<br><br>Esto indica que el documento físico ha regresado a su custodia.`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, Reingresar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#10B981',
+        cancelButtonColor: '#6B7280'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await api.post(`/solicitudes-retiro/${item.id}/return-archive`);
+            Swal.fire('Éxito', 'Garantía reingresada al archivo exitosamente.', 'success');
+            
+            // Reload BOTH lists to keep everything in sync
+            loadHistory(currentPage.value);
+            loadIncoming(currentPageIncoming.value);
+            
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', error.response?.data?.message || 'Error al reingresar.', 'error');
+        }
+    }
+};
+
 onMounted(() => {
-  loadHistory();
-  loadIncoming();
+  loadHistory(1); // Force page 1
+  loadIncoming(1);
 });
 </script>
 

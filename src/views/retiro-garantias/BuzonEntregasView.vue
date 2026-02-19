@@ -38,14 +38,15 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entregado Por</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Evidencia</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-if="loading">
-              <td colspan="9" class="px-6 py-4 text-center text-gray-500">Cargando historial de entregas...</td>
+              <td colspan="10" class="px-6 py-4 text-center text-gray-500">Cargando historial de entregas...</td>
             </tr>
             <tr v-else-if="items.length === 0">
-              <td colspan="9" class="px-6 py-4 text-center text-gray-500">No hay garantías entregadas en esta sección.</td>
+              <td colspan="10" class="px-6 py-4 text-center text-gray-500">No hay garantías entregadas en esta sección.</td>
             </tr>
             <tr v-for="item in items" :key="item.id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(item.updated_at) }}</td>
@@ -69,6 +70,16 @@
                   <i class="fas fa-file-pdf mr-1"></i> Ver Evidencia
                 </a>
                 <span v-else class="text-gray-400 italic">Sin evidencia</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <button 
+                      v-if="item.tipo_retiro === 'Temporal'"
+                      @click="returnToArchive(item)"
+                      class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1 rounded text-xs font-bold border border-gray-300 transition-colors"
+                      title="Reingresar al Archivo (Devolución)"
+                  >
+                      <i class="fas fa-archive mr-1"></i> Reingresar
+                  </button>
               </td>
             </tr>
           </tbody>
@@ -110,6 +121,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
 import api from '@/api/axios';
+import Swal from 'sweetalert2'; // Add Swal
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
@@ -149,6 +161,30 @@ const loadItems = async (page = 1) => {
   } finally {
     loading.value = false;
   }
+};
+
+const returnToArchive = async (item) => {
+    const result = await Swal.fire({
+        title: '¿Reingresar al Archivo?',
+        html: `Está a punto de devolver la garantía <strong>${item.numero_documento}</strong> al archivo (histórico).<br><br>Esto indica que el documento físico ha regresado a su custodia.`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, Reingresar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#10B981',
+        cancelButtonColor: '#6B7280'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await api.post(`/solicitudes-retiro/${item.id}/return-archive`);
+            Swal.fire('Éxito', 'Garantía reingresada al archivo exitosamente.', 'success');
+            loadItems(currentPage.value);
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', error.response?.data?.message || 'Error al reingresar.', 'error');
+        }
+    }
 };
 
 const formatDate = (dateString) => {

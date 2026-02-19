@@ -95,7 +95,18 @@
                 >
                   Despachar
                 </button>
-                <span v-else class="text-gray-400">Despachado</span>
+                <div v-else class="flex flex-col space-y-1">
+                    <span class="text-xs font-bold text-gray-500">Despachado ({{ getStatusLabel(req.estado_actual) }})</span>
+                    
+                     <button 
+                      v-if="req.tipo_retiro === 'Temporal' && req.estado_actual !== 0"
+                      @click="returnToArchive(req)" 
+                      class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1 rounded border border-gray-300 text-xs"
+                      title="Reingresar al Archivo (El documento ha regresado)"
+                    >
+                      <i class="fas fa-archive"></i> Reingresar
+                    </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -298,6 +309,42 @@ const dispatchRequest = async (req) => {
        Swal.fire('Error', 'Error al despachar el documento', 'error');
     }
   }
+};
+
+const returnToArchive = async (req) => {
+    const result = await Swal.fire({
+        title: '¿Reingresar al Archivo?',
+        html: `Está a punto de marcar el documento <strong>${req.numero_documento}</strong> como reingresado al archivo.<br><br>Esto confirma que ha regresado físicamente.`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, Reingresar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#10B981',
+        cancelButtonColor: '#6B7280'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await api.post(`/solicitudes-retiro/${req.id}/return-archive`);
+            Swal.fire('Éxito', 'Documento reingresado al archivo.', 'success');
+            loadRequests();
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', error.response?.data?.message || 'Error al reingresar.', 'error');
+        }
+    }
+};
+
+const getStatusLabel = (status) => {
+    switch(status) {
+        case 0: return 'Archivado';
+        case 1: return 'Solicitado';
+        case 2: return 'Enviado (Temporal)';
+        case 3: return 'Enviado (Definitivo)';
+        case 4: return 'Recibido en Agencia';
+        case 5: return 'Entregado a Asociado';
+        default: return 'Desconocido';
+    }
 };
 
 const formatDate = (dateString) => {
