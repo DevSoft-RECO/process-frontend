@@ -51,6 +51,7 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Justificación</th>
+              <th v-if="filterState === 4" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Obs. Retorno</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
@@ -88,6 +89,9 @@
               <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" :title="req.justificacion">
                 {{ req.justificacion }}
               </td>
+              <td v-if="filterState === 4" class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" :title="req.observacion_retorno">
+                {{ req.observacion_retorno || '-' }}
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button 
                   @click="openDetailModal(req)"
@@ -103,16 +107,9 @@
                   Despachar
                 </button>
                 <div v-else class="flex flex-col space-y-1">
-                    <span class="text-xs font-bold text-gray-500">Despachado ({{ getStatusLabel(req.estado_actual) }})</span>
-                    
-                     <button 
-                      v-if="req.tipo_retiro === 'Temporal' && req.estado_actual !== 0"
-                      @click="returnToArchive(req)" 
-                      class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1 rounded border border-gray-300 text-xs"
-                      title="Reingresar al Archivo (El documento ha regresado)"
-                    >
-                      <i class="fas fa-archive"></i> Reingresar
-                    </button>
+                     <span class="text-xs font-bold text-gray-500">
+                         {{ getStatusLabel(req.estado_actual) }}
+                     </span>
                     
                     <button 
                       v-if="req.estado_actual === 6"
