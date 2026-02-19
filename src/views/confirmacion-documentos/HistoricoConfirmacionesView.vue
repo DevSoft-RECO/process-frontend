@@ -22,38 +22,73 @@
         <thead class="bg-gray-50">
           <tr>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Identificación</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datos Registrales</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observaciones</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resultado</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observación</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Validación</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr v-if="loading" class="animate-pulse">
-              <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">Cargando histórico...</td>
+              <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Cargando histórico...</td>
           </tr>
           <tr v-else-if="history.length === 0">
-              <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">No hay documentos en el histórico.</td>
+              <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">No hay documentos en el histórico.</td>
           </tr>
           <tr v-for="item in history" :key="item.id" class="hover:bg-gray-50">
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">{{ item.numero }}</div>
-              <div class="text-xs text-gray-500">{{ item.tipo_documento }}</div>
+            <!-- Col 1: Documento -->
+            <td class="px-6 py-4 whitespace-nowrap align-top">
+              <div class="text-sm font-bold text-gray-900">No. {{ item.numero }}</div>
+              <div class="text-xs text-gray-500">Fecha: {{ formatDate(item.fecha) }}</div>
+              <div class="text-xs text-gray-500 mt-1">{{ item.tipo_documento }}</div>
+              <div class="text-xs text-gray-400">{{ item.registro_propiedad }}</div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span 
-                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                :class="item.confirmacion === 'SI' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-              >
-                {{ item.confirmacion === 'SI' ? 'CONFIRMADO' : 'RECHAZADO' }}
-              </span>
+
+            <!-- Col 2: Identificacion -->
+            <td class="px-6 py-4 whitespace-nowrap align-top">
+              <div class="text-xs text-gray-900"><span class="font-semibold">Prop:</span> {{ item.propietario || '-' }}</div>
+              <div class="text-xs text-gray-900"><span class="font-semibold">Aut:</span> {{ item.autorizador || '-' }}</div>
+              <div class="text-xs text-gray-500 mt-1">Ref: {{ item.referencia || '-' }}</div>
+              <div class="text-xs text-gray-500">Monto: {{ item.monto_poliza ? 'Q ' + item.monto_poliza : '-' }}</div>
             </td>
-             <td class="px-6 py-4 text-sm text-gray-500">
-                <div class="max-w-xs truncate" :title="item.observacion_confirmacion">
-                    {{ item.observacion_confirmacion || '-' }}
+
+            <!-- Col 3: Datos Registrales -->
+            <td class="px-6 py-4 whitespace-nowrap align-top">
+              <div class="text-xs text-gray-600">
+                <span class="font-semibold">F:</span> {{ item.no_finca || '-' }} &nbsp;|&nbsp; 
+                <span class="font-semibold">F:</span> {{ item.folio || '-' }}
+              </div>
+              <div class="text-xs text-gray-600">
+                <span class="font-semibold">L:</span> {{ item.libro || '-' }} &nbsp;|&nbsp; 
+                <span class="font-semibold">D:</span> {{ item.no_dominio || '-' }}
+              </div>
+            </td>
+
+            <!-- Col 4: Observaciones -->
+            <td class="px-6 py-4 text-sm text-gray-500 align-top">
+                <div class="mb-2">
+                    <span class="text-xs font-semibold text-gray-400 uppercase">Solicitud:</span>
+                    <p class="text-xs text-gray-600 italic whitespace-normal max-w-xs">{{ item.observacion || '(Sin obs)' }}</p>
                 </div>
-              </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ formatDateTime(item.fecha_confirmacion) }}
+                <div>
+                    <span class="text-xs font-semibold text-gray-400 uppercase">Respuesta:</span>
+                    <p class="text-xs text-gray-800 font-medium whitespace-normal max-w-xs">{{ item.observacion_confirmacion || '-' }}</p>
+                </div>
+            </td>
+
+            <!-- Col 5: Resultado -->
+            <td class="px-6 py-4 whitespace-nowrap align-top">
+              <div class="flex flex-col items-start gap-1">
+                  <span 
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                    :class="item.confirmacion === 'SI' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                  >
+                    {{ item.confirmacion === 'SI' ? 'EXISTE' : 'NO EXISTE' }}
+                  </span>
+                  <span class="text-xs text-gray-400 mt-1">
+                    {{ formatDateTime(item.fecha_confirmacion) }}
+                  </span>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -81,6 +116,12 @@ const loadHistory = async () => {
     } finally {
         loading.value = false;
     }
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
 };
 
 const formatDateTime = (dateString) => {
