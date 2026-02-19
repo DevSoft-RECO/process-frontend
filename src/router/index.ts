@@ -261,6 +261,14 @@ const routes: RouteRecordRaw[] = [
                     title: 'Buzón de Solicitudes (Archivo)'
                 }
             },
+            {
+                path: 'retiro-garantias/entrega',
+                name: 'retiro-garantias-entrega',
+                component: () => import('@/views/retiro-garantias/EntregaGarantiasView.vue'),
+                meta: {
+                    title: 'Entrega de Garantías'
+                }
+            },
 
             // Asesores de Crédito
             {

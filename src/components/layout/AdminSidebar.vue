@@ -459,6 +459,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Buzón Archivo',
                     route: '/admin/retiro-garantias/buzon'
+                },
+                {
+                    label: 'Entrega de Garantías',
+                    route: '/admin/retiro-garantias/entrega'
                 }
             ]
         },
