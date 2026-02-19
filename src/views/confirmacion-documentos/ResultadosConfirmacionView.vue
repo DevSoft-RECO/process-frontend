@@ -72,7 +72,9 @@
                 </div>
                 <div>
                     <span class="text-xs font-semibold text-gray-400 uppercase">Respuesta:</span>
-                    <p class="text-xs text-gray-800 font-medium whitespace-normal max-w-xs">{{ res.observacion_confirmacion || '-' }}</p>
+                    <p class="text-xs text-gray-800 font-medium whitespace-normal max-w-xs">
+                        {{ res.observacion_confirmacion || (res.confirmacion ? '-' : 'En proceso...') }}
+                    </p>
                 </div>
             </td>
 
@@ -81,12 +83,16 @@
               <div class="flex flex-col items-start gap-1">
                   <span 
                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                    :class="res.confirmacion === 'SI' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                    :class="{
+                        'bg-green-100 text-green-800': res.confirmacion === 'SI',
+                        'bg-red-100 text-red-800': res.confirmacion === 'NO',
+                        'bg-yellow-100 text-yellow-800': !res.confirmacion
+                    }"
                   >
-                    {{ res.confirmacion === 'SI' ? 'EXISTE' : 'NO EXISTE' }}
+                    {{ res.confirmacion === 'SI' ? 'EXISTE' : (res.confirmacion === 'NO' ? 'NO EXISTE' : 'PENDIENTE') }}
                   </span>
                   <span class="text-xs text-gray-400 mt-1">
-                    {{ formatDateTime(res.fecha_confirmacion) }}
+                    {{ res.fecha_confirmacion ? formatDateTime(res.fecha_confirmacion) : '-' }}
                   </span>
               </div>
             </td>
