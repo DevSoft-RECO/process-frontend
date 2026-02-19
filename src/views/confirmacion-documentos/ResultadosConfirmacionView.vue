@@ -21,6 +21,7 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID de confirmacion</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Identificación</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datos Registrales</th>
@@ -30,12 +31,17 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr v-if="loading" class="animate-pulse">
-              <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Cargando resultados...</td>
+              <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">Cargando resultados...</td>
           </tr>
           <tr v-else-if="results.length === 0">
-              <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">No hay documentos validados.</td>
+              <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">No hay documentos validados.</td>
           </tr>
           <tr v-for="res in results" :key="res.id" class="hover:bg-gray-50">
+            <!-- Col 0: ID -->
+            <td class="px-6 py-4 whitespace-nowrap align-top text-sm font-bold text-gray-700">
+              #{{ res.id }}
+            </td>
+
             <!-- Col 1: Documento -->
             <td class="px-6 py-4 whitespace-nowrap align-top">
               <div class="text-sm font-bold text-gray-900">No. {{ res.numero }}</div>
