@@ -201,8 +201,17 @@ const filterState = ref(1); // Default: Pendientes
 const showDetailModal = ref(false);
 const selectedDocument = ref(null);
 const currentRequest = ref(null);
+const agencies = ref([]);
 
 // Methods
+const loadAgencies = async () => {
+    try {
+        const response = await api.get('/agencias');
+        agencies.value = response.data;
+    } catch (error) {
+        console.error('Error loading agencies', error);
+    }
+};
 const loadRequests = async () => {
   loading.value = true;
   try {
@@ -250,22 +259,36 @@ const closeDetailModal = () => {
 };
 
 const dispatchRequest = async (req) => {
-  const result = await Swal.fire({
-    title: '¿Despachar Documento?',
-    text: `Se enviará el documento ${req.numero_documento} a la agencia ${req.agencia?.nombre || ''} como ${req.tipo_retiro}.`,
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonText: 'Sí, Despachar',
-    cancelButtonText: 'Cancelar'
+  // Preparar opciones para SweetAlert
+  const agencyOptions = {};
+  agencies.value.forEach(a => {
+      agencyOptions[a.id] = a.nombre;
   });
 
-  if (result.isConfirmed) {
+  const { value: selectedAgencyId } = await Swal.fire({
+    title: 'Despachar Documento',
+    text: `Se enviará el documento ${req.numero_documento} como ${req.tipo_retiro}. Seleccione la agencia de destino:`,
+    input: 'select',
+    inputOptions: agencyOptions,
+    inputPlaceholder: 'Seleccione una agencia',
+    showCancelButton: true,
+    confirmButtonText: 'Despachar',
+    cancelButtonText: 'Cancelar',
+    inputValidator: (value) => {
+      if (!value) {
+        return 'Debe seleccionar una agencia de destino';
+      }
+    }
+  });
+
+  if (selectedAgencyId) {
     try {
       // Determinar estado destino: Temporal -> 2, Definitivo -> 3
       const targetState = req.tipo_retiro === 'Definitivo' ? 3 : 2;
 
       await api.post(`/solicitudes-retiro/${req.id}/despachar`, {
-        estado: targetState
+        estado: targetState,
+        id_agencia_entrega: selectedAgencyId
       });
 
       Swal.fire('Éxito', 'Documento despachado correctamente', 'success');
@@ -285,5 +308,6 @@ const formatDate = (dateString) => {
 
 onMounted(() => {
   loadRequests();
+  loadAgencies();
 });
 </script>
