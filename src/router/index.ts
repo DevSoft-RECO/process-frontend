@@ -326,6 +326,22 @@ const routes: RouteRecordRaw[] = [
                 meta: {
                     title: 'Editar Seguimiento (Admin)'
                 }
+            },
+            {
+                path: 'confirmacion-documentos/solicitud',
+                name: 'admin-confirmacion-solicitud',
+                component: () => import('@/views/confirmacion-documentos/SolicitudConfirmacionView.vue'),
+                meta: {
+                    title: 'Solicitud de Confirmación'
+                }
+            },
+            {
+                path: 'confirmacion-documentos/buzon',
+                name: 'admin-confirmacion-buzon',
+                component: () => import('@/views/confirmacion-documentos/BuzonConfirmacionesView.vue'),
+                meta: {
+                    title: 'Buzón de Confirmaciones'
+                }
             }
 
         ]
