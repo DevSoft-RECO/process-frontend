@@ -38,12 +38,16 @@
     </div>
 
     <nav
-      class="flex-1 py-6 px-3 space-y-2 custom-scrollbar"
-      :class="layoutStore.isCollapsed ? 'overflow-visible' : 'overflow-y-auto'"
+      class="flex-1 py-6 px-3 space-y-2 overflow-y-auto custom-scrollbar"
+      :class="{ 'scrollbar-hide': layoutStore.isCollapsed }"
     >
-      <template v-for="(item, index) in menuItems" :key="item.id">
+      <template v-for="item in menuItems" :key="item.id">
 
-        <div v-if="!item.children" class="relative group">
+        <div v-if="!item.children" 
+             class="relative group"
+             @mouseenter="handleMouseEnter(item, $event)"
+             @mouseleave="handleMouseLeave"
+        >
             <RouterLink
             :to="item.route"
             @click="handleItemClick"
@@ -64,22 +68,13 @@
                     {{ item.label }}
                 </span>
             </RouterLink>
-
-            <div
-                v-if="layoutStore.isCollapsed"
-                class="absolute left-full ml-2 px-3 py-2 bg-verde-cope text-white text-sm font-bold rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 whitespace-nowrap pointer-events-none"
-                style="width: max-content;"
-                :class="index >= menuItems.length - 3 ? 'bottom-0 origin-bottom-left' : 'top-0 origin-top-left'"
-            >
-                {{ item.label }}
-                <div 
-                    class="absolute -left-1 w-2 h-2 bg-verde-cope transform rotate-45"
-                    :class="index >= menuItems.length - 3 ? 'bottom-3' : 'top-3'"
-                ></div>
-            </div>
         </div>
 
-        <div v-else class="relative group">
+        <div v-else 
+             class="relative group"
+             @mouseenter="handleMouseEnter(item, $event)"
+             @mouseleave="handleMouseLeave"
+        >
             <button
                 @click="handleGroupClick(item.id)"
                 class="w-full flex items-center px-3 py-3 rounded-lg transition-all duration-200 group border-l-4 border-transparent"
@@ -107,49 +102,6 @@
                 </svg>
             </button>
 
-            <!-- POP-OVER FLOTANTE (SOLO CUANDO COLAPSADO) -->
-            <div
-                v-if="layoutStore.isCollapsed"
-                class="absolute left-full ml-4 w-64
-                       bg-azul-cope dark:bg-gray-800
-                       border-l-4 border-verde-cope
-                       rounded-xl shadow-2xl
-                       opacity-0 invisible
-                       group-hover:opacity-100 group-hover:visible
-                       transition-all duration-300 ease-out
-                       group-hover:scale-100 scale-95
-                       group-hover:translate-x-1
-                       z-50"
-                :class="index >= menuItems.length - 3 ? 'bottom-0 origin-bottom-left' : 'top-0 origin-top-left'"
-            >
-                 <div class="px-3 py-2 text-xs font-semibold text-verde-cope uppercase tracking-wider border-b border-white/10 dark:border-gray-700 mb-1">
-                    {{ item.label }}
-                 </div>
-
-                 <RouterLink
-                  v-for="child in item.children"
-                  :key="child.route"
-                  :to="child.route"
-                  @click="handleItemClick"
-                  class="block px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2"
-                  :class="isActive(child.route)
-                    ? 'bg-white/10 text-white font-medium shadow-sm'
-                    : 'text-gray-300 hover:bg-white/5 hover:text-white'"
-                >
-                  <span class="w-1.5 h-1.5 rounded-full" :class="isActive(child.route) ? 'bg-verde-cope' : 'bg-gray-400'"></span>
-                  {{ child.label }}
-                </RouterLink>
-
-                 <!-- Colita / Flecha apuntando al botón padre (Verde para efecto 'llave' { ) -->
-                 <div
-                   class="absolute left-0 -translate-x-1/2
-                          w-3 h-3 bg-verde-cope
-                          border-l border-b border-white/10
-                          rotate-45"
-                    :class="index >= menuItems.length - 3 ? 'bottom-5' : 'top-5'"
-                 ></div>
-            </div>
-
             <!-- ACORDEÓN EXPANDIDO (SOLO CUANDO ESTÁ ABIERTO) -->
             <transition
                 enter-active-class="transition-all duration-300 ease-out"
@@ -163,8 +115,6 @@
                     v-if="openGroups.includes(item.id) && !layoutStore.isCollapsed"
                     class="mt-2 ml-3 space-y-1 relative"
                 >
-
-
                     <RouterLink
                         v-for="child in item.children"
                         :key="child.route"
@@ -175,7 +125,6 @@
                             ? 'bg-verde-cope/10 text-verde-cope font-bold translate-x-1'
                             : 'text-gray-400 hover:text-white hover:bg-white/5 hover:translate-x-1'"
                     >
-                         <!-- Indicador circular animado -->
                          <span
                             class="w-1.5 h-1.5 rounded-full transition-all duration-300 ring-2"
                             :class="isActive(child.route)
@@ -190,6 +139,55 @@
         </div>
       </template>
 
+      <!-- TELEPORT OVERLAY -->
+      <Teleport to="body">
+          <transition 
+            enter-active-class="transition ease-out duration-200" 
+            enter-from-class="opacity-0 translate-x-2" 
+            enter-to-class="opacity-100 translate-x-0" 
+            leave-active-class="transition ease-in duration-150" 
+            leave-from-class="opacity-100 translate-x-0" 
+            leave-to-class="opacity-0 translate-x-2"
+          >
+            <div
+                v-if="hoveredItem && layoutStore.isCollapsed"
+                :style="popoverStyle"
+                class="fixed z-[9999] ml-2"
+                @mouseenter="handlePopoverEnter"
+                @mouseleave="handleMouseLeave"
+            >
+                 <!-- Simple Label -->
+                 <div v-if="!hoveredItem.children" 
+                      class="px-3 py-2 bg-verde-cope text-white text-sm font-bold rounded-md shadow-xl whitespace-nowrap relative"
+                 >
+                    {{ hoveredItem.label }}
+                     <div class="absolute -left-1 top-3 w-2 h-2 bg-verde-cope transform rotate-45"></div>
+                 </div>
+
+                 <!-- Expanded Menu -->
+                 <div v-else
+                      class="w-64 bg-azul-cope dark:bg-gray-800 border-l-4 border-verde-cope rounded-xl shadow-2xl relative"
+                 >
+                      <div class="px-3 py-2 text-xs font-semibold text-verde-cope uppercase tracking-wider border-b border-white/10 dark:border-gray-700 mb-1">
+                        {{ hoveredItem.label }}
+                      </div>
+                      
+                      <RouterLink
+                          v-for="child in hoveredItem.children"
+                          :key="child.route"
+                          :to="child.route"
+                          class="block px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 text-gray-300 hover:bg-white/5 hover:text-white"
+                          active-class="bg-white/10 text-white font-medium shadow-sm"
+                      >
+                            <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                            {{ child.label }}
+                      </RouterLink>
+
+                      <div class="absolute -left-2 top-4 w-4 h-4 bg-azul-cope dark:bg-gray-800 border-l border-b border-verde-cope transform rotate-45"></div>
+                 </div>
+            </div>
+          </transition>
+      </Teleport>
     </nav>
 
     <div class="p-4 mt-auto border-t border-white/10 dark:border-gray-800 shrink-0">
@@ -543,6 +541,41 @@ const handleGroupClick = (id: string) => {
         openGroups.value = [id]
     }
 }
+
+// --- TELEPORT / POPOVER LOGIC ---
+const hoveredItem = ref<any>(null)
+const popoverStyle = ref({ top: '0px', left: '0px' })
+let hoverTimeout: any = null
+
+const handleMouseEnter = (item: any, event: MouseEvent) => {
+  if (!layoutStore.isCollapsed) return
+  
+  if (hoverTimeout) clearTimeout(hoverTimeout)
+  
+  // Find the group container
+  const target = (event.target as HTMLElement).closest('.group')
+  if (!target) return
+
+  const rect = target.getBoundingClientRect()
+  
+  hoveredItem.value = item
+  popoverStyle.value = {
+    top: `${rect.top}px`,
+    left: `${rect.right}px` // Position right next to the item
+  }
+}
+
+const handleMouseLeave = () => {
+  if (!layoutStore.isCollapsed) return
+  
+  hoverTimeout = setTimeout(() => {
+    hoveredItem.value = null
+  }, 300) // Delay to reach the popover
+}
+
+const handlePopoverEnter = () => {
+  if (hoverTimeout) clearTimeout(hoverTimeout)
+}
 </script>
 
 <style scoped>
@@ -552,4 +585,12 @@ const handleGroupClick = (id: string) => {
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.2); border-radius: 20px; }
+
+.scrollbar-hide {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome/Safari/Webkit */
+}
 </style>
