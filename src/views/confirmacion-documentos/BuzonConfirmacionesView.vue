@@ -76,74 +76,7 @@
       </div>
     </div>
 
-    <!-- Validation Modal -->
-    <div v-if="showModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeModal"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="modal-title">
-              Validar Documento: {{ selectedRequest?.numero }}
-            </h3>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Resultado de la Validación</label>
-                    <div class="flex space-x-4">
-                        <label class="inline-flex items-center">
-                            <input type="radio" v-model="validationForm.confirmacion" value="SI" class="form-radio text-green-600 h-5 w-5">
-                            <span class="ml-2 font-medium text-gray-700">Confirmado (Existe)</span>
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input type="radio" v-model="validationForm.confirmacion" value="NO" class="form-radio text-red-600 h-5 w-5">
-                            <span class="ml-2 font-medium text-gray-700">Rechazado (No Existe/Erróneo)</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Observación</label>
-                    <textarea 
-                        v-model="validationForm.observacion_confirmacion" 
-                        rows="3" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="Detalles del hallazgo físico..."
-                    ></textarea>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Respuesta Administrativa</label>
-                    <textarea 
-                        v-model="validationForm.respuesta" 
-                        rows="2" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="Instrucciones o respuesta..."
-                    ></textarea>
-                </div>
-            </div>
-          </div>
-          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-            <button 
-                type="button" 
-                @click="submitValidation"
-                :disabled="modalLoading || !validationForm.confirmacion"
-                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
-            >
-              <i v-if="modalLoading" class="fas fa-spinner fa-spin mr-2"></i>
-              Guardar Validación
-            </button>
-            <button 
-                type="button" 
-                @click="closeModal"
-                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Validation Modal replaced by SweetAlert -->
   </div>
 </template>
 
@@ -154,14 +87,6 @@ import Swal from 'sweetalert2';
 
 const requests = ref([]);
 const loading = ref(false);
-const showModal = ref(false);
-const modalLoading = ref(false);
-const selectedRequest = ref(null);
-const validationForm = ref({
-    confirmacion: null,
-    observacion_confirmacion: '',
-    respuesta: ''
-});
 
 const loadRequests = async () => {
     loading.value = true;
@@ -178,8 +103,6 @@ const loadRequests = async () => {
 
 const formatDate = (dateString) => {
     if (!dateString) return '-';
-    // Handle YYYY-MM-DD which might have timezone issues if parsed as UTC
-    // Manual split is safer for date-only strings to display as-is
     const [year, month, day] = dateString.split('-');
     return `${day}/${month}/${year}`;
 };
@@ -190,36 +113,96 @@ const formatDateTime = (dateString) => {
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 };
 
-const openValidationModal = (req) => {
-    selectedRequest.value = req;
-    validationForm.value = {
-        confirmacion: null,
-        observacion_confirmacion: '',
-        respuesta: ''
-    };
-    showModal.value = true;
+const openValidationModal = async (req) => {
+    const htmlContent = `
+        <div class="text-left text-sm bg-gray-50 p-3 rounded mb-4 border">
+            <div class="grid grid-cols-2 gap-2">
+                <div class="col-span-2 border-b pb-2 mb-2">
+                    <strong>Tipo Documento:</strong> ${req.tipo_documento || '-'}<br>
+                    <strong>Registro Propiedad:</strong> ${req.registro_propiedad || '-'}
+                </div>
+
+                <div><strong>No. Documento:</strong> <br>${req.numero}</div>
+                <div><strong>Fecha Doc:</strong> <br>${formatDate(req.fecha)}</div>
+                
+                <div><strong>Monto Póliza:</strong> <br>${req.monto_poliza ? 'Q ' + req.monto_poliza : '-'}</div>
+                <div><strong>Referencia:</strong> <br>${req.referencia || '-'}</div>
+
+                <div class="col-span-2"><strong>Propietario:</strong> <br>${req.propietario || '-'}</div>
+                <div class="col-span-2"><strong>Autorizador:</strong> <br>${req.autorizador || '-'}</div>
+                
+                <div class="col-span-2 mt-2 pt-2 border-t border-gray-200 grid grid-cols-4 gap-2 text-center">
+                    <div><strong>Finca</strong><br>${req.no_finca || '-'}</div>
+                    <div><strong>Folio</strong><br>${req.folio || '-'}</div>
+                    <div><strong>Libro</strong><br>${req.libro || '-'}</div>
+                    <div><strong>Dominio</strong><br>${req.no_dominio || '-'}</div>
+                </div>
+                
+                <div class="col-span-2 mt-2 pt-2 border-t border-gray-200">
+                    <strong>Observación del Documento:</strong> <br>
+                    <span class="italic text-gray-600">${req.observacion || '(Sin observación)'}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mb-4">
+            <h3 class="font-bold text-gray-800 mb-2">¿Existe el documento físico en archivo?</h3>
+            <div class="flex justify-center gap-4">
+                <label class="cursor-pointer border p-2 rounded hover:bg-green-50 has-[:checked]:bg-green-100 has-[:checked]:border-green-500 transition-colors">
+                    <input type="radio" name="swal-confirmacion" value="SI" class="mr-2">
+                    <span class="font-bold text-green-700">SÍ EXISTE</span>
+                </label>
+                <label class="cursor-pointer border p-2 rounded hover:bg-red-50 has-[:checked]:bg-red-100 has-[:checked]:border-red-500 transition-colors">
+                    <input type="radio" name="swal-confirmacion" value="NO" class="mr-2">
+                    <span class="font-bold text-red-700">NO EXISTE</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="text-left">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Observación de Confirmación</label>
+            <textarea id="swal-observacion" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" rows="2" placeholder="Detalles extra..."></textarea>
+        </div>
+    `;
+
+    const { value: formValues } = await Swal.fire({
+        title: 'Validación Física',
+        html: htmlContent,
+        showCancelButton: true,
+        confirmButtonText: 'Guardar Validación',
+        cancelButtonText: 'Cancelar',
+        width: '600px',
+        focusConfirm: false,
+        preConfirm: () => {
+            const confirmacion = document.querySelector('input[name="swal-confirmacion"]:checked')?.value;
+            const observacion = document.getElementById('swal-observacion').value;
+
+            if (!confirmacion) {
+                Swal.showValidationMessage('Debe seleccionar SI o NO');
+                return false;
+            }
+
+            return {
+                confirmacion: confirmacion,
+                observacion_confirmacion: observacion
+            };
+        }
+    });
+
+    if (formValues) {
+        await submitValidation(req.id, formValues);
+    }
 };
 
-const closeModal = () => {
-    showModal.value = false;
-    selectedRequest.value = null;
-};
-
-const submitValidation = async () => {
-    if (!selectedRequest.value) return;
-
-    modalLoading.value = true;
+const submitValidation = async (id, data) => {
     try {
-        await api.put(`/confirmacion-documentos/${selectedRequest.value.id}`, validationForm.value);
+        await api.put(`/confirmacion-documentos/${id}`, data);
         
         await Swal.fire('Éxito', 'Documento validado correctamente', 'success');
-        closeModal();
         loadRequests();
     } catch (error) {
         console.error(error);
         Swal.fire('Error', 'No se pudo guardar la validación', 'error');
-    } finally {
-        modalLoading.value = false;
     }
 };
 
