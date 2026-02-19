@@ -52,6 +52,7 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Justificación</th>
               <th v-if="filterState === 4" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Obs. Retorno</th>
+
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
@@ -92,6 +93,7 @@
               <td v-if="filterState === 4" class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" :title="req.observacion_retorno">
                 {{ req.observacion_retorno || '-' }}
               </td>
+
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button 
                   @click="openDetailModal(req)"

@@ -445,6 +445,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Buzón Archivo',
                     route: '/admin/retiro-garantias/buzon'
+                },
+                {
+                    label: 'Histórico General',
+                    route: '/admin/retiro-garantias/historico-general'
                 }
             ]
         },

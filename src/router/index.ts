@@ -277,6 +277,14 @@ const routes: RouteRecordRaw[] = [
                     title: 'Buzón de Garantías Entregadas'
                 }
             },
+            {
+                path: 'retiro-garantias/historico-general',
+                name: 'retiro-garantias-historico-general',
+                component: () => import('@/views/retiro-garantias/validacion/BuzonHistoricoGeneralView.vue'),
+                meta: {
+                    title: 'Histórico General de Garantías'
+                }
+            },
 
             // Asesores de Crédito
             {
