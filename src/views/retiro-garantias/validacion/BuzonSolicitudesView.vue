@@ -108,6 +108,14 @@
                 >
                   Despachar
                 </button>
+                <button 
+                  v-if="req.estado_actual === 1 && authStore.hasRole('Super Admin')"
+                  @click="deleteRequest(req)" 
+                  class="ml-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                  title="Eliminar Solicitud"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
                 <div v-else class="flex flex-col space-y-1">
                      <span class="text-xs font-bold text-gray-500">
                          {{ getStatusLabel(req.estado_actual) }}
@@ -219,6 +227,9 @@
 import { ref, onMounted, nextTick } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
 
 // State
 const requests = ref([]);
@@ -250,6 +261,30 @@ const loadRequests = async () => {
     Swal.fire('Error', 'No se pudieron cargar las solicitudes', 'error');
   } finally {
     loading.value = false;
+  }
+};
+
+const deleteRequest = async (req) => {
+  const result = await Swal.fire({
+    title: '¿Estás seguro?',
+    text: "Esta acción eliminará la solicitud permanentemente. No se puede deshacer.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  });
+
+  if (result.isConfirmed) {
+    try {
+      await api.delete(`/solicitudes-retiro/${req.id}`);
+      Swal.fire('Eliminado!', 'La solicitud ha sido eliminada.', 'success');
+      loadRequests();
+    } catch (error) {
+      console.error(error);
+      Swal.fire('Error', 'No se pudo eliminar la solicitud.', 'error');
+    }
   }
 };
 
