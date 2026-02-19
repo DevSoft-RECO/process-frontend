@@ -330,7 +330,7 @@ const routes: RouteRecordRaw[] = [
             {
                 path: 'confirmacion-documentos/solicitud',
                 name: 'admin-confirmacion-solicitud',
-                component: () => import('@/views/confirmacion-documentos/SolicitudConfirmacionView.vue'),
+                component: () => import('@/views/confirmacion-documentos/solicitud/SolicitudConfirmacionView.vue'),
                 meta: {
                     title: 'Solicitud de Confirmación'
                 }
@@ -338,7 +338,7 @@ const routes: RouteRecordRaw[] = [
             {
                 path: 'confirmacion-documentos/buzon',
                 name: 'admin-confirmacion-buzon',
-                component: () => import('@/views/confirmacion-documentos/BuzonConfirmacionesView.vue'),
+                component: () => import('@/views/confirmacion-documentos/validacion/BuzonConfirmacionesView.vue'),
                 meta: {
                     title: 'Buzón de Confirmaciones'
                 }
@@ -346,7 +346,7 @@ const routes: RouteRecordRaw[] = [
             {
                 path: 'confirmacion-documentos/resultados',
                 name: 'admin-confirmacion-resultados',
-                component: () => import('@/views/confirmacion-documentos/ResultadosConfirmacionView.vue'),
+                component: () => import('@/views/confirmacion-documentos/solicitud/ResultadosConfirmacionView.vue'),
                 meta: {
                     title: 'Resultados de Confirmación'
                 }
@@ -354,7 +354,7 @@ const routes: RouteRecordRaw[] = [
             {
                 path: 'confirmacion-documentos/historico',
                 name: 'admin-confirmacion-historico',
-                component: () => import('@/views/confirmacion-documentos/HistoricoConfirmacionesView.vue'),
+                component: () => import('@/views/confirmacion-documentos/validacion/HistoricoConfirmacionesView.vue'),
                 meta: {
                     title: 'Histórico de Confirmaciones'
                 }
