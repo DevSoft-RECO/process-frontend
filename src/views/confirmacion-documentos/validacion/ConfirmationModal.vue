@@ -20,7 +20,6 @@
                      <span v-else class="text-xs bg-green-100 text-green-800 px-2 rounded-full font-bold">Documento Registrado</span>
                   </div>
               </div>
-              <div class="col-span-2"><strong>Observación Solicitud:</strong> <br><span class="italic text-gray-600">{{ request.observacion || '(Sin observación)' }}</span></div>
           </div>
       </div>
 
@@ -127,6 +126,37 @@
 
        <!-- STEP 2: PHYSICAL VALIDATION (Only if Registered) -->
       <div v-else class="mb-6 animate-fade-in-down">
+          
+          <!-- Read-only Document Details -->
+          <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 text-sm">
+              <h5 class="font-bold text-gray-800 mb-3 border-b border-gray-200 pb-2">
+                  <i class="fas fa-info-circle mr-1"></i> Detalles del Documento
+              </h5>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div><strong>No. Documento:</strong> <br>{{ request.documento?.numero || request.numero }}</div>
+                  <div><strong>Fecha:</strong> <br>{{ request.documento?.fecha || request.fecha }}</div>
+                  <div><strong>Tipo Documento:</strong> <br>{{ request.documento?.tipo_documento?.nombre || request.tipo_documento }}</div>
+                  <div><strong>Registro Propiedad:</strong> <br>{{ request.documento?.registro_propiedad?.nombre || request.registro_propiedad || '-' }}</div>
+                  
+                  <div><strong>Monto Póliza:</strong> <br>{{ request.documento?.monto_poliza || request.monto_poliza || '-' }}</div>
+                  <div><strong>Referencia:</strong> <br>{{ request.documento?.referencia || request.referencia || '-' }}</div>
+
+                  <div><strong>Propietario:</strong> <br>{{ request.documento?.propietario || request.propietario || '-' }}</div>
+                  <div><strong>Autorizador:</strong> <br>{{ request.documento?.autorizador || request.autorizador || '-' }}</div>
+
+                  <div class="col-span-1 md:col-span-2 grid grid-cols-4 gap-2 mt-2 pt-2 border-t border-gray-100">
+                     <div><strong>Finca:</strong> {{ request.documento?.no_finca || request.no_finca || '-' }}</div>
+                     <div><strong>Folio:</strong> {{ request.documento?.folio || request.folio || '-' }}</div>
+                     <div><strong>Libro:</strong> {{ request.documento?.libro || request.libro || '-' }}</div>
+                     <div><strong>Dominio:</strong> {{ request.documento?.no_dominio || request.no_dominio || '-' }}</div>
+                  </div>
+                   <div class="col-span-1 md:col-span-2 mt-2">
+                      <strong>Observación Documento:</strong> <br>
+                      <span class="italic text-gray-600">{{ request.documento?.observacion || request.observacion || '-' }}</span>
+                  </div>
+              </div>
+          </div>
+
           <h4 class="font-bold text-gray-800 mb-2 text-center text-lg">¿Existe el documento físico en archivo?</h4>
           
           <div class="flex justify-center gap-4 mb-4">
