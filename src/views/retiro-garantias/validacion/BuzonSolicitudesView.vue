@@ -26,6 +26,13 @@
            >
              Enviados Definitivos
            </button>
+           <button 
+             @click="filterState = 4; loadRequests()" 
+             class="px-3 py-1 rounded"
+             :class="filterState === 4 ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'"
+           >
+             Por Reingresar
+           </button>
         </div>
         <button @click="loadRequests" class="text-blue-600 hover:text-blue-800 text-sm">
           <i class="fas fa-sync"></i> Actualizar
@@ -105,6 +112,15 @@
                       title="Reingresar al Archivo (El documento ha regresado)"
                     >
                       <i class="fas fa-archive"></i> Reingresar
+                    </button>
+                    
+                    <button 
+                      v-if="req.estado_actual === 6"
+                      @click="confirmReturn(req)" 
+                      class="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 text-xs shadow-sm"
+                      title="Confirmar recepción física en archivo"
+                    >
+                      <i class="fas fa-check-double"></i> Confirmar Reingreso
                     </button>
                 </div>
               </td>
@@ -335,6 +351,30 @@ const returnToArchive = async (req) => {
     }
 };
 
+const confirmReturn = async (req) => {
+    const result = await Swal.fire({
+        title: '¿Confirmar Reingreso?',
+        html: `¿Confirma que ha recibido físicamente la garantía <strong>${req.numero_documento}</strong> de vuelta en el archivo?<br><br>Esto finalizará el ciclo de préstamo.`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, Confirmar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#7C3AED',
+        cancelButtonColor: '#6B7280'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await api.post(`/solicitudes-retiro/${req.id}/confirm-return`);
+            Swal.fire('Éxito', 'Garantía reingresada al archivo correctamente.', 'success');
+            loadRequests();
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', error.response?.data?.message || 'No se pudo confirmar el reingreso.', 'error');
+        }
+    }
+};
+
 const getStatusLabel = (status) => {
     switch(status) {
         case 0: return 'Archivado';
@@ -343,6 +383,7 @@ const getStatusLabel = (status) => {
         case 3: return 'Enviado (Definitivo)';
         case 4: return 'Recibido en Agencia';
         case 5: return 'Entregado a Asociado';
+        case 6: return 'En Retorno a Archivo';
         default: return 'Desconocido';
     }
 };

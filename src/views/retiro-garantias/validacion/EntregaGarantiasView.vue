@@ -32,13 +32,25 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.titulo_nombre }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <template v-if="canDeliver(item)">
-                    <button 
-                      @click="deliverToAssociate(item)"
-                      class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-4 py-2 rounded text-xs font-bold border border-blue-300 transition-colors"
-                      title="Entregar a Asociado"
-                    >
-                      <i class="fas fa-hand-holding-usd mr-1"></i> Entregar a Asociado
-                    </button>
+                    <div class="flex space-x-2">
+                        <button 
+                          v-if="item.tipo_retiro !== 'Temporal'"
+                          @click="deliverToAssociate(item)"
+                          class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-xs font-bold border border-blue-300 transition-colors"
+                          title="Entregar a Asociado"
+                        >
+                          <i class="fas fa-hand-holding-usd mr-1"></i> Entregar
+                        </button>
+                        
+                        <button 
+                          v-if="item.tipo_retiro === 'Temporal'"
+                          @click="returnToArchive(item)"
+                          class="bg-purple-100 text-purple-700 hover:bg-purple-200 px-3 py-1 rounded text-xs font-bold border border-purple-300 transition-colors"
+                          title="Devolver al Archivo"
+                        >
+                          <i class="fas fa-undo-alt mr-1"></i> Devolver
+                        </button>
+                    </div>
                 </template>
                 <template v-else>
                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
@@ -173,6 +185,34 @@ const deliverToAssociate = async (item) => {
         } catch (error) {
             console.error(error);
             Swal.fire('Error', error.response?.data?.message || 'No se pudo registrar la entrega.', 'error');
+        }
+    }
+};
+
+const returnToArchive = async (item) => {
+    const { value: observacion } = await Swal.fire({
+        title: '¿Devolver a Archivo?',
+        html: `Está solicitando la devolución de la garantía <strong>${item.numero_documento}</strong> al archivo central.<br><br>Ingrese una observación (opcional):`,
+        input: 'textarea',
+        inputPlaceholder: 'Motivo de devolución...',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, Solicitar Devolución',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#7C3AED',
+        cancelButtonColor: '#6B7280'
+    });
+
+    if (observacion !== undefined) {
+        try {
+            await api.post(`/solicitudes-retiro/${item.id}/return-archive`, {
+                observacion: observacion
+            });
+            Swal.fire('Éxito', 'Solicitud de devolución enviada. El archivo deberá confirmar la recepción.', 'success');
+            loadItems(currentPage.value);
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', error.response?.data?.message || 'Error al solicitar devolución.', 'error');
         }
     }
 };

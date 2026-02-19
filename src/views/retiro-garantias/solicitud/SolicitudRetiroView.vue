@@ -756,21 +756,25 @@ const confirmReceipt = async (item) => {
 };
 
 const returnToArchive = async (item) => {
-    const result = await Swal.fire({
-        title: '¿Reingresar al Archivo?',
-        html: `Está a punto de devolver la garantía <strong>${item.numero_documento}</strong> al archivo (histórico).<br><br>Esto indica que el documento físico ha regresado a su custodia.`,
+    const { value: observacion } = await Swal.fire({
+        title: '¿Devolver a Archivo?',
+        html: `Está solicitando la devolución de la garantía <strong>${item.numero_documento}</strong> al archivo central.<br><br>Ingrese una observación (opcional):`,
+        input: 'textarea',
+        inputPlaceholder: 'Motivo de devolución...',
         icon: 'info',
         showCancelButton: true,
-        confirmButtonText: 'Sí, Reingresar',
+        confirmButtonText: 'Sí, Solicitar Devolución',
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#10B981',
         cancelButtonColor: '#6B7280'
     });
 
-    if (result.isConfirmed) {
+    if (observacion !== undefined) { // Check if confirmed (even if empty string)
         try {
-            await api.post(`/solicitudes-retiro/${item.id}/return-archive`);
-            Swal.fire('Éxito', 'Garantía reingresada al archivo exitosamente.', 'success');
+            await api.post(`/solicitudes-retiro/${item.id}/return-archive`, {
+                observacion: observacion
+            });
+            Swal.fire('Éxito', 'Solicitud de devolución enviada. El archivo deberá confirmar la recepción.', 'success');
             
             // Reload BOTH lists to keep everything in sync
             loadHistory(currentPage.value);
@@ -778,7 +782,7 @@ const returnToArchive = async (item) => {
             
         } catch (error) {
             console.error(error);
-            Swal.fire('Error', error.response?.data?.message || 'Error al reingresar.', 'error');
+            Swal.fire('Error', error.response?.data?.message || 'Error al solicitar devolución.', 'error');
         }
     }
 };
