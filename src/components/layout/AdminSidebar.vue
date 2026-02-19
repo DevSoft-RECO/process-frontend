@@ -463,6 +463,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Entrega de Garantías',
                     route: '/admin/retiro-garantias/entrega'
+                },
+                {
+                    label: 'Buzón Entregas',
+                    route: '/admin/retiro-garantias/entregadas'
                 }
             ]
         },
