@@ -248,7 +248,7 @@ const routes: RouteRecordRaw[] = [
             {
                 path: 'retiro-garantias/solicitar',
                 name: 'retiro-garantias-solicitar',
-                component: () => import('@/views/retiro-garantias/SolicitudRetiroView.vue'),
+                component: () => import('@/views/retiro-garantias/solicitud/SolicitudRetiroView.vue'),
                 meta: {
                     title: 'Solicitud de Retiro'
                 }
@@ -256,7 +256,7 @@ const routes: RouteRecordRaw[] = [
             {
                 path: 'retiro-garantias/buzon',
                 name: 'retiro-garantias-buzon',
-                component: () => import('@/views/retiro-garantias/BuzonSolicitudesView.vue'),
+                component: () => import('@/views/retiro-garantias/validacion/BuzonSolicitudesView.vue'),
                 meta: {
                     title: 'Buzón de Solicitudes (Archivo)'
                 }
@@ -264,7 +264,7 @@ const routes: RouteRecordRaw[] = [
             {
                 path: 'retiro-garantias/entrega',
                 name: 'retiro-garantias-entrega',
-                component: () => import('@/views/retiro-garantias/EntregaGarantiasView.vue'),
+                component: () => import('@/views/retiro-garantias/validacion/EntregaGarantiasView.vue'),
                 meta: {
                     title: 'Entrega de Garantías'
                 }
@@ -272,7 +272,7 @@ const routes: RouteRecordRaw[] = [
             {
                 path: 'retiro-garantias/entregadas',
                 name: 'retiro-garantias-entregadas',
-                component: () => import('@/views/retiro-garantias/BuzonEntregasView.vue'),
+                component: () => import('@/views/retiro-garantias/validacion/BuzonEntregasView.vue'),
                 meta: {
                     title: 'Buzón de Garantías Entregadas'
                 }
