@@ -67,11 +67,11 @@
             <!-- Col 4: Observaciones -->
             <td class="px-6 py-4 text-sm text-gray-500 align-top">
                 <div class="mb-2">
-                    <span class="text-xs font-semibold text-gray-400 uppercase">Solicitud:</span>
+                    <span class="text-xs font-semibold text-gray-400 uppercase">Observacion Documento:</span>
                     <p class="text-xs text-gray-600 italic whitespace-normal max-w-xs">{{ res.observacion || '(Sin obs)' }}</p>
                 </div>
                 <div>
-                    <span class="text-xs font-semibold text-gray-400 uppercase">Respuesta:</span>
+                    <span class="text-xs font-semibold text-gray-400 uppercase">Respuesta de Confirmacion:</span>
                     <p class="text-xs text-gray-800 font-medium whitespace-normal max-w-xs">
                         {{ res.observacion_confirmacion || (res.confirmacion ? '-' : 'En proceso...') }}
                     </p>
