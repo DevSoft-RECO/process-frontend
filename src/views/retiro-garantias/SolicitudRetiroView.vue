@@ -308,14 +308,15 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
                 <tr v-if="loadingIncoming">
-                  <td colspan="6" class="px-6 py-4 text-center text-gray-500">Cargando solicitudes recibidas...</td>
+                  <td colspan="7" class="px-6 py-4 text-center text-gray-500">Cargando solicitudes recibidas...</td>
                 </tr>
                 <tr v-else-if="incomingRequests.length === 0">
-                  <td colspan="6" class="px-6 py-4 text-center text-gray-500">No ha recibido solicitudes de otras agencias.</td>
+                  <td colspan="7" class="px-6 py-4 text-center text-gray-500">No ha recibido solicitudes de otras agencias.</td>
                 </tr>
                 <tr v-for="item in incomingRequests" :key="item.id" class="hover:bg-gray-50">
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(item.fecha_envio) }}</td>
@@ -329,6 +330,16 @@
                       <span v-else-if="item.estado_actual === 3">Recibido Definitivo</span>
                       <span v-else>{{ getStatusLabel(item.estado_actual) }}</span>
                     </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button 
+                        v-if="[2, 3].includes(item.estado_actual)"
+                        @click="confirmReceipt(item)"
+                        class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-xs font-bold border border-green-300 transition-colors"
+                        title="Confirmar Recepción Física"
+                    >
+                        <i class="fas fa-check-circle mr-1"></i> Recibir
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -672,8 +683,33 @@ const getStatusClass = (status) => {
     case 1: return 'bg-yellow-100 text-yellow-800';
     case 2: return 'bg-blue-100 text-blue-800';
     case 3: return 'bg-red-100 text-red-800';
+    case 4: return 'bg-green-100 text-green-800'; // Added styling for Accepted
     default: return 'bg-gray-100 text-gray-800';
   }
+};
+
+const confirmReceipt = async (item) => {
+    const result = await Swal.fire({
+        title: '¿Confirmar Recepción?',
+        html: `¿Confirma que ha recibido físicamente la garantía <strong>${item.numero_documento}</strong>?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, Confirmar Recepción',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#10B981',
+        cancelButtonColor: '#6B7280'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await api.post(`/solicitudes-retiro/${item.id}/confirm-receipt`);
+            Swal.fire('Éxito', 'Recepción confirmada. El estado ha cambiado a Aceptado.', 'success');
+            loadIncoming(currentPageIncoming.value);
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', error.response?.data?.message || 'No se pudo confirmar la recepción.', 'error');
+        }
+    }
 };
 
 onMounted(() => {
