@@ -161,7 +161,10 @@
                       class="px-3 py-2 bg-verde-cope text-white text-sm font-bold rounded-md shadow-xl whitespace-nowrap relative"
                  >
                     {{ hoveredItem.label }}
-                     <div class="absolute -left-1 top-3 w-2 h-2 bg-verde-cope transform rotate-45"></div>
+                     <div 
+                        class="absolute -left-1 w-2 h-2 bg-verde-cope transform rotate-45"
+                        :class="isBottomAligned ? 'bottom-3' : 'top-3'"
+                    ></div>
                  </div>
 
                  <!-- Expanded Menu -->
@@ -183,7 +186,10 @@
                             {{ child.label }}
                       </RouterLink>
 
-                      <div class="absolute -left-2 top-4 w-4 h-4 bg-azul-cope dark:bg-gray-800 border-l border-b border-verde-cope transform rotate-45"></div>
+                      <div 
+                        class="absolute -left-2 w-4 h-4 bg-azul-cope dark:bg-gray-800 border-l border-b border-verde-cope transform rotate-45"
+                        :class="isBottomAligned ? 'bottom-4' : 'top-4'"
+                      ></div>
                  </div>
             </div>
           </transition>
@@ -544,7 +550,8 @@ const handleGroupClick = (id: string) => {
 
 // --- TELEPORT / POPOVER LOGIC ---
 const hoveredItem = ref<any>(null)
-const popoverStyle = ref({ top: '0px', left: '0px' })
+const popoverStyle = ref<any>({})
+const isBottomAligned = ref(false)
 let hoverTimeout: any = null
 
 const handleMouseEnter = (item: any, event: MouseEvent) => {
@@ -557,11 +564,27 @@ const handleMouseEnter = (item: any, event: MouseEvent) => {
   if (!target) return
 
   const rect = target.getBoundingClientRect()
+  const windowHeight = window.innerHeight
   
+  // Check if item is in the lower half of the screen
+  // If so, align the popover to the bottom of the item
+  const isLowerHalf = rect.top > (windowHeight / 2)
+  isBottomAligned.value = isLowerHalf
+
   hoveredItem.value = item
-  popoverStyle.value = {
-    top: `${rect.top}px`,
-    left: `${rect.right}px` // Position right next to the item
+  
+  if (isLowerHalf) {
+      popoverStyle.value = {
+        bottom: `${windowHeight - rect.bottom}px`,
+        left: `${rect.right}px`,
+        top: 'auto'
+      }
+  } else {
+      popoverStyle.value = {
+        top: `${rect.top}px`,
+        left: `${rect.right}px`,
+        bottom: 'auto'
+      }
   }
 }
 
