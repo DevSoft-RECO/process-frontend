@@ -15,7 +15,7 @@
           <div class="grid grid-cols-2 gap-2">
               <div class="col-span-2 border-b pb-2 mb-2">
                   <div class="flex justify-between items-center">
-                     <span><strong>Solicitud:</strong> {{ request.numero }}</span>
+                     <span><strong>Solicitud #{{ request.id }}:</strong></span>
                      <span v-if="!isRegistered" class="text-xs bg-yellow-100 text-yellow-800 px-2 rounded-full font-bold">Manual / No Registrado</span>
                      <span v-else class="text-xs bg-green-100 text-green-800 px-2 rounded-full font-bold">Documento Registrado</span>
                   </div>
@@ -244,7 +244,7 @@ watch(() => props.request, (newVal) => {
             folio: newVal.folio || '',
             libro: newVal.libro || '',
             no_dominio: newVal.no_dominio || '',
-            observacion: ''
+            observacion: newVal.observacion || '' // Pre-fill with request observation
         };
     }
 }, { immediate: true });
