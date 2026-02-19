@@ -8,6 +8,7 @@
           <thead class="bg-gray-50 sticky top-0">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Entrega</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitante</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
@@ -18,13 +19,18 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-if="loading">
-              <td colspan="7" class="px-6 py-4 text-center text-gray-500">Cargando historial de entregas...</td>
+              <td colspan="8" class="px-6 py-4 text-center text-gray-500">Cargando historial de entregas...</td>
             </tr>
             <tr v-else-if="items.length === 0">
-              <td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay garantías entregadas registradas.</td>
+              <td colspan="8" class="px-6 py-4 text-center text-gray-500">No hay garantías entregadas registradas.</td>
             </tr>
             <tr v-for="item in items" :key="item.id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(item.updated_at) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <span :class="item.tipo_retiro === 'Definitivo' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                      {{ item.tipo_retiro }}
+                  </span>
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.solicitante?.name || 'N/A' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.numero_documento }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.titulo_nombre }}</td>
