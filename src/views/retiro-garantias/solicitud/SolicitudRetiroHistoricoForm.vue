@@ -105,6 +105,7 @@ const loadingSubmit = ref(false);
 const formData = reactive({
   id_expediente: null,
   numero_documento: '',
+  fecha_documento: null,
   titulo_nombre: '',
   tipo_retiro: 'Temporal',
   justificacion: '',
@@ -113,6 +114,7 @@ const formData = reactive({
 
 onMounted(() => {
     formData.numero_documento = props.documentData.numero_documento;
+    formData.fecha_documento = props.documentData.fecha_documento || props.documentData.fecha_solicitud || null;
     formData.titulo_nombre = props.documentData.titulo_nombre;
     // Pre-fill justificacion with observations if useful, or leave empty
     // formData.justificacion = props.documentData.observaciones || ''; 

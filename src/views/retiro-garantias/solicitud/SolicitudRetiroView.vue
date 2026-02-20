@@ -69,10 +69,17 @@
                                   <i class="fas fa-link"></i> Vinculado a otros
                               </span>
                           </div>
-                          <div class="text-sm text-gray-600 mt-1">
-                              <p><span class="font-semibold">Tipo:</span> {{ doc.tipo_documento?.nombre || 'N/A' }}</p>
-                              <p><span class="font-semibold">Propietario:</span> {{ doc.propietario }}</p>
-                              <p><span class="font-semibold">Monto:</span> {{ doc.monto_poliza }}</p>
+                          <div class="text-sm text-gray-600 mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1">
+                              <p><span class="font-semibold text-gray-700">Tipo:</span> {{ doc.tipo_documento?.nombre || 'N/A' }}</p>
+                              <p><span class="font-semibold text-gray-700">Fecha:</span> {{ doc.fecha ? new Date(doc.fecha).toLocaleDateString() : 'N/A' }}</p>
+                              <p><span class="font-semibold text-gray-700">Propietario:</span> {{ doc.propietario || 'N/A' }}</p>
+                              <p><span class="font-semibold text-gray-700">Monto Poliza:</span> {{ doc.monto_poliza || 'N/A' }}</p>
+                              <p><span class="font-semibold text-gray-700">Autorizador:</span> {{ doc.autorizador || 'N/A' }}</p>
+                              <p><span class="font-semibold text-gray-700">Finca:</span> {{ doc.no_finca || 'N/A' }}</p>
+                              <p><span class="font-semibold text-gray-700">Folio:</span> {{ doc.folio || 'N/A' }}</p>
+                              <p><span class="font-semibold text-gray-700">Libro:</span> {{ doc.libro || 'N/A' }}</p>
+                              <p><span class="font-semibold text-gray-700">Reg. Propiedad:</span> {{ doc.registro_propiedad?.nombre || 'N/A' }}</p>
+                              <p class="sm:col-span-2 lg:col-span-3"><span class="font-semibold text-gray-700">Observación:</span> {{ doc.observacion || 'N/A' }}</p>
                           </div>
                       </div>
                       <div class="flex flex-col space-y-2">
@@ -99,8 +106,17 @@
       </div>
       
       <!-- Detalle Simple (Solo para Manual o sin lista) -->
-      <div v-if="isManual || (documentInfo && documentsList.length === 0)" class="bg-gray-50 p-4 rounded border border-gray-200 text-sm grid grid-cols-1 md:grid-cols-3 gap-4">
-           <div><span class="font-bold">Propietario:</span> {{ documentInfo?.propietario || 'N/A' }}</div>
+      <div v-if="isManual || (documentInfo && documentsList.length === 0)" class="bg-gray-50 p-4 rounded border border-gray-200 text-sm grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4">
+           <div><span class="font-bold text-gray-700">Tipo:</span> {{ documentInfo?.tipo_documento?.nombre || 'N/A' }}</div>
+           <div><span class="font-bold text-gray-700">Fecha:</span> {{ documentInfo?.fecha ? new Date(documentInfo.fecha).toLocaleDateString() : 'N/A' }}</div>
+           <div><span class="font-bold text-gray-700">Propietario:</span> {{ documentInfo?.propietario || 'N/A' }}</div>
+           <div><span class="font-bold text-gray-700">Monto Poliza:</span> {{ documentInfo?.monto_poliza || 'N/A' }}</div>
+           <div><span class="font-bold text-gray-700">Autorizador:</span> {{ documentInfo?.autorizador || 'N/A' }}</div>
+           <div><span class="font-bold text-gray-700">Finca:</span> {{ documentInfo?.no_finca || 'N/A' }}</div>
+           <div><span class="font-bold text-gray-700">Folio:</span> {{ documentInfo?.folio || 'N/A' }}</div>
+           <div><span class="font-bold text-gray-700">Libro:</span> {{ documentInfo?.libro || 'N/A' }}</div>
+           <div><span class="font-bold text-gray-700">Reg. Propiedad:</span> {{ documentInfo?.registro_propiedad?.nombre || 'N/A' }}</div>
+           <div class="md:col-span-3 xl:col-span-4 block mb-2"><span class="font-bold text-gray-700">Observación:</span> {{ documentInfo?.observacion || 'N/A' }}</div>
       </div>
       
 
@@ -454,6 +470,7 @@ const expedienteActive = ref(false);
 const formData = reactive({
   id_expediente: null,
   numero_documento: '',
+  fecha_documento: null,
   titulo_nombre: '',
   tipo_retiro: 'Temporal',
   justificacion: '',
@@ -550,6 +567,7 @@ const isSelectionLinked = computed(() => {
 
 const selectDocument = (doc) => {
     formData.numero_documento = doc.numero;
+    formData.fecha_documento = doc.fecha;
     if (doc.tiene_otros_activos) {
         formData.tipo_retiro = 'Temporal';
         Swal.fire({
