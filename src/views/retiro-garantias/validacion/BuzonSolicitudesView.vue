@@ -43,14 +43,10 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50 sticky top-0">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Origen</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Agencia</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitante</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha / Origen</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Origen / Destino</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Justificación</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detalles Retiro</th>
               <th v-if="filterState === 4" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Obs. Retorno</th>
 
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
@@ -58,37 +54,41 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-if="loading">
-              <td colspan="9" class="px-6 py-4 text-center text-gray-500">Cargando solicitudes...</td>
+              <td colspan="7" class="px-6 py-4 text-center text-gray-500">Cargando solicitudes...</td>
             </tr>
             <tr v-else-if="requests.length === 0">
-              <td colspan="9" class="px-6 py-4 text-center text-gray-500">No hay solicitudes en este estado.</td>
+              <td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay solicitudes en este estado.</td>
             </tr>
             <tr v-for="req in requests" :key="req.id" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(req.fecha_solicitud) }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                  <!-- Origen Logic -->
-                  <span v-if="req.id_expediente" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                      Sistema
-                  </span>
-                  <span v-else-if="req.es_manual" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                      Manual
-                  </span>
-                  <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
-                      Histórico
-                  </span>
+                  <div class="text-gray-900 font-medium">{{ formatDate(req.fecha_solicitud) }}</div>
+                  <div class="mt-1">
+                      <span v-if="req.id_expediente" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                          Sistema
+                      </span>
+                      <span v-else-if="req.es_manual" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                          Manual
+                      </span>
+                      <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                          Histórico
+                      </span>
+                  </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ req.agencia?.nombre || 'N/A' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ req.solicitante?.name || 'N/A' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {{ req.numero_documento }}
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <div class="text-gray-900 font-bold" title="Agencia Solicitante"><i class="fas fa-building text-gray-400 mr-1"></i> {{ req.agencia?.nombre || 'N/A' }}</div>
+                  <div class="text-gray-500" title="Usuario Solicitante"><i class="fas fa-user-circle text-gray-400 mr-1"></i> {{ req.solicitante?.name || 'N/A' }}</div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ req.titulo_nombre }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-bold" 
-                  :class="req.tipo_retiro === 'Definitivo' ? 'text-red-600' : 'text-blue-600'">
-                {{ req.tipo_retiro }}
+              <td class="px-6 py-4 text-sm">
+                <div class="font-bold text-gray-900 truncate max-w-[200px]" :title="req.numero_documento">{{ req.numero_documento }}</div>
+                <div class="text-gray-500 text-xs truncate max-w-[200px]" :title="req.titulo_nombre">{{ req.titulo_nombre }}</div>
               </td>
-              <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" :title="req.justificacion">
-                {{ req.justificacion }}
+              <td class="px-6 py-4 text-sm max-w-xs">
+                 <div class="font-bold mb-1" :class="req.tipo_retiro === 'Definitivo' ? 'text-red-600' : 'text-blue-600'">
+                    {{ req.tipo_retiro }}
+                 </div>
+                 <div class="text-gray-500 text-xs truncate" :title="req.justificacion">
+                    {{ req.justificacion }}
+                 </div>
               </td>
               <td v-if="filterState === 4" class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" :title="req.observacion_retorno">
                 {{ req.observacion_retorno || '-' }}
@@ -324,12 +324,14 @@ const openDetailModal = async (req) => {
 
   await nextTick(); // Esperar renderizado del modal
 
-  if (req.id_expediente && req.documento) {
-      // SISTEMA: Asignar datos de documento real
+  // IMPORTANTE: Si YA existe documento registrado (req.documento) mostramos la vista con el detalle físico,
+  // independientemente de si el origen fue Sistema, Manual o Histórico.
+  if (req.documento) {
+      // SISTEMA O REGISTRADO: Asignar datos de documento real
       selectedDocument.value = { ...req.documento };
       selectedDocument.value._isHistoric = false;
   } else if (!req.id_expediente && req.expediente_historico) {
-      // HISTÓRICO: Asignar datos planos
+      // HISTÓRICO SIN REGISTRAR: Asignar datos planos
       selectedDocument.value = { 
           numero: req.numero_documento,
           datos_garantia: req.expediente_historico.datos_garantia,
