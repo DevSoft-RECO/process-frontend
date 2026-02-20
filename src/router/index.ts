@@ -254,6 +254,14 @@ const routes: RouteRecordRaw[] = [
                 }
             },
             {
+                path: 'retiro-garantias/historico-cliente',
+                name: 'retiro-garantias-historico-cliente',
+                component: () => import('@/views/retiro-garantias/solicitud/SolicitudRetiroHistoricoClienteView.vue'),
+                meta: {
+                    title: 'Histórico de Solicitudes Realizadas'
+                }
+            },
+            {
                 path: 'retiro-garantias/buzon',
                 name: 'retiro-garantias-buzon',
                 component: () => import('@/views/retiro-garantias/validacion/BuzonSolicitudesView.vue'),

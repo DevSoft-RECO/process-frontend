@@ -471,6 +471,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Buzón Entregas',
                     route: '/admin/retiro-garantias/entregadas'
+                },
+                {
+                    label: 'Histórico Realizadas',
+                    route: '/admin/retiro-garantias/historico-cliente'
                 }
             ]
         },
