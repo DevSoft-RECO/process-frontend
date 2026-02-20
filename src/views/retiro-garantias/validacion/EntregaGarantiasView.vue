@@ -28,7 +28,10 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{{ item.agencia?.nombre || 'N/A' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.agencia_entrega?.nombre || item.agencia?.nombre || 'N/A' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.solicitante?.name || 'N/A' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.numero_documento }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <div>{{ item.numero_documento }}</div>
+                  <div class="text-xs text-gray-500 font-normal">Fecha doc: {{ item.fecha_documento ? new Date(item.fecha_documento).toLocaleDateString() : 'N/A' }}</div>
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.titulo_nombre }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <template v-if="canDeliver(item)">
