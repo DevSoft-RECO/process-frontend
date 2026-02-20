@@ -17,6 +17,24 @@
           </p>
       </div>
 
+      <!-- Información Histórica de la Garantía -->
+      <div v-if="request?.expediente_historico" class="bg-yellow-50 border border-yellow-200 p-4 mb-5 rounded shadow-sm text-sm">
+          <h4 class="font-bold text-yellow-800 mb-2">
+              <i class="fas fa-info-circle mr-1"></i> Información Histórica de la Garantía solicitada
+          </h4>
+          <ul class="text-yellow-700 space-y-1 ml-5 list-disc">
+              <li v-if="request.expediente_historico.datos_garantia">
+                  <strong>Datos:</strong> {{ request.expediente_historico.datos_garantia }}
+              </li>
+              <li v-if="request.expediente_historico.observacion">
+                  <strong>Observación original:</strong> {{ request.expediente_historico.observacion }}
+              </li>
+              <li v-if="!request.expediente_historico.datos_garantia && !request.expediente_historico.observacion">
+                  Sin información histórica detallada.
+              </li>
+          </ul>
+      </div>
+
       <form @submit.prevent="submitRegistration">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-5">
               <!-- Datos Principales -->
@@ -178,8 +196,6 @@ watch(() => props.show, (isVisible) => {
             folio: '',
             libro: '',
             no_dominio: '',
-            // Si la solicitud historica traía observacion en los datos JSON, podríamos extraerla aquí. 
-            // Por ahora, lo dejamos vacío para que el usuario documente el estado físico.
             observacion: '' 
         };
     }
