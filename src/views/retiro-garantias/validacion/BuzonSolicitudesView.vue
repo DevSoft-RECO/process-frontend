@@ -148,8 +148,8 @@
     </div>
 
     <!-- Detail Modal -->
-    <div v-if="showDetailModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
+    <div v-if="showDetailModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity">
+      <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl transform transition-all relative">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-xl font-bold text-gray-800">Detalles de la Garantía</h3>
           <button @click="closeDetailModal" class="text-gray-500 hover:text-gray-700">
@@ -202,14 +202,23 @@
                  <span class="block font-bold text-gray-600">Tipo Documento</span>
                  <span class="text-gray-900">{{ selectedDocument.tipo_documento?.nombre || 'N/A' }}</span>
               </div>
-               <div class="col-span-2 bg-gray-50 p-3 rounded flex space-x-4">
-                 <div><span class="font-bold text-gray-600">Finca:</span> {{ selectedDocument.no_finca }}</div>
-                 <div><span class="font-bold text-gray-600">Folio:</span> {{ selectedDocument.folio }}</div>
-                 <div><span class="font-bold text-gray-600">Libro:</span> {{ selectedDocument.libro }}</div>
+               <div class="col-span-2 bg-gray-50 p-3 rounded flex flex-wrap gap-4">
+                 <div class="flex-1 min-w-[120px]"><span class="block font-bold text-gray-600 text-xs uppercase mb-1">Finca</span> {{ selectedDocument.no_finca || '-' }}</div>
+                 <div class="flex-1 min-w-[120px]"><span class="block font-bold text-gray-600 text-xs uppercase mb-1">Folio</span> {{ selectedDocument.folio || '-' }}</div>
+                 <div class="flex-1 min-w-[120px]"><span class="block font-bold text-gray-600 text-xs uppercase mb-1">Libro</span> {{ selectedDocument.libro || '-' }}</div>
+                 <div class="flex-1 min-w-[120px]"><span class="block font-bold text-gray-600 text-xs uppercase mb-1">No. Dominio</span> {{ selectedDocument.no_dominio || '-' }}</div>
               </div>
               <div class="col-span-2 bg-gray-50 p-3 rounded">
                  <span class="block font-bold text-gray-600">Registro de Propiedad</span>
                  <span class="text-gray-900">{{ selectedDocument.registro_propiedad?.nombre || 'N/A' }}</span>
+              </div>
+              <div class="bg-gray-50 p-3 rounded">
+                  <span class="block font-bold text-gray-600">Referencia</span>
+                  <span class="text-gray-900">{{ selectedDocument.referencia || '-' }}</span>
+              </div>
+              <div class="bg-gray-50 p-3 rounded">
+                  <span class="block font-bold text-gray-600">Observación Doc.</span>
+                  <span class="text-gray-900 text-xs">{{ selectedDocument.observacion || '-' }}</span>
               </div>
            </div>
            
@@ -406,9 +415,13 @@ const dispatchRequest = async (req) => {
 };
 
 const returnToArchive = async (req) => {
+    // Intentar obtener la fecha del documento si está disponible, sino usar la de la solicitud, o 'N/A'
+    const docDate = req.documento?.fecha ? new Date(req.documento.fecha).toLocaleDateString() : 
+                    (req.fecha_solicitud ? new Date(req.fecha_solicitud).toLocaleDateString() : 'N/A');
+
     const result = await Swal.fire({
         title: '¿Reingresar al Archivo?',
-        html: `Está a punto de marcar el documento <strong>${req.numero_documento}</strong> como reingresado al archivo.<br><br>Esto confirma que ha regresado físicamente.`,
+        html: `Está a punto de marcar el documento <strong>${req.numero_documento}</strong> de fecha <strong>${docDate}</strong> como reingresado al archivo.<br><br>Esto confirma que ha regresado físicamente.`,
         icon: 'info',
         showCancelButton: true,
         confirmButtonText: 'Sí, Reingresar',
@@ -430,9 +443,13 @@ const returnToArchive = async (req) => {
 };
 
 const confirmReturn = async (req) => {
+    // Intentar obtener la fecha del documento si está disponible, sino usar la de la solicitud, o 'N/A'
+    const docDate = req.documento?.fecha ? new Date(req.documento.fecha).toLocaleDateString() : 
+                    (req.fecha_solicitud ? new Date(req.fecha_solicitud).toLocaleDateString() : 'N/A');
+
     const result = await Swal.fire({
         title: '¿Confirmar Reingreso?',
-        html: `¿Confirma que ha recibido físicamente la garantía <strong>${req.numero_documento}</strong> de vuelta en el archivo?<br><br>Esto finalizará el ciclo de préstamo.`,
+        html: `¿Confirma que ha recibido físicamente la garantía <strong>${req.numero_documento}</strong> de fecha <strong>${docDate}</strong> de vuelta en el archivo?<br><br>Esto finalizará el ciclo de préstamo.`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Sí, Confirmar',
