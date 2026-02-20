@@ -471,15 +471,15 @@ const confirmReturn = async (req) => {
 };
 
 const getStatusLabel = (status) => {
-    switch(status) {
-        case 0: return 'Archivado';
+    switch(Number(status)) {
+        case 0: return 'Archivado / Finalizado';
         case 1: return 'Solicitado';
         case 2: return 'Enviado (Temporal)';
         case 3: return 'Enviado (Definitivo)';
         case 4: return 'Recibido en Agencia';
         case 5: return 'Entregado a Asociado';
         case 6: return 'En Retorno a Archivo';
-        default: return 'Desconocido';
+        default: return `Desconocido (${status})`;
     }
 };
 

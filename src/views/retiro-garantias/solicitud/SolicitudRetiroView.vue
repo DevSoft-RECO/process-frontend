@@ -709,24 +709,27 @@ const formatDate = (dateString) => {
 };
 
 const getStatusLabel = (status) => {
-  switch (status) {
+  switch (Number(status)) {
     case 0: return 'Archivado';
     case 1: return 'Solicitado';
     case 2: return 'Enviado Temporal';
     case 3: return 'Enviado Definitivo';
     case 4: return 'Recibido en Agencia';
     case 5: return 'Entregado a Asociado';
-    default: return 'Desconocido';
+    case 6: return 'En Retorno a Archivo';
+    default: return `Desconocido (${status})`;
   }
 };
 
 const getStatusClass = (status) => {
-  switch (status) {
+  switch (Number(status)) {
+    case 0: return 'bg-gray-100 text-gray-800';
     case 1: return 'bg-yellow-100 text-yellow-800';
     case 2: return 'bg-blue-100 text-blue-800';
     case 3: return 'bg-red-100 text-red-800';
     case 4: return 'bg-indigo-100 text-indigo-800'; // Received
     case 5: return 'bg-green-100 text-green-800'; // Delivered
+    case 6: return 'bg-purple-100 text-purple-800'; // Returning
     default: return 'bg-gray-100 text-gray-800';
   }
 };
