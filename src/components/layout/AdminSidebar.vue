@@ -41,26 +41,35 @@
       class="flex-1 py-6 px-3 space-y-2 overflow-y-auto custom-scrollbar"
       :class="{ 'scrollbar-hide': layoutStore.isCollapsed }"
     >
-      <template v-for="item in menuItems" :key="item.id">
+      <template v-for="item in menuItems" :key="item.id || item.label">
+        
+        <!-- DIVIDER ITEM -->
+        <div v-if="item.isDivider" class="px-3 py-2 mt-4">
+           <div v-show="!layoutStore.isCollapsed" class="text-[10px] font-black text-verde-cope uppercase tracking-widest mb-1 shadow-sm">
+               {{ item.label }}
+           </div>
+           <div v-show="layoutStore.isCollapsed" class="h-px bg-white/10 dark:bg-gray-800 my-2"></div>
+        </div>
 
-        <div v-if="!item.children" 
+        <!-- SINGLE LINK ITEM -->
+        <div v-else-if="!item.children" 
              class="relative group"
              @mouseenter="handleMouseEnter(item, $event)"
              @mouseleave="handleMouseLeave"
         >
             <RouterLink
-            :to="item.route"
+            :to="item.route || ''"
             @click="handleItemClick"
             class="flex items-center px-3 py-3 rounded-lg transition-all duration-200 group border-l-4"
             :class="[
-                isActive(item.route)
+                isActive(item.route || '')
                 ? 'bg-white/10 dark:bg-gray-800 border-verde-cope text-white dark:text-verde-cope shadow-lg'
                 : 'border-transparent text-gray-300 dark:text-gray-400 hover:bg-white/5 dark:hover:bg-gray-800 hover:text-white dark:hover:text-gray-100',
                 layoutStore.isCollapsed ? 'justify-center pl-0 border-l-0' : ''
             ]"
             >
                 <span class="shrink-0 transition-colors duration-200"
-                      :class="isActive(item.route) ? 'text-verde-cope' : 'group-hover:text-verde-cope'">
+                      :class="isActive(item.route || '') ? 'text-verde-cope' : 'group-hover:text-verde-cope'">
                     <svg v-html="item.iconSvg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"></svg>
                 </span>
 
@@ -70,23 +79,24 @@
             </RouterLink>
         </div>
 
+        <!-- GROUP ROUTE ITEM -->
         <div v-else 
              class="relative group"
              @mouseenter="handleMouseEnter(item, $event)"
              @mouseleave="handleMouseLeave"
         >
             <button
-                @click="handleGroupClick(item.id)"
+                @click="handleGroupClick(item.id || '')"
                 class="w-full flex items-center px-3 py-3 rounded-lg transition-all duration-200 group border-l-4 border-transparent"
                 :class="[
-                    openGroups.includes(item.id) && !layoutStore.isCollapsed
+                    openGroups.includes(item.id || '') && !layoutStore.isCollapsed
                     ? 'bg-black/20 dark:bg-black/40 text-white dark:text-gray-100'
                     : 'text-gray-300 dark:text-gray-400 hover:bg-white/5 dark:hover:bg-gray-800 hover:text-white',
                     layoutStore.isCollapsed ? 'justify-center pl-0' : 'justify-between'
                 ]"
             >
                 <div class="flex items-center">
-                    <span class="shrink-0 transition-colors" :class="openGroups.includes(item.id) ? 'text-verde-cope' : 'group-hover:text-verde-cope'">
+                    <span class="shrink-0 transition-colors" :class="openGroups.includes(item.id || '') ? 'text-verde-cope' : 'group-hover:text-verde-cope'">
                         <svg v-html="item.iconSvg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"></svg>
                     </span>
                     <span v-if="!layoutStore.isCollapsed" class="ml-3 font-medium text-sm truncate">{{ item.label }}</span>
@@ -95,7 +105,7 @@
                 <svg
                     v-if="!layoutStore.isCollapsed"
                     class="w-4 h-4 transition-transform duration-300"
-                    :class="openGroups.includes(item.id) ? 'text-verde-cope rotate-180' : 'text-gray-400'"
+                    :class="openGroups.includes(item.id || '') ? 'text-verde-cope rotate-180' : 'text-gray-400'"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 >
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -112,7 +122,7 @@
                 leave-to-class="opacity-0 -translate-y-2"
             >
                 <div
-                    v-if="openGroups.includes(item.id) && !layoutStore.isCollapsed"
+                    v-if="openGroups.includes(item.id || '') && !layoutStore.isCollapsed"
                     class="mt-2 ml-3 space-y-1 relative"
                 >
                     <RouterLink
@@ -399,6 +409,11 @@ const menuItems = computed(() => {
 
         // Role: Requester (Solicitante)
         {
+            isDivider: true,
+            label: 'Confirmacion Documentos',
+            show: true
+        },
+        {
             id: 'solicitudes-confirmacion',
             label: 'Solicitudes Confirmación',
             // Search Circle Icon
@@ -435,6 +450,11 @@ const menuItems = computed(() => {
             ]
         },
         
+        {
+            isDivider: true,
+            label: 'Retiro de Garantías',
+            show: true
+        },
         {
             id: 'validacion-garantias',
             label: 'Validación Garantías',
@@ -479,6 +499,11 @@ const menuItems = computed(() => {
             ]
         },
 
+        {
+            isDivider: true,
+            label: 'Ajustes',
+            show: true
+        },
         {
             id: 'carga-datos',
             label: 'Carga de Datos',
