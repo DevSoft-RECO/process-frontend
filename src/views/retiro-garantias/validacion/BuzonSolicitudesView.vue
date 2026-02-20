@@ -168,6 +168,17 @@
                    <h4 class="font-bold text-gray-800">Detalles Recuperados</h4>
                </div>
                
+               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
+                  <div>
+                    <span class="block text-xs font-bold text-gray-500 uppercase">Nombre asociado Producto</span>
+                    <span class="text-gray-900">{{ currentRequest?.titulo_nombre || 'N/A' }}</span>
+                  </div>
+                  <div>
+                    <span class="block text-xs font-bold text-gray-500 uppercase">Fecha del Documento</span>
+                    <span class="text-gray-900">{{ currentRequest?.fecha_documento ? new Date(currentRequest.fecha_documento).toLocaleDateString() : 'N/A' }}</span>
+                  </div>
+               </div>
+               
                <div class="mb-3">
                    <p class="text-xs font-bold text-gray-500 uppercase">Datos de Garantía</p>
                    <p class="text-sm text-gray-800 whitespace-pre-line">{{ selectedDocument.datos_garantia || 'Sin datos registrados.' }}</p>
@@ -186,8 +197,12 @@
                 <span class="text-gray-900">{{ selectedDocument.numero }}</span>
               </div>
               <div class="bg-gray-50 p-3 rounded">
-                 <span class="block font-bold text-gray-600">Título / Nombre</span>
+                 <span class="block font-bold text-gray-600">Nombre asociado Producto</span>
                  <span class="text-gray-900">{{ currentRequest?.titulo_nombre }}</span>
+              </div>
+               <div class="bg-gray-50 p-3 rounded">
+                 <span class="block font-bold text-gray-600">Fecha del Documento</span>
+                 <span class="text-gray-900">{{ currentRequest?.fecha_documento ? new Date(currentRequest.fecha_documento).toLocaleDateString() : 'N/A' }}</span>
               </div>
               <div class="bg-gray-50 p-3 rounded">
                  <span class="block font-bold text-gray-600">Propietario</span>
