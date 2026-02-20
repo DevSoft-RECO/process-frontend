@@ -589,7 +589,7 @@ const isSelectionLinked = computed(() => {
 
 const selectDocument = (doc) => {
     formData.numero_documento = doc.numero;
-    formData.fecha_documento = doc.fecha;
+    formData.fecha_documento = doc.fecha ? new Date(doc.fecha).toISOString().split('T')[0] : null;
     if (doc.tiene_otros_activos) {
         formData.tipo_retiro = 'Temporal';
         Swal.fire({
