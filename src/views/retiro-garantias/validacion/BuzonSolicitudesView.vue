@@ -338,16 +338,26 @@ const openDetailModal = async (req) => {
 
   // IMPORTANTE: Si YA existe documento registrado (req.documento) mostramos la vista con el detalle físico,
   // independientemente de si el origen fue Sistema, Manual o Histórico.
+  const hist = req.expediente_historico || req.expedienteHistorico;
+
   if (req.documento) {
       // SISTEMA O REGISTRADO: Asignar datos de documento real
       selectedDocument.value = { ...req.documento };
       selectedDocument.value._isHistoric = false;
-  } else if (!req.id_expediente && req.expediente_historico) {
+  } else if (!req.id_expediente && hist) {
       // HISTÓRICO SIN REGISTRAR: Asignar datos planos
       selectedDocument.value = { 
           numero: req.numero_documento,
-          datos_garantia: req.expediente_historico.datos_garantia,
-          observacion: req.expediente_historico.observacion,
+          datos_garantia: hist.datos_garantia || hist.asociado || 'Sin datos detallados.',
+          observacion: hist.observacion || req.justificacion,
+          _isHistoric: true
+      };
+  } else if (!req.id_expediente) {
+      // HISTÓRICO MANUAL O SIN EXPEDIENTE_HISTORICO
+      selectedDocument.value = { 
+          numero: req.numero_documento,
+          datos_garantia: 'Información insertada manualmente. No hay datos históricos en la base de datos.',
+          observacion: req.justificacion,
           _isHistoric: true
       };
   } else {

@@ -18,18 +18,18 @@
       </div>
 
       <!-- Información Histórica de la Garantía -->
-      <div v-if="request?.expediente_historico" class="bg-yellow-50 border border-yellow-200 p-4 mb-5 rounded shadow-sm text-sm">
+      <div v-if="histInfo" class="bg-yellow-50 border border-yellow-200 p-4 mb-5 rounded shadow-sm text-sm">
           <h4 class="font-bold text-yellow-800 mb-2">
               <i class="fas fa-info-circle mr-1"></i> Información Histórica de la Garantía solicitada
           </h4>
           <ul class="text-yellow-700 space-y-1 ml-5 list-disc">
-              <li v-if="request.expediente_historico.datos_garantia">
-                  <strong>Datos:</strong> {{ request.expediente_historico.datos_garantia }}
+              <li v-if="histInfo.datos_garantia">
+                  <strong>Datos:</strong> {{ histInfo.datos_garantia }}
               </li>
-              <li v-if="request.expediente_historico.observacion">
-                  <strong>Observación original:</strong> {{ request.expediente_historico.observacion }}
+              <li v-if="histInfo.observacion">
+                  <strong>Observación original:</strong> {{ histInfo.observacion }}
               </li>
-              <li v-if="!request.expediente_historico.datos_garantia && !request.expediente_historico.observacion">
+              <li v-if="!histInfo.datos_garantia && !histInfo.observacion">
                   Sin información histórica detallada.
               </li>
           </ul>
@@ -131,13 +131,18 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
 
 const props = defineProps({
   show: Boolean,
   request: Object
+});
+
+const histInfo = computed(() => {
+    if (!props.request) return null;
+    return props.request.expediente_historico || props.request.expedienteHistorico || null;
 });
 
 const emit = defineEmits(['close', 'registered']);

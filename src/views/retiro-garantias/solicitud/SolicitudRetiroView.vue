@@ -489,6 +489,7 @@ const expedienteActive = ref(false);
 
 const formData = reactive({
   id_expediente: null,
+  id_expediente_historico: null,
   numero_documento: '',
   fecha_documento: null,
   titulo_nombre: '',
@@ -548,6 +549,7 @@ const searchDocument = async () => {
       isHistorico.value = false;
       // Pre-fill expediente data
       formData.id_expediente = response.data.data.id_expediente;
+      formData.id_expediente_historico = response.data.data.id_expediente_historico || null;
       formData.titulo_nombre = response.data.data.titulo_nombre; // Keep existing title if any
       formData.es_manual = false;
       
@@ -719,6 +721,7 @@ const loadIncoming = async (page = 1) => {
 
 const resetFormData = () => {
   formData.id_expediente = null;
+  formData.id_expediente_historico = null;
   formData.numero_documento = '';
   formData.titulo_nombre = '';
   formData.tipo_retiro = 'Temporal';
