@@ -182,10 +182,12 @@ const loadCatalogs = async () => {
 // Initialize form when request changes or modal opens
 watch(() => props.show, (isVisible) => {
     if (isVisible && props.request) {
-        // Reset form and leave number empty for manual input
+        // Reset form and leave number empty for manual input if not present
         form.value = {
-            numero: '',
-            fecha: '',
+            numero: props.request?.numero_documento || '',
+            fecha: props.request?.fecha_documento 
+                   ? new Date(props.request.fecha_documento).toISOString().split('T')[0] 
+                   : '',
             tipo_documento_id: '',
             registro_propiedad_id: '',
             monto_poliza: '',

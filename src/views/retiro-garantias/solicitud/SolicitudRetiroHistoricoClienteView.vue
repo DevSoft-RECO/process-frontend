@@ -43,7 +43,12 @@
             </tr>
             <tr v-for="item in history" :key="item.id" class="hover:bg-gray-50 transition-colors">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatDate(item.fecha_solicitud) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{{ item.numero_documento }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <div class="font-bold">{{ item.numero_documento }}</div>
+                <div class="text-xs text-gray-500 mt-1" v-if="item.fecha_documento">
+                    <i class="far fa-calendar-alt"></i> {{ new Date(item.fecha_documento).toLocaleDateString() }}
+                </div>
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 max-w-[200px] truncate" :title="item.titulo_nombre">{{ item.titulo_nombre }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
                 <span :class="item.tipo_retiro === 'Definitivo' ? 'text-red-600 font-bold bg-red-50 px-2 py-1 rounded' : 'text-blue-600 font-bold bg-blue-50 px-2 py-1 rounded'">

@@ -80,6 +80,9 @@
               </td>
               <td class="px-6 py-4 text-sm">
                 <div class="font-bold text-gray-900 truncate max-w-[200px]" :title="req.numero_documento">{{ req.numero_documento }}</div>
+                <div class="text-xs text-gray-500 mt-1" v-if="req.fecha_documento">
+                    <i class="far fa-calendar-alt"></i> {{ new Date(req.fecha_documento).toLocaleDateString() }}
+                </div>
                 <div class="text-gray-500 text-xs truncate max-w-[200px]" :title="req.titulo_nombre">{{ req.titulo_nombre }}</div>
               </td>
               <td class="px-6 py-4 text-sm max-w-xs">

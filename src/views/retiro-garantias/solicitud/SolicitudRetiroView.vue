@@ -274,7 +274,12 @@
             </tr>
             <tr v-for="item in filteredHistory" :key="item.id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(item.fecha_solicitud) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.numero_documento }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <div class="font-medium">{{ item.numero_documento }}</div>
+                <div class="text-xs text-gray-500 mt-1" v-if="item.fecha_documento">
+                    <i class="far fa-calendar-alt"></i> {{ new Date(item.fecha_documento).toLocaleDateString() }}
+                </div>
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.titulo_nombre }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <span :class="item.tipo_retiro === 'Definitivo' ? 'text-red-600 font-bold' : 'text-blue-600'">
@@ -373,7 +378,12 @@
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(item.fecha_envio) }}</td>
                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{{ item.agencia?.nombre || 'N/A' }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.solicitante?.name || 'N/A' }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.numero_documento }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <div class="font-medium">{{ item.numero_documento }}</div>
+                    <div class="text-xs text-gray-500 mt-1" v-if="item.fecha_documento">
+                        <i class="far fa-calendar-alt"></i> {{ new Date(item.fecha_documento).toLocaleDateString() }}
+                    </div>
+                  </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.titulo_nombre }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm">
                     <span :class="getStatusClass(item.estado_actual)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
