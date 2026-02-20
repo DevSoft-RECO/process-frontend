@@ -101,13 +101,23 @@
                 >
                   <i class="fas fa-eye"></i> Ver
                 </button>
-                <button 
-                  v-if="req.estado_actual === 1"
-                  @click="dispatchRequest(req)" 
-                  class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-                >
-                  Despachar
-                </button>
+                <template v-if="req.estado_actual === 1">
+                    <button 
+                      v-if="!isHistoricoSinDocumento(req)"
+                      @click="dispatchRequest(req)" 
+                      class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                    >
+                      Despachar
+                    </button>
+                    <button 
+                      v-else
+                      @click="openRegistrationModal(req)" 
+                      class="bg-blue-600 text-white px-3 py-1 mb-1 rounded hover:bg-blue-700 shadow-sm block text-xs"
+                      title="Debe registrar el documento físico antes de despachar"
+                    >
+                      <i class="fas fa-file-signature"></i> Registrar Doc.
+                    </button>
+                </template>
                 <button 
                   v-if="req.estado_actual === 1 && authStore.hasRole('Super Admin')"
                   @click="deleteRequest(req)" 
@@ -220,6 +230,14 @@
         </div>
       </div>
     </div>
+
+    <!-- Registration Modal for Historical Documents -->
+    <RegistroDocumentoModal 
+      :show="showRegistrationModal" 
+      :request="selectedRequestForRegistration" 
+      @close="showRegistrationModal = false"
+      @registered="handleDocumentRegistered"
+    />
   </div>
 </template>
 
@@ -228,6 +246,7 @@ import { ref, onMounted, nextTick } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
 import { useAuthStore } from '@/stores/auth';
+import RegistroDocumentoModal from './RegistroDocumentoModal.vue';
 
 const authStore = useAuthStore();
 
@@ -239,6 +258,16 @@ const showDetailModal = ref(false);
 const selectedDocument = ref(null);
 const currentRequest = ref(null);
 const agencies = ref([]);
+
+// Modals state for registration
+const showRegistrationModal = ref(false);
+const selectedRequestForRegistration = ref(null);
+
+// Computeds/Helpers
+const isHistoricoSinDocumento = (req) => {
+    // Es histórico si no tiene id_expediente. Y requiere registro si no trae documento asociado.
+    return !req.id_expediente && !req.documento;
+};
 
 // Methods
 const loadAgencies = async () => {
@@ -318,6 +347,19 @@ const closeDetailModal = () => {
   selectedDocument.value = null;
   currentRequest.value = null;
 };
+
+// --- Registration Logic ---
+const openRegistrationModal = (req) => {
+    selectedRequestForRegistration.value = req;
+    showRegistrationModal.value = true;
+};
+
+const handleDocumentRegistered = () => {
+    showRegistrationModal.value = false;
+    selectedRequestForRegistration.value = null;
+    loadRequests(); // Recargar para obtener el documento asociado
+};
+// -------------------------
 
 const dispatchRequest = async (req) => {
   // Preparar opciones para SweetAlert
