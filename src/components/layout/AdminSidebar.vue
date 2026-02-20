@@ -45,7 +45,7 @@
         
         <!-- DIVIDER ITEM -->
         <div v-if="item.isDivider" class="px-3 py-2 mt-4">
-           <div v-show="!layoutStore.isCollapsed" class="text-[10px] font-black text-verde-cope uppercase tracking-widest mb-1 shadow-sm">
+           <div v-show="!layoutStore.isCollapsed" class="text-[9px] font-black text-verde-cope uppercase tracking-widest mb-1 shadow-sm">
                {{ item.label }}
            </div>
            <div v-show="layoutStore.isCollapsed" class="h-px bg-white/10 dark:bg-gray-800 my-2"></div>
