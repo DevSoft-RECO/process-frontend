@@ -15,23 +15,39 @@
          <p class="text-sm text-gray-700 whitespace-pre-line">{{ documentData.datos_garantia || 'Sin detalles registrados.' }}</p>
      </div>
 
-     <div class="alert bg-blue-50 text-blue-800 p-3 rounded text-sm mt-4">
-         <i class="fas fa-info-circle"></i> 
-         Verifique si el documento que busca se encuentra en el campo "Información de Garantías". 
-         Indique en la justificación cuál de ellos desea retirar.
+     <div class="alert bg-blue-50 text-blue-800 p-3 rounded text-sm mt-4 space-y-2">
+         <p>
+           <i class="fas fa-info-circle"></i> 
+           Verifique si el documento que busca se encuentra en el campo "Información de Garantías". 
+           Indique en la justificación cuál de ellos desea retirar.
+         </p>
+         <p class="font-semibold text-blue-900">
+           Puede insertar manualmente el Número de Documento y la Fecha del Documento para agilizar la búsqueda posterior, aunque estos campos son opcionales pero puede ingresar la información para agilizar el proceso.
+         </p>
      </div>
 
      <!-- Formulario -->
      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
         <div>
-          <label class="block text-sm font-medium text-gray-700">Número de Documento</label>
+          <label class="block text-sm font-medium text-gray-700">Cambie el #Prdocuto por el #Doc </label>
           <input 
             v-model="formData.numero_documento" 
             type="text" 
-            readonly
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-white focus:ring-purple-500 focus:border-purple-500"
+            placeholder="Ej. ESC-12345"
           >
         </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Fecha del Documento (Opcional)</label>
+          <input 
+            v-model="formData.fecha_documento" 
+            type="date" 
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-white focus:ring-purple-500 focus:border-purple-500"
+          >
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700">Asociado (Título)</label>
           <input 
@@ -41,9 +57,6 @@
             class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100"
           >
         </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
          <div>
           <label class="block text-sm font-medium text-gray-700">Tipo de Retiro</label>
           <select 

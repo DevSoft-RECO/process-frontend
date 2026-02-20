@@ -4,7 +4,7 @@
 
     <!-- Search Section -->
     <div class="bg-white p-4 rounded-lg shadow space-y-4">
-      <h2 class="text-lg font-semibold text-gray-700">Buscar Expediente / Documento</h2>
+      <h2 class="text-lg font-semibold text-gray-700">Buscar Garantia mediante el # de Producto</h2>
       <div class="flex space-x-2">
         <input 
           v-model="searchTerm" 
@@ -133,6 +133,19 @@
           >
         </div>
         <div>
+          <label class="block text-sm font-medium text-gray-700">Fecha del Documento</label>
+          <input 
+            v-model="formData.fecha_documento" 
+            type="date" 
+            :readonly="!isManual"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-50"
+            :class="{'bg-white': isManual}"
+          >
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
           <label class="block text-sm font-medium text-gray-700">Título / Nombre Asociado</label>
           <input 
             v-model="formData.titulo_nombre" 
@@ -142,9 +155,6 @@
             :class="{'bg-white': isManual}"
           >
         </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
          <div>
           <label class="block text-sm font-medium text-gray-700">Tipo de Retiro</label>
           <select 
