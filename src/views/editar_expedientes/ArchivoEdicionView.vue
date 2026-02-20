@@ -141,9 +141,12 @@
                          <div v-else class="grid grid-cols-1 gap-4">
                              <div v-for="d in detallesData.documentos" :key="d.id" class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                                  <div class="bg-gray-50 dark:bg-gray-700/30 px-4 py-3 flex justify-between items-center">
-                                     <div class="flex items-center gap-3">
-                                         <span class="font-bold text-gray-800 dark:text-white">{{ d.tipo_documento?.nombre || 'Documento' }}</span>
-                                         <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">No: {{ d.numero }}</span>
+                                     <div class="flex flex-col gap-2">
+                                         <div class="flex items-center gap-3">
+                                             <span class="font-bold text-gray-800 dark:text-white">{{ d.tipo_documento?.nombre || 'Documento' }}</span>
+                                             <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">No: {{ d.numero }}</span>
+                                             <span v-if="d.estado !== 'activo'" class="text-xs font-bold bg-orange-100 text-orange-800 px-2 py-0.5 rounded" title="Retirado temporal o definitivamente">INACTIVO</span>
+                                         </div>
                                         <div v-if="d.expedientes_asociados_count > 0" class="flex items-center gap-2">
                                             <span class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded border border-red-200 flex items-center gap-1">
                                                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -157,7 +160,7 @@
                                              </button>
                                          </div>
                                      </div>
-                                     <button @click="openEditDocumento(d)" class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md text-sm font-medium hover:bg-blue-200 transition">
+                                     <button @click="openEditDocumento(d)" :disabled="d.estado !== 'activo'" class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md text-sm font-medium hover:bg-blue-200 transition disabled:opacity-50 disabled:cursor-not-allowed">
                                          Editar
                                      </button>
                                  </div>
