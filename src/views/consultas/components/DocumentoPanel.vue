@@ -94,6 +94,9 @@
                                             <span v-if="doc.already_linked" class="px-2 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300">
                                             YA VINCULADO
                                             </span>
+                                            <span v-else-if="doc.estado !== 'activo'" class="px-2 py-0.5 rounded text-xs font-bold bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300" title="Retirado temporal o definitivamente">
+                                            INACTIVO
+                                            </span>
                                     </div>
                                     <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
                                         <span class="font-semibold">Finca:</span> {{ doc.no_finca }} | 
@@ -104,8 +107,8 @@
                                         Propietario: {{ doc.propietario || 'N/A' }} | Registro: {{ doc.registro_propiedad?.nombre || 'N/A' }}
                                     </p>
                                 </div>
-                                <button type="button" @click="selectExistingDoc(doc)" class="px-3 py-1.5 text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                                    {{ doc.already_linked ? 'Vincular de nuevo' : 'Seleccionar' }}
+                                <button type="button" @click="selectExistingDoc(doc)" :disabled="doc.estado !== 'activo'" class="px-3 py-1.5 text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {{ doc.estado !== 'activo' ? 'No Disponible' : (doc.already_linked ? 'Vincular de nuevo' : 'Seleccionar') }}
                                 </button>
                             </div>
                         </div>
