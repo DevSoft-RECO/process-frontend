@@ -43,22 +43,23 @@
     <!-- Right Side Actions -->
     <div class="flex items-center gap-4">
 
-      <!-- Botón Bandeja de Descargas (Visible si hay reportes) -->
-      <transition name="fade">
-          <button v-if="reportStore.myReports.length > 0" 
-                  @click="reportStore.openWidget()"
-                  class="relative p-2 rounded-lg text-white hover:bg-white/20 transition focus:outline-none"
-                  title="Abrir Bandeja de Descargas"
+      <!-- Botón Bandeja de Descargas (Siempre Visible) -->
+      <button 
+          @click="reportStore.openWidget()"
+          class="relative p-2 rounded-lg text-white hover:bg-white/20 transition focus:outline-none"
+          title="Abrir Bandeja de Descargas"
+      >
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+          </svg>
+          <!-- Indicador Numérico (Solo visible si hay reportes completados) -->
+          <span 
+              v-if="reportStore.completedReports.length > 0" 
+              class="absolute top-0 right-0 -mt-1 -mr-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow"
           >
-              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
-              </svg>
-              <!-- Indicador Numérico -->
-              <span class="absolute top-0 right-0 -mt-1 -mr-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow">
-                  {{ reportStore.myReports.length }}
-              </span>
-          </button>
-      </transition>
+              {{ reportStore.completedReports.length }}
+          </span>
+      </button>
 
        <!-- Theme Toggle -->
        <button

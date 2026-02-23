@@ -94,11 +94,6 @@ export const useReportStore = defineStore('report', {
                 if (response.data && response.data.success) {
                     this.myReports = response.data.data;
 
-                    // Asegurarnos que el widget esté visible si hay reportes que no hemos cerrado
-                    if (this.myReports.length > 0) {
-                        this.isWidgetVisible = true;
-                    }
-
                     // Iniciar polling si hay algo en progreso, y detenerlo si no hay
                     if (this.hasActiveReports) {
                         this.startPolling();

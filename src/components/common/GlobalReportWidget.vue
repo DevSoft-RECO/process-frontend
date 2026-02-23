@@ -110,9 +110,9 @@ const reportStore = useReportStore();
 
 const getReportName = (code: string) => {
     switch (code) {
-        case 'seguimiento_csv': return 'Seguimiento Crudo';
-        case 'general_agencias': return 'General por Agencias';
-        case 'general_asesor': return 'Rendimiento Asesor';
+        case 'seguimiento_csv': return 'Seguimiento General';
+        case 'general_agencias': return 'Seguimiento General por Agencias';
+        case 'general_asesor': return 'Seguimiento General por Asesor';
         case 'gerencial_tiempos': return 'Analítica de Tiempos';
         default: return 'Reporte Exportado';
     }
