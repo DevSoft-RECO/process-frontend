@@ -34,15 +34,7 @@ export const useReportStore = defineStore('report', {
             this.isRequesting = true;
             try {
                 await api.post('/exportar/seguimiento-csv');
-                Swal.fire({
-                    title: '¡Reporte en Cola!',
-                    text: 'Tu reporte se procesará en segundo plano. Puedes revisarlo en la ventana inferior derecha.',
-                    icon: 'success',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
+
 
                 // Mostrar widget 
                 this.isWidgetVisible = true;

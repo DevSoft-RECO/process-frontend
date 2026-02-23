@@ -1,30 +1,16 @@
 <template>
   <div class="h-full flex flex-col pt-10 px-4 md:px-8 bg-gray-50 overflow-y-auto w-full max-w-7xl mx-auto">
     <!-- Header -->
-    <div class="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div class="text-center md:text-left">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight flex items-center justify-center md:justify-start">
-          <div class="bg-blue-100 p-3 rounded-2xl mr-4 shadow-sm">
-              <i class="fas fa-chart-line text-blue-600"></i>
-          </div> 
-          Reportes Analíticos
-        </h1>
-        <p class="mt-4 text-gray-500 text-lg md:text-xl max-w-3xl">
-          Descargue la información de todos los expedientes y fechas para análisis gerencial. Los reportes grandes se generan asíncronamente en segundo plano.
-        </p>
-      </div>
-
-      <!-- Botón para Reabrir Widget (Aparece si hay reportes pero el widget está cerrado) -->
-      <transition name="fade">
-          <div v-if="reportStore.myReports.length > 0 && !reportStore.isWidgetVisible" class="flex justify-center md:justify-end">
-             <button @click="reportStore.openWidget()" 
-                     class="flex items-center gap-2 bg-blue-50 text-blue-600 hover:bg-blue-100 px-4 py-2.5 rounded-xl font-semibold transition-colors border border-blue-200 shadow-sm">
-                 <i class="fas fa-inbox text-lg"></i>
-                 Abrir Bandeja de Descargas
-                 <span class="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full ml-1">{{ reportStore.myReports.length }}</span>
-             </button>
-          </div>
-      </transition>
+    <div class="mb-10 text-center md:text-left">
+      <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight flex items-center justify-center md:justify-start">
+        <div class="bg-blue-100 p-3 rounded-2xl mr-4 shadow-sm">
+            <i class="fas fa-chart-line text-blue-600"></i>
+        </div> 
+        Reportes Analíticos
+      </h1>
+      <p class="mt-4 text-gray-500 text-lg md:text-xl max-w-3xl">
+        Descargue la información de todos los expedientes y fechas para análisis gerencial. Los reportes grandes se generan asíncronamente en segundo plano.
+      </p>
     </div>
 
     <!-- Reports Grid -->
