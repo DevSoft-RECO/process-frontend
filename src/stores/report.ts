@@ -49,6 +49,24 @@ export const useReportStore = defineStore('report', {
             }
         },
 
+        async requestReporteGeneralAgencias(agenciasIds: number[]) {
+            this.isRequesting = true;
+            try {
+                await api.post('/exportar/general-agencias', {
+                    agencias: agenciasIds
+                });
+
+                this.isWidgetVisible = true;
+                this.isWidgetMinimized = false;
+                await this.fetchMyReports();
+            } catch (error) {
+                console.error('Error enviando a cola reporte de agencias', error);
+                Swal.fire('Error', 'No se pudo generar el reporte de agencias.', 'error');
+            } finally {
+                this.isRequesting = false;
+            }
+        },
+
         async fetchMyReports() {
             if (this.myReports.length === 0) {
                 this.loadingReports = true;
