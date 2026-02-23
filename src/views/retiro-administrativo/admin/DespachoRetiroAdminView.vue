@@ -125,7 +125,18 @@
                                     Despachar
                                 </button>
                                 
-                                <span v-if="req.estado_solicitud === 'despachado'" class="text-xs text-gray-400 italic">Esperando confirmación...</span>
+                                <!-- Botón Confirmar Reingreso -->
+                                <button
+                                    v-if="req.estado_solicitud === 'despachado' && req.estado === 'retornando'"
+                                    @click="confirmarReingresoExpediente(req)"
+                                    class="text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
+                                    title="Confirmar que el expediente regresó al Archivo"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+                                    Reingresar y Cerrar
+                                </button>
+
+                                <span v-if="req.estado_solicitud === 'despachado' && req.estado !== 'retornando'" class="text-xs text-gray-400 italic">En Agencia...</span>
                                 <span v-if="req.estado_solicitud === 'archivado'" class="text-xs text-gray-400 italic">Finalizado</span>
                             </div>
                         </td>
@@ -250,6 +261,37 @@ const despacharExpediente = async (id: number, notas: string) => {
         }
     } catch (error: any) {
         Swal.fire('Error', error.response?.data?.message || 'Error al despachar el expediente', 'error');
+    }
+}
+
+const confirmarReingresoExpediente = async (req: any) => {
+    const { isConfirmed } = await Swal.fire({
+        title: 'Reingresar Expediente',
+        text: `¿Confirma que el expediente de ${req.expediente?.nombre_asociado} está físicamente de vuelta y quiere archivar esta solicitud?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#8B5CF6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, reingresar y cerrar',
+        cancelButtonText: 'Cancelar'
+    });
+
+    if (isConfirmed) {
+        try {
+            const response = await api.post(`/solicitudes-administrativas/${req.id}/reingreso`);
+            if (response.data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Proceso Finalizado',
+                    text: 'El expediente fue reingresado y la solicitud archivada.',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+                loadRequests(currentPage.value);
+            }
+        } catch (error: any) {
+            Swal.fire('Error', error.response?.data?.message || 'Error al reingresar el expediente', 'error');
+        }
     }
 }
 
