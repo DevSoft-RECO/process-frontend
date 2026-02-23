@@ -65,14 +65,14 @@
                 <p class="text-gray-600 mb-8 leading-relaxed">
                     {{ found 
                         ? 'El documento existe en nuestros registros. Por favor, verifique los detalles a la derecha antes de confirmar.' 
-                        : 'No encontramos registros con estos datos. Si tiene el documento físico, puede solicitar una validación manual llenando el formulario.' 
+                        : 'No encontramos registros con estos datos. Si tiene el documento físico, puede solicitar una validación manual llenando el formulario con los datos que poseea del documento.' 
                     }}
                 </p>
 
                 <div v-if="!found" class="bg-yellow-50 rounded-xl p-5 text-left text-sm text-yellow-800 border-l-4 border-yellow-400 shadow-sm">
                     <div class="flex items-start">
                          <i class="fas fa-info-circle mr-3 mt-1 text-yellow-600"></i>
-                         <p>Asegúrese de que el número y la fecha sean correctos. Si el error persiste, ingrese los datos manualmente.</p>
+                         <p>Asegúrese de que el número y la fecha sean correctos. Si el error persiste, ingrese los datos manualmente. Depende del tipo de docuemnto algunos campos quedaran vacios.</p>
                     </div>
                 </div>
             </div>
