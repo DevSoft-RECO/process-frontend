@@ -85,6 +85,22 @@ export const useReportStore = defineStore('report', {
             }
         },
 
+        async requestReporteDocumentos() {
+            this.isRequesting = true;
+            try {
+                await api.post('/exportar/general-documentos');
+
+                this.isWidgetVisible = true;
+                this.isWidgetMinimized = false;
+                await this.fetchMyReports();
+            } catch (error) {
+                console.error('Error enviando a cola reporte de documentos', error);
+                Swal.fire('Error', 'No se pudo generar la exportación de documentos.', 'error');
+            } finally {
+                this.isRequesting = false;
+            }
+        },
+
         async fetchMyReports() {
             if (this.myReports.length === 0) {
                 this.loadingReports = true;

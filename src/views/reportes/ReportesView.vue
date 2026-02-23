@@ -84,6 +84,29 @@
         </button>
       </div>
 
+      <!-- Export Documentos Generales (Garantías) -->
+      <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+        <div class="flex-grow">
+          <div class="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-orange-100">
+            <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Garantías Reales</h3>
+          <p class="text-gray-500 mb-8 leading-relaxed">
+            Descargar todo el registro central de Documentos base (Sin filtro de expedientes).
+          </p>
+        </div>
+        
+        <button 
+          @click="dispararReporteDocumentos" 
+          :disabled="reportStore.isRequesting"
+          class="w-full flex justify-center items-center gap-3 bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white font-bold py-3.5 px-6 rounded-2xl transition-all shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed group"
+        >
+          <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin text-lg"></i>
+          <svg v-else class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          Extraer Matriz
+        </button>
+      </div>
+
     </div>
     
     <!-- Modal Selection Agencias -->
@@ -111,12 +134,15 @@ const handleGenerarAgencias = async (agenciasSeleccionadas) => {
 };
 
 const dispararReporteAsesor = async () => {
-    // Si la estructura del login guarda "username", sino fallback a "name" del usuario.
     const identificador = authStore.user?.username || authStore.user?.name;
     if (!identificador) {
         Swal.fire('Error', 'No se detecta un nombre de usuario en tu sesión activa.', 'error');
         return;
     }
     await reportStore.requestReporteGeneralAsesor(identificador);
+};
+
+const dispararReporteDocumentos = async () => {
+    await reportStore.requestReporteDocumentos();
 };
 </script>
