@@ -501,6 +501,29 @@ const menuItems = computed(() => {
 
         {
             isDivider: true,
+            label: 'Retiro doc Administrativo',
+            show: true
+        },
+        {
+            id: 'retiro-administrativo',
+            label: 'Retiro Administrativo',
+            // Document Arrow Up Icon
+            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-3-3v6m-9 1V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2H6a2 2 0 01-2-2z" />',
+            show: true,
+            children: [
+                {
+                    label: 'Solicitar Retiro',
+                    route: '/admin/retiro-administrativo/usuario/solicitar'
+                },
+                {
+                    label: 'Despacho y Reingreso',
+                    route: '/admin/retiro-administrativo/admin/despacho'
+                }
+            ]
+        },
+
+        {
+            isDivider: true,
             label: 'Ajustes',
             show: true
         },

@@ -294,6 +294,24 @@ const routes: RouteRecordRaw[] = [
                 }
             },
 
+            // Retiro Administrativo
+            {
+                path: 'retiro-administrativo/usuario/solicitar',
+                name: 'retiro-administrativo-solicitar',
+                component: () => import('@/views/retiro-administrativo/usuario/SolicitarRetiroAdminView.vue'),
+                meta: {
+                    title: 'Solicitar Retiro Administrativo'
+                }
+            },
+            {
+                path: 'retiro-administrativo/admin/despacho',
+                name: 'retiro-administrativo-despacho',
+                component: () => import('@/views/retiro-administrativo/admin/DespachoRetiroAdminView.vue'),
+                meta: {
+                    title: 'Despacho y Reingreso'
+                }
+            },
+
             // Asesores de Crédito
             {
                 path: 'asesores/nuevos',
