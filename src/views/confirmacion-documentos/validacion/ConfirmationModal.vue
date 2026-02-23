@@ -310,13 +310,13 @@ const registerDocument = async () => {
 };
 
 const confirmValidation = () => {
-    if (exists.value !== true) {
-         Swal.fire('Atención', 'Debe indicar que el documento SÍ EXISTE para validar.', 'warning');
+    if (exists.value === null) {
+         Swal.fire('Atención', 'Debe indicar si el documento EXISTE o NO EXISTE físicamente.', 'warning');
          return;
     }
 
     const data = {
-        confirmacion: 'SI',
+        confirmacion: exists.value ? 'SI' : 'NO',
         observacion_confirmacion: validationObservation.value
     };
 
