@@ -124,12 +124,199 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal de Confirmación y Justificación -->
+    <div v-if="modalConfirmacion" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 fade-in">
+        <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" @click="modalConfirmacion = false"></div>
+        
+        <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden transform transition-all flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 flex items-center justify-between shrink-0">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-verde-cope" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
+                    Confirmar Solicitud
+                </h3>
+                <button @click="modalConfirmacion = false" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto custom-scrollbar">
+                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl p-4 mb-6">
+                    <p class="text-sm text-blue-800 dark:text-blue-300">
+                        Está a punto de solicitar el retiro físico del expediente de <strong>{{ expedienteEncontrado?.nombre_asociado }}</strong>.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Motivo / Justificación *</label>
+                        <textarea 
+                            v-model="observaciones"
+                            rows="4"
+                            class="block w-full border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-verde-cope/50 focus:border-verde-cope sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                            placeholder="Detalle la razón por la que requiere retirar este expediente (Ej. Revisión de firmas, Actualización de datos, etc.)."
+                            required
+                        ></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 shrink-0 flex justify-end gap-3">
+                <button 
+                    @click="modalConfirmacion = false"
+                    :disabled="isSubmitting"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-verde-cope transition-colors disabled:opacity-50"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    @click="confirmarYEnviar"
+                    :disabled="isSubmitting || !observaciones.trim()"
+                    class="px-4 py-2 text-sm font-medium text-white bg-azul-cope border border-transparent rounded-lg shadow-sm hover:bg-azul-cope/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-azul-cope flex items-center gap-2 disabled:opacity-50 transition-colors"
+                >
+                    <svg v-if="isSubmitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>{{ isSubmitting ? 'Enviando...' : 'Confirmar Solicitud' }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active and Historic Requests Section -->
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden fade-in flex flex-col h-[500px]">
+        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 flex space-x-4">
+            <button 
+                @click="activeTab = 'active'"
+                class="pb-2 text-lg font-semibold border-b-2 transition-colors"
+                :class="activeTab === 'active' ? 'border-azul-cope text-azul-cope dark:text-blue-400 dark:border-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
+            >
+                Solicitudes Activas
+            </button>
+            <button 
+                @click="activeTab = 'historic'"
+                class="pb-2 text-lg font-semibold border-b-2 transition-colors"
+                :class="activeTab === 'historic' ? 'border-azul-cope text-azul-cope dark:text-blue-400 dark:border-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
+            >
+                Historial (Finalizadas)
+            </button>
+            <div class="flex-1 flex justify-end">
+                <button @click="loadRequests" class="text-gray-500 hover:text-azul-cope transition-colors flex items-center gap-1 text-sm font-medium">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                    Actualizar
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-auto custom-scrollbar p-0">
+            <!-- Active Table -->
+            <table v-if="activeTab === 'active'" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-800/50 sticky top-0 z-10">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fecha</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Expediente</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Documento</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Estado</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tr v-if="loadingRequests">
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-500">Cargando solicitudes...</td>
+                    </tr>
+                    <tr v-else-if="activeRequests.length === 0">
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-500 flex flex-col items-center justify-center">
+                            <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-3-3v6m-9 1V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2H6a2 2 0 01-2-2z" /></svg>
+                            <p>No tienes solicitudes activas en este momento.</p>
+                        </td>
+                    </tr>
+                    <tr v-for="req in activeRequests" :key="req.id" class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                            {{ formatDate(req.fecha_solicitud) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-medium">
+                            <div v-if="req.expediente">
+                                <div>{{ req.expediente.nombre_asociado }}</div>
+                                <div class="text-xs text-gray-500 mt-1">ID: {{ req.expediente.id }}</div>
+                            </div>
+                            <span v-else class="text-gray-400">N/A</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            {{ req.expediente?.numero_documento || 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span :class="getStatusClass(req.estado)" class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border">
+                                {{ req.estado.toUpperCase() }}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Historic Table -->
+            <table v-if="activeTab === 'historic'" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-800/50 sticky top-0 z-10">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fecha Finalización</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Expediente</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Documento</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Estado</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tr v-if="loadingRequests">
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-500">Cargando historial...</td>
+                    </tr>
+                    <tr v-else-if="historicRequests.length === 0">
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                            <p>No tienes solicitudes finalizadas en tu historial.</p>
+                        </td>
+                    </tr>
+                    <tr v-for="req in historicRequests" :key="req.id" class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                            {{ formatDate(req.fecha_finalizacion || req.updated_at) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-medium">
+                            <div v-if="req.expediente">
+                                <div>{{ req.expediente.nombre_asociado }}</div>
+                                <div class="text-xs text-gray-500 mt-1">ID: {{ req.expediente.id }}</div>
+                            </div>
+                            <span v-else class="text-gray-400">N/A</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            {{ req.expediente?.numero_documento || 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">
+                                ARCHIVADO
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination Component placeholder -->
+        <div class="px-6 py-3 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 flex items-center justify-between">
+            <div class="text-sm text-gray-500 dark:text-gray-400">
+                Mostrando <span class="font-medium">{{ activeTab === 'active' ? activeRequests.length : historicRequests.length }}</span> resultados.
+            </div>
+        </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import api from '@/api/axios'
+import Swal from 'sweetalert2'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 // Estados
 const criterioBusqueda = ref('')
@@ -137,8 +324,73 @@ const isLoading = ref(false)
 const mensajeError = ref('')
 const expedienteEncontrado = ref<any>(null)
 const modalConfirmacion = ref(false)
+const observaciones = ref('')
+const isSubmitting = ref(false)
+
+const activeTab = ref('active')
+const loadingRequests = ref(false)
+const activeRequests = ref<any[]>([])
+const historicRequests = ref<any[]>([])
 
 // Métodos
+const loadRequests = async () => {
+    loadingRequests.value = true
+    try {
+        const agencyId = authStore.user?.id_agencia || authStore.user?.agencia_id || authStore.user?.agencia?.id;
+
+        // Cargar solicitudes activas
+        const resActive = await api.get('/solicitudes-administrativas', {
+            params: { id_agencia: agencyId }
+        });
+        if (resActive.data.success) {
+            activeRequests.value = resActive.data.data.data;
+        }
+
+        // Cargar historial
+        const resHistoric = await api.get('/solicitudes-administrativas/historico', {
+            params: { id_agencia: agencyId }
+        });
+        if (resHistoric.data.success) {
+            historicRequests.value = resHistoric.data.data.data;
+        }
+    } catch (error) {
+        console.error("Error cargando solicitudes:", error);
+    } finally {
+        loadingRequests.value = false;
+    }
+}
+
+// Cargar al inicio
+import { onMounted } from 'vue'
+onMounted(() => {
+    loadRequests()
+})
+
+const getStatusClass = (estado: string) => {
+    switch (estado?.toLowerCase()) {
+        case 'activo':
+        case 'pendiente':
+            return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-800'
+        case 'aprobado':
+            return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800'
+        case 'rechazado':
+            return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800'
+        default:
+            return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'
+    }
+}
+
+const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A'
+    return new Date(dateString).toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    })
+}
+
 const buscarExpediente = async () => {
     if (!criterioBusqueda.value) return
 
@@ -172,6 +424,72 @@ const limpiarBusqueda = () => {
     criterioBusqueda.value = ''
     expedienteEncontrado.value = null
     mensajeError.value = ''
+    observaciones.value = ''
+}
+
+const confirmarYEnviar = async () => {
+    // 1. Validar Justificación
+    if (!observaciones.value.trim()) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atención',
+            text: 'Debe ingresar el motivo de la solicitud.',
+            confirmButtonColor: '#005D97'
+        });
+        return;
+    }
+
+    // 2. Obtener la agencia del usuario (Se asume del authStore según otras vistas)
+    const agencyId = authStore.user?.id_agencia || authStore.user?.agencia_id || authStore.user?.agencia?.id;
+
+    if (!agencyId) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de Sesión',
+            text: 'No se pudo identificar a qué agencia pertenece su usuario.',
+            confirmButtonColor: '#005D97'
+        });
+        return;
+    }
+
+    isSubmitting.value = true;
+
+    try {
+        const payload = {
+            id_expediente: expedienteEncontrado.value?.id,
+            id_agencia: agencyId,
+            observaciones: observaciones.value
+        };
+
+        const response = await api.post('/solicitudes-administrativas', payload);
+
+        if (response.data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Solicitud Enviada',
+                text: 'La solicitud de retiro administrativo se generó correctamente.',
+                confirmButtonColor: '#10B981'
+            }).then(() => {
+                modalConfirmacion.value = false;
+                limpiarBusqueda();
+                loadRequests(); // Recargar las tablas
+            });
+        }
+    } catch (error: any) {
+        let msg = 'Ocurrió un error inesperado al enviar la solicitud.';
+        if (error.response && error.response.data && error.response.data.message) {
+            msg = error.response.data.message;
+        }
+        
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: msg,
+            confirmButtonColor: '#005D97'
+        });
+    } finally {
+        isSubmitting.value = false;
+    }
 }
 </script>
 
