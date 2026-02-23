@@ -10,7 +10,7 @@
         <div class="flex items-center gap-3">
              <div v-if="reportStore.hasActiveReports" class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
              <div v-else class="text-green-400">
-                <i class="fas fa-check-circle"></i>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
              </div>
             
             <span class="font-medium text-sm truncate">
@@ -46,16 +46,16 @@
            
            <div class="flex items-start justify-between">
              <div class="flex items-center gap-3 w-full pr-20">
-                <!-- Icono Descriptivo -->
+                <!-- Icono Descriptivo (Miniatura) -->
                <div :class="[
-                  'w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0',
-                  report.estado === 'completado' ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400' : '',
-                  report.estado === 'fallido' ? 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400' : '',
-                  (report.estado === 'procesando' || report.estado === 'pendiente') ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400' : ''
+                  'w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border shadow-sm',
+                  report.estado === 'completado' ? 'bg-green-50 border-green-200 text-green-600 dark:bg-green-900/50 dark:border-green-800 dark:text-green-400' : '',
+                  report.estado === 'fallido' ? 'bg-red-50 border-red-200 text-red-600 dark:bg-red-900/50 dark:border-red-800 dark:text-red-400' : '',
+                  (report.estado === 'procesando' || report.estado === 'pendiente') ? 'bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-900/50 dark:border-blue-800 dark:text-blue-400' : ''
                ]">
-                  <i v-if="report.estado === 'completado'" class="fas fa-file-csv"></i>
-                  <i v-else-if="report.estado === 'fallido'" class="fas fa-exclamation-triangle"></i>
-                  <i v-else class="fas fa-file-export animate-pulse"></i>
+                  <svg v-if="report.estado === 'completado'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                  <svg v-else-if="report.estado === 'fallido'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                  <svg v-else class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                </div>
 
                <!-- Información textual -->
@@ -77,14 +77,14 @@
            <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-white dark:bg-slate-800 z-10 pl-2">
                 <button v-if="report.estado === 'completado'" 
                         @click="reportStore.downloadReportFile(report.id)"
-                        class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-800/50 p-2 rounded-md transition-colors" 
+                        class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-800/50 p-2 rounded-lg transition-colors" 
                         title="Descargar CSV">
-                  <i class="fas fa-download"></i>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 </button>
                 <button @click="reportStore.deleteReport(report.id)"
-                        class="text-gray-400 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 bg-gray-50 dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900/30 p-2 rounded-md transition-colors" 
+                        class="text-gray-400 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 bg-gray-50 dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900/30 p-2 rounded-lg transition-colors" 
                         title="Eliminar Reporte">
-                  <i class="fas fa-times"></i>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
            </div>
 
