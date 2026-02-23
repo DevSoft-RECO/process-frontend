@@ -107,6 +107,29 @@
         </button>
       </div>
 
+      <!-- Export Préstamos de Expedientes (Solicitudes Admin) -->
+      <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+        <div class="flex-grow">
+          <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-blue-100">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Préstamo de Expedientes</h3>
+          <p class="text-gray-500 mb-8 leading-relaxed">
+            Reporte maestro sobre solicitudes administrativas y movimiento de uso interno de Archivo.
+          </p>
+        </div>
+        
+        <button 
+          @click="dispararReporteSolicitudesAdmin" 
+          :disabled="reportStore.isRequesting"
+          class="w-full flex justify-center items-center gap-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3.5 px-6 rounded-2xl transition-all shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed group"
+        >
+          <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin text-lg"></i>
+          <svg v-else class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          Auditoría Física
+        </button>
+      </div>
+
     </div>
     
     <!-- Modal Selection Agencias -->
@@ -144,5 +167,9 @@ const dispararReporteAsesor = async () => {
 
 const dispararReporteDocumentos = async () => {
     await reportStore.requestReporteDocumentos();
+};
+
+const dispararReporteSolicitudesAdmin = async () => {
+    await reportStore.requestReporteSolicitudesAdmin();
 };
 </script>

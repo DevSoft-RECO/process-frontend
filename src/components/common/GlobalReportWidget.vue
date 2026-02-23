@@ -114,6 +114,7 @@ const getReportName = (code: string) => {
         case 'general_agencias': return 'Seguimiento General por Agencias';
         case 'general_asesor': return 'Seguimiento General por Asesor';
         case 'general_documentos': return 'Garantías y Documentos';
+        case 'general_solicitudes_admin': return 'Préstamos de Exps.';
         case 'gerencial_tiempos': return 'Analítica de Tiempos';
         default: return 'Reporte Exportado';
     }
