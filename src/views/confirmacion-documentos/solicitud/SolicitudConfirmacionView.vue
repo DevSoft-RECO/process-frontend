@@ -234,21 +234,72 @@ const searchDocument = async () => {
         found.value = response.data.found;
         
         if (found.value) {
-            // Populate form with found data
-            form.value = { 
-                ...response.data.data,
-            };
-            // Map ID to documento_id for relationship
-            form.value.documento_id = response.data.data.id;
+            if (response.data.multiple) {
+                // Hay multiples, crear un select o mostrarlos en un SweetAlert custom HTML
+                let optionsHtml = '';
+                response.data.data.forEach((doc, index) => {
+                    optionsHtml += `
+                        <div class="p-3 border rounded-lg mb-2 text-left cursor-pointer hover:bg-blue-50 transition-colors bg-white ${index === 0 ? 'ring-2 ring-blue-500 bg-blue-50' : ''}" 
+                             onclick="window.selectDocumentOption(${index})" id="doc-option-${index}">
+                            <p class="font-bold text-slate-800"><i class="fas fa-file-alt mr-2 text-blue-500"></i>Doc: ${doc.numero}</p>
+                            <p class="text-sm text-slate-600 mt-1"><i class="fas fa-user mr-2 text-slate-400"></i>Propietario: <span class="font-medium">${doc.propietario || 'Sin nombre'}</span></p>
+                            <p class="text-sm text-slate-500"><i class="fas fa-money-check-alt mr-2 text-slate-400"></i>Monto: ${doc.monto_poliza || 'N/A'}</p>
+                        </div>
+                    `;
+                });
+
+                let selectedIndex = 0;
+                window.selectDocumentOption = (index) => {
+                    selectedIndex = index;
+                    document.querySelectorAll('[id^="doc-option-"]').forEach(el => {
+                        el.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50');
+                    });
+                    document.getElementById(`doc-option-${index}`).classList.add('ring-2', 'ring-blue-500', 'bg-blue-50');
+                };
+
+                const { isConfirmed } = await Swal.fire({
+                    title: 'Múltiples Documentos Encontrados',
+                    html: `Hemos encontrado más de un documento con ese número y fecha. Por favor seleccione el correcto:<br><br>
+                           <div class="max-h-60 overflow-y-auto p-2 bg-slate-50 rounded-xl border">${optionsHtml}</div>`,
+                    showCancelButton: true,
+                    confirmButtonText: 'Seleccionar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#3b82f6',
+                    width: '600px',
+                    didOpen: () => {
+                         // Evitar focus default en enter
+                    }
+                });
+
+                if (isConfirmed) {
+                    const selectedDoc = response.data.data[selectedIndex];
+                    form.value = { ...selectedDoc };
+                    form.value.documento_id = selectedDoc.id;
+                    hasSearched.value = true;
+                } else {
+                    hasSearched.value = false;
+                    form.value = {};
+                }
+                
+                // Limpiar la funcion global
+                delete window.selectDocumentOption;
+
+            } else {
+                // Solo un resultado, comportamiento original
+                const doc = response.data.data[0];
+                form.value = { ...doc };
+                form.value.documento_id = doc.id;
+                hasSearched.value = true;
+            }
         } else {
              // Populate form with search criteria to save manual entry
             form.value = {
                 numero: searchForm.value.numero,
                 fecha: searchForm.value.fecha,
             };
+            hasSearched.value = true;
         }
 
-        hasSearched.value = true;
     } catch (error) {
         console.error(error);
         Swal.fire('Error', 'Error al buscar documento', 'error');
