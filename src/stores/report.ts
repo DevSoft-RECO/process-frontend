@@ -67,6 +67,24 @@ export const useReportStore = defineStore('report', {
             }
         },
 
+        async requestReporteGeneralAsesor(username: string) {
+            this.isRequesting = true;
+            try {
+                await api.post('/exportar/general-asesor', {
+                    username: username
+                });
+
+                this.isWidgetVisible = true;
+                this.isWidgetMinimized = false;
+                await this.fetchMyReports();
+            } catch (error) {
+                console.error('Error enviando a cola reporte de asesor', error);
+                Swal.fire('Error', 'No se pudo generar el reporte del asesor.', 'error');
+            } finally {
+                this.isRequesting = false;
+            }
+        },
+
         async fetchMyReports() {
             if (this.myReports.length === 0) {
                 this.loadingReports = true;

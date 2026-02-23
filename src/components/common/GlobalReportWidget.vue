@@ -112,6 +112,7 @@ const getReportName = (code: string) => {
     switch (code) {
         case 'seguimiento_csv': return 'Seguimiento Crudo';
         case 'general_agencias': return 'General por Agencias';
+        case 'general_asesor': return 'Rendimiento Asesor';
         case 'gerencial_tiempos': return 'Analítica de Tiempos';
         default: return 'Reporte Exportado';
     }

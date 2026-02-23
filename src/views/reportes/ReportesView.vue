@@ -61,14 +61,28 @@
         </button>
       </div>
 
-       <!-- Future Feature Placeholder -->
-       <div class="bg-gray-50 rounded-3xl border border-dashed border-gray-300 p-8 flex flex-col items-center justify-center text-center opacity-70">
-          <div class="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mb-4 text-gray-400">
-             <i class="fas fa-lock text-2xl"></i>
+      <!-- Export General (Asesor Logueado) -->
+      <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+        <div class="flex-grow">
+          <div class="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-purple-100">
+            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
           </div>
-          <h3 class="text-lg font-bold text-gray-600 mb-2">Más Reportes</h3>
-          <p class="text-sm text-gray-500">Próximamente más formatos</p>
-       </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Rendimiento Personal</h3>
+          <p class="text-gray-500 mb-8 leading-relaxed">
+            Extraer el consolidado de expedientes asignados a tu usuario ({{ authStore.user?.username || authStore.user?.name || 'Invitado' }}).
+          </p>
+        </div>
+        
+        <button 
+          @click="dispararReporteAsesor" 
+          :disabled="reportStore.isRequesting || (!authStore.user?.username && !authStore.user?.name)"
+          class="w-full flex justify-center items-center gap-3 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold py-3.5 px-6 rounded-2xl transition-all shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed group"
+        >
+          <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin text-lg"></i>
+          <svg v-else class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.956 11.956 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+          Generar mi Reporte
+        </button>
+      </div>
 
     </div>
     
@@ -84,13 +98,25 @@
 <script setup>
 import { ref } from 'vue';
 import { useReportStore } from '@/stores/report';
+import { useAuthStore } from '@/stores/auth';
 import SelectAgenciasModal from '@/components/reportes/SelectAgenciasModal.vue';
+import Swal from 'sweetalert2';
 
 const reportStore = useReportStore();
+const authStore = useAuthStore();
 const isModalOpen = ref(false);
 
 const handleGenerarAgencias = async (agenciasSeleccionadas) => {
-    // LLamar al store con el array resultante (vacío/lleno)
     await reportStore.requestReporteGeneralAgencias(agenciasSeleccionadas);
+};
+
+const dispararReporteAsesor = async () => {
+    // Si la estructura del login guarda "username", sino fallback a "name" del usuario.
+    const identificador = authStore.user?.username || authStore.user?.name;
+    if (!identificador) {
+        Swal.fire('Error', 'No se detecta un nombre de usuario en tu sesión activa.', 'error');
+        return;
+    }
+    await reportStore.requestReporteGeneralAsesor(identificador);
 };
 </script>
