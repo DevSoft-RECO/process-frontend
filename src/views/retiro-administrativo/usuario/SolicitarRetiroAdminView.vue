@@ -147,7 +147,7 @@
             <div class="p-6 overflow-y-auto custom-scrollbar">
                 <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl p-4 mb-6">
                     <p class="text-sm text-blue-800 dark:text-blue-300">
-                        Está a punto de solicitar el retiro físico del expediente de <strong>{{ expedienteEncontrado?.nombre_asociado }}</strong>.
+                        Está a punto de solicitar el retiro físico del archivo administrativo de <strong>{{ expedienteEncontrado?.nombre_asociado }} (ID: {{ expedienteEncontrado?.id }})</strong>.
                     </p>
                 </div>
 
@@ -401,8 +401,8 @@ onMounted(() => {
 
 const confirmarRecepcionFisica = async (req: any) => {
     const { isConfirmed } = await Swal.fire({
-        title: 'Confirmar Recepción',
-        text: `¿Confirma que ha recibido físicamente el expediente de ${req.expediente?.nombre_asociado}?`,
+        title: 'Confirmar Recepción de Archivo',
+        text: `¿Confirma que ha recibido físicamente el archivo administrativo del expediente de ${req.expediente?.nombre_asociado} (ID: ${req.expediente?.id})?`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#10B981',
@@ -432,8 +432,8 @@ const confirmarRecepcionFisica = async (req: any) => {
 
 const iniciarDevolucionExpediente = async (req: any) => {
     const { isConfirmed } = await Swal.fire({
-        title: 'Devolver Expediente',
-        text: `¿Está seguro de iniciar la devolución del expediente ${req.expediente?.nombre_asociado} al Archivo Central?`,
+        title: 'Devolver Archivo Administrativo',
+        text: `¿Está seguro de iniciar la devolución del archivo administrativo del expediente ${req.expediente?.nombre_asociado} (ID: ${req.expediente?.id}) al Archivo Central?`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#F59E0B',

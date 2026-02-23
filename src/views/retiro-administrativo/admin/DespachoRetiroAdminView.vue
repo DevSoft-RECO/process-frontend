@@ -234,12 +234,12 @@ const aceptarSolicitud = async (req: any) => {
 
 const abrirModalDespacho = async (req: any) => {
     const { value: observacionesAdicionales, isConfirmed } = await Swal.fire({
-        title: 'Despachar Expediente',
-        html: `¿Confirmar salida física del expediente <b>${req.expediente?.nombre_asociado}</b> hacia ${req.agencia?.nombre}?<br><br>Puede agregar una nota de despacho (opcional):`,
+        title: 'Despachar Archivo Administrativo',
+        html: `¿Confirmar salida física del archivo administrativo del expediente <b>${req.expediente?.nombre_asociado} (ID: ${req.expediente?.id})</b> hacia ${req.agencia?.nombre}?<br><br>Puede agregar una nota de despacho (opcional):`,
         input: 'textarea',
         inputPlaceholder: 'Observaciones de envío...',
         showCancelButton: true,
-        confirmButtonText: 'Despachar Expediente',
+        confirmButtonText: 'Despachar Archivo',
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#10B981',
     });
@@ -266,8 +266,8 @@ const despacharExpediente = async (id: number, notas: string) => {
 
 const confirmarReingresoExpediente = async (req: any) => {
     const { isConfirmed } = await Swal.fire({
-        title: 'Reingresar Expediente',
-        text: `¿Confirma que el expediente de ${req.expediente?.nombre_asociado} está físicamente de vuelta y quiere archivar esta solicitud?`,
+        title: 'Reingresar Archivo Administrativo',
+        text: `¿Confirma que el archivo administrativo del expediente ${req.expediente?.nombre_asociado} (ID: ${req.expediente?.id}) está físicamente de vuelta y quiere archivar esta solicitud?`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#8B5CF6',
