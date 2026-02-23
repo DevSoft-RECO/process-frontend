@@ -221,15 +221,16 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fecha</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Expediente</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Documento</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Estado</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Estado Central</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Acciones (Agencia)</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     <tr v-if="loadingRequests">
-                        <td colspan="4" class="px-6 py-8 text-center text-gray-500">Cargando solicitudes...</td>
+                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">Cargando solicitudes...</td>
                     </tr>
                     <tr v-else-if="activeRequests.length === 0">
-                        <td colspan="4" class="px-6 py-8 text-center text-gray-500 flex flex-col items-center justify-center">
+                        <td colspan="5" class="px-6 py-8 text-center text-gray-500 flex flex-col items-center justify-center">
                             <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-3-3v6m-9 1V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2H6a2 2 0 01-2-2z" /></svg>
                             <p>No tienes solicitudes activas en este momento.</p>
                         </td>
@@ -249,9 +250,41 @@
                             {{ req.expediente?.numero_documento || 'N/A' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span :class="getStatusClass(req.estado)" class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border">
-                                {{ req.estado.toUpperCase() }}
-                            </span>
+                            <div class="flex flex-col gap-1">
+                                <span :class="getStatusClass(req.estado_solicitud)" class="w-fit px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border">
+                                    {{ (req.estado_solicitud || 'N/A').toUpperCase().replace(/_/g, ' ') }}
+                                </span>
+                                <span v-if="req.estado === 'en_agencia'" class="text-[10px] text-green-600 font-bold ml-1">EN AGENCIA</span>
+                                <span v-if="req.estado === 'retornando'" class="text-[10px] text-orange-600 font-bold ml-1">RETORNANDO</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex items-center justify-end gap-2">
+                                <!-- Confirmar Recepción (Aparece cuando admin ya despachó) -->
+                                <button
+                                    v-if="req.estado_solicitud === 'despachado' && req.confirmacion_solicitante === 'pendiente'"
+                                    @click="confirmarRecepcionFisica(req)"
+                                    class="text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
+                                    title="Confirmar que recibí el expediente físico"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    Confirmar Recepción
+                                </button>
+
+                                <!-- Iniciar Devolución (Aparece cuando ya se tiene en físico y no se ha devuelto aún) -->
+                                <button
+                                    v-if="req.confirmacion_solicitante === 'si' && !req.fecha_devolucion_iniciada"
+                                    @click="iniciarDevolucionExpediente(req)"
+                                    class="text-orange-700 bg-orange-50 hover:bg-orange-100 border border-orange-200 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
+                                    title="Devolver el expediente al archivo central"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
+                                    Devolver Archivo
+                                </button>
+                                
+                                <span v-if="req.estado_solicitud === 'pendiente' || req.estado_solicitud === 'recibido_por_admin'" class="text-xs text-gray-400 italic">En proceso central...</span>
+                                <span v-if="req.fecha_devolucion_iniciada" class="text-xs text-gray-400 italic">Devolución en curso...</span>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -365,6 +398,68 @@ import { onMounted } from 'vue'
 onMounted(() => {
     loadRequests()
 })
+
+const confirmarRecepcionFisica = async (req: any) => {
+    const { isConfirmed } = await Swal.fire({
+        title: 'Confirmar Recepción',
+        text: `¿Confirma que ha recibido físicamente el expediente de ${req.expediente?.nombre_asociado}?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10B981',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, confirmar',
+        cancelButtonText: 'Cancelar'
+    })
+
+    if (isConfirmed) {
+        try {
+            const res = await api.post(`/solicitudes-administrativas/${req.id}/confirmar`)
+            if (res.data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Recepción Confirmada',
+                    text: 'El expediente se marcó como recibido en su agencia.',
+                    timer: 2000,
+                    showConfirmButton: false
+                })
+                loadRequests()
+            }
+        } catch (error: any) {
+            Swal.fire('Error', error.response?.data?.message || 'Error al confirmar recepción', 'error')
+        }
+    }
+}
+
+const iniciarDevolucionExpediente = async (req: any) => {
+    const { isConfirmed } = await Swal.fire({
+        title: 'Devolver Expediente',
+        text: `¿Está seguro de iniciar la devolución del expediente ${req.expediente?.nombre_asociado} al Archivo Central?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#F59E0B',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, iniciar devolución',
+        cancelButtonText: 'Cancelar'
+    })
+
+    if (isConfirmed) {
+        try {
+            const res = await api.post(`/solicitudes-administrativas/${req.id}/devolver`)
+            if (res.data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Devolución Iniciada',
+                    text: 'El expediente se marcó para retorno al Archivo Central.',
+                    timer: 2000,
+                    showConfirmButton: false
+                })
+                loadRequests()
+            }
+        } catch (error: any) {
+            Swal.fire('Error', error.response?.data?.message || 'Error al iniciar devolución', 'error')
+        }
+    }
+}
 
 const getStatusClass = (estado: string) => {
     switch (estado?.toLowerCase()) {
