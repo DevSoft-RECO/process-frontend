@@ -295,11 +295,18 @@ const registerDocument = async () => {
 
     registering.value = true;
     try {
-        await api.post(`/confirmacion-documentos/${props.request.id}/register-document`, form.value);
+        const response = await api.post(`/confirmacion-documentos/${props.request.id}/register-document`, form.value);
         Swal.fire('Éxito', 'Documento registrado y vinculado correctamente.', 'success');
         
         // After registration, we consider it exists.
-        exists.value = true; 
+        exists.value = true;
+        isRegistered.value = true; // Switch view to step 2 automatically
+
+        // Update the reactive props object with the newly created document data 
+        // to render in Step 2 properly if needed without needing a refetch from parent
+        props.request.documento = response.data.data;
+        props.request.documento_id = response.data.data.id;
+
         emit('document-registered'); 
     } catch (error) {
         console.error(error);
