@@ -392,6 +392,14 @@ const routes: RouteRecordRaw[] = [
                 meta: {
                     title: 'Histórico de Confirmaciones'
                 }
+            },
+            {
+                path: 'reportes',
+                name: 'admin-reportes',
+                component: () => import('@/views/reportes/ReportesView.vue'),
+                meta: {
+                    title: 'Reportes y Analítica'
+                }
             }
 
         ]
