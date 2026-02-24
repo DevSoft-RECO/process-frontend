@@ -35,373 +35,323 @@ const routes: RouteRecordRaw[] = [
             permission: 'app_sadec'
         },
         children: [
+            // ==========================================
+            // DASHBOARD
+            // ==========================================
             {
                 path: 'dashboard',
                 name: 'dashboard',
                 component: DashboardView,
-                meta: {
-                    title: 'SADEC'
-                }
+                meta: { title: 'SADEC' }
+            },
+
+            // ==========================================
+            // MÓDULO: ASESORES DE CRÉDITOS
+            // ==========================================
+            {
+                path: 'asesores/nuevos',
+                name: 'admin-asesores-nuevos',
+                component: () => import('@/views/asesores-creditos/NuevosPendientesView.vue'),
+                meta: { title: 'Cargados / Pendientes', permission: 'asesores_credito' }
             },
             {
-                path: 'carga-datos/clientes',
-                name: 'admin-carga-clientes',
-                component: () => import('@/views/carga-datos/ExpedientesHistoricosImportView.vue'),
-                meta: {
-                    title: 'Carga de Expedientes Históricos'
-                }
+                path: 'asesores/seguimiento',
+                name: 'admin-asesores-seguimiento',
+                component: () => import('@/views/asesores-creditos/EnSeguimientoView.vue'),
+                meta: { title: 'En Seguimiento', permission: 'asesores_credito' }
             },
             {
-                path: 'carga-datos/nuevos-expedientes',
-                name: 'admin-carga-nuevos-expedientes',
-                component: () => import('@/views/carga-datos/NuevosExpedientesImportView.vue'),
-                meta: {
-                    title: 'Carga Histórica / Nuevos'
-                }
+                path: 'asesores/retornados',
+                name: 'admin-asesores-retornados',
+                component: () => import('@/views/asesores-creditos/RetornadosView.vue'),
+                meta: { title: 'Retornados', permission: 'asesores_credito' }
+            },
+            {
+                path: 'asesores/finalizados',
+                name: 'admin-asesores-finalizados',
+                component: () => import('@/views/asesores-creditos/FinalizadosView.vue'),
+                meta: { title: 'Finalizados (Histórico)', permission: 'asesores_credito' }
             },
             {
                 path: 'consultas/expedientes',
                 name: 'admin-consultas-expedientes',
                 component: () => import('@/views/consultas/ExpedientesHistoricosView.vue'),
-                meta: {
-                    title: 'Listado de Expedientes Históricos'
-                }
+                meta: { title: 'Listado Histórico', permission: 'asesores_credito' }
             },
             {
                 path: 'consultas/mis-expedientes',
                 name: 'admin-consultas-mis-expedientes',
                 component: () => import('@/views/consultas/MisExpedientesView.vue'),
-                meta: {
-                    title: 'Mis Expedientes (Nuevos)'
-                }
+                meta: { title: 'Mis Expedientes (Nuevos)', permission: 'asesores_credito' }
             },
-            {
-                path: 'catalogos/garantias',
-                name: 'admin-catalogos-garantias',
-                component: () => import('@/views/catalogos/GarantiasView.vue'),
-                meta: {
-                    title: 'Catálogo de Garantías'
-                }
-            },
-            {
-                path: 'catalogos/tipo-documentos',
-                name: 'admin-catalogos-tipo-documentos',
-                component: () => import('@/views/catalogos/TipoDocumentosView.vue'),
-                meta: {
-                    title: 'Catálogo de Tipo Documentos'
-                }
-            },
-            {
-                path: 'catalogos/agencias',
-                name: 'admin-catalogos-agencias',
-                component: () => import('@/views/catalogos/AgenciasView.vue'),
-                meta: {
-                    title: 'Sincronización de Agencias'
-                }
-            },
-            {
-                path: 'catalogos/bufetes',
-                name: 'admin-catalogos-bufetes',
-                component: () => import('@/views/catalogos/BufetesView.vue'),
-                meta: {
-                    title: 'Catálogo de Bufetes'
-                }
-            },
-            {
-                path: 'catalogos/registros-propiedad',
-                name: 'admin-catalogos-registros-propiedad',
-                component: () => import('@/views/catalogos/RegistrosPropiedadView.vue'),
-                meta: {
-                    title: 'Registros de Propiedad'
-                }
-            },
-            {
-                path: 'catalogos/tipo-estados',
-                name: 'admin-catalogos-tipo-estados',
-                component: () => import('@/views/catalogos/TipoEstadosView.vue'),
-                meta: {
-                    title: 'Tipos de Estado'
-                }
-            },
+
+            // ==========================================
+            // MÓDULO: BUZÓN SECRE. AGENCIA
+            // ==========================================
             {
                 path: 'tracking/secretaria-agencia',
                 name: 'admin-tracking-secretaria',
                 component: () => import('@/views/tracking/SecretariaAgenciaView.vue'),
-                meta: {
-                    title: 'Buzón Secretaría Agencia'
-                }
+                meta: { title: 'Bandeja Principal', permission: 'secretaria_agencia' }
             },
             {
                 path: 'tracking/secretaria-edicion',
                 name: 'admin-tracking-secretaria-edicion',
                 component: () => import('@/views/editar_expedientes/SecretariaEdicionView.vue'),
-                meta: {
-                    title: 'Edición de Expedientes'
-                }
-            },
-            {
-                path: 'secretaria-credito/edicion',
-                name: 'secretaria-credito-edicion',
-                component: () => import('@/views/editar_expedientes/SecretariaCreditosEdicionView.vue'),
-                meta: {
-                    title: 'Edición Créditos'
-                }
-            },
-            {
-                path: 'archivo/edicion',
-                name: 'archivo-edicion',
-                component: () => import('@/views/editar_expedientes/ArchivoEdicionView.vue'),
-                meta: {
-                    title: 'Edición Archivo'
-                }
+                meta: { title: 'Edición de Expedientes', permission: 'secretaria_agencia' }
             },
             {
                 path: 'tracking/secretaria-agencia/archivados',
                 name: 'admin-tracking-secretaria-archivados',
                 component: () => import('@/views/tracking/SecretariaAgenciaArchivadosView.vue'),
-                meta: {
-                    title: 'Archivados Administrativamente'
-                }
+                meta: { title: 'Archivados Administrativamente', permission: 'secretaria_agencia' }
             },
+
+            // ==========================================
+            // MÓDULO: BUZÓN SECRE. CRÉDITOS
+            // ==========================================
             {
                 path: 'secretaria-credito/buzon-entrantes',
                 name: 'secretaria-credito-buzon',
                 component: () => import('@/views/secretaria-credito/BuzonEntrantesView.vue'),
-                meta: {
-                    title: 'Buzón Entrantes Crédito'
-                }
+                meta: { title: 'Buzón Entrantes', permission: 'secretaria_credito' }
             },
             {
                 path: 'secretaria-credito/buzon-aceptados',
                 name: 'secretaria-credito-buzon-aceptados',
                 component: () => import('@/views/secretaria-credito/BuzonAceptadosView.vue'),
-                meta: {
-                    title: 'Buzón Aceptados Crédito'
-                }
-            },
-            {
-                path: 'secretaria-credito/buzon-completados',
-                name: 'secretaria-credito-buzon-completados',
-                component: () => import('@/views/secretaria-credito/BuzonCompletadosView.vue'),
-                meta: {
-                    title: 'Buzón Completados Crédito'
-                }
+                meta: { title: 'Buzón Aceptados', permission: 'secretaria_credito' }
             },
             {
                 path: 'secretaria-credito/buzon-abogados',
                 name: 'secretaria-credito-buzon-abogados',
                 component: () => import('@/views/secretaria-credito/BuzonAbogadosView.vue'),
-                meta: {
-                    title: 'Enviado a Abogados'
-                }
+                meta: { title: 'Enviado a Abogados', permission: 'secretaria_credito' }
             },
             {
                 path: 'secretaria-credito/escanear-documentos',
                 name: 'secretaria-credito-escanear-documentos',
                 component: () => import('@/views/secretaria-credito/EscanearDocumentosView.vue'),
-                meta: {
-                    title: 'Escanear Documentos'
-                }
+                meta: { title: 'Escanear Documentos', permission: 'secretaria_credito' }
             },
+            {
+                path: 'secretaria-credito/buzon-completados',
+                name: 'secretaria-credito-buzon-completados',
+                component: () => import('@/views/secretaria-credito/BuzonCompletadosView.vue'),
+                meta: { title: 'Buzón Completados', permission: 'secretaria_credito' }
+            },
+            {
+                path: 'secretaria-credito/edicion',
+                name: 'secretaria-credito-edicion',
+                component: () => import('@/views/editar_expedientes/SecretariaCreditosEdicionView.vue'),
+                meta: { title: 'Edición de Expedientes', permission: 'secretaria_credito' }
+            },
+
+            // ==========================================
+            // MÓDULO: BUZÓN ABOGADO
+            // ==========================================
             {
                 path: 'abogado/buzon',
                 name: 'buzon-abogado',
                 component: () => import('@/views/abogado/BuzonAbogadoView.vue'),
-                meta: {
-                    title: 'Bandeja de Abogado'
-                }
+                meta: { title: 'Bandeja de Entrada', permission: 'abogado' }
             },
             {
                 path: 'abogado/devueltos',
                 name: 'abogado-devueltos',
                 component: () => import('@/views/abogado/BuzonAbogadoDevueltosView.vue'),
-                meta: {
-                    title: 'Devueltos a Secretaría'
-                }
+                meta: { title: 'Devueltos a Secretaría', permission: 'abogado' }
             },
+
+            // ==========================================
+            // MÓDULO: ARCHIVO
+            // ==========================================
             {
                 path: 'archivo/buzon-recibidos',
                 name: 'archivo-buzon-recibidos',
                 component: () => import('@/views/archivo/BuzonRecibidosView.vue'),
-                meta: {
-                    title: 'Buzón Recibidos (Archivo)'
-                }
+                meta: { title: 'Buzón Recibidos', permission: 'archivo' }
             },
             {
                 path: 'archivo/sistema',
                 name: 'archivo-sistema',
                 component: () => import('@/views/archivo/ArchivoSistemaView.vue'),
-                meta: {
-                    title: 'Archivo Sistema'
-                }
+                meta: { title: 'Archivo Sistema', permission: 'archivo' }
             },
             {
                 path: 'archivo/historico',
                 name: 'archivo-historico',
                 component: () => import('@/views/archivo/ArchivoHistoricoView.vue'),
-                meta: {
-                    title: 'Archivo Histórico'
-                }
+                meta: { title: 'Archivo Histórico', permission: 'archivo' }
+            },
+            {
+                path: 'archivo/edicion',
+                name: 'archivo-edicion',
+                component: () => import('@/views/editar_expedientes/ArchivoEdicionView.vue'),
+                meta: { title: 'Edición de Expedientes', permission: 'archivo' }
             },
 
-            // Retiro de Garantías
-            {
-                path: 'retiro-garantias/solicitar',
-                name: 'retiro-garantias-solicitar',
-                component: () => import('@/views/retiro-garantias/solicitud/SolicitudRetiroView.vue'),
-                meta: {
-                    title: 'Solicitud de Retiro'
-                }
-            },
-            {
-                path: 'retiro-garantias/historico-cliente',
-                name: 'retiro-garantias-historico-cliente',
-                component: () => import('@/views/retiro-garantias/solicitud/SolicitudRetiroHistoricoClienteView.vue'),
-                meta: {
-                    title: 'Histórico de Solicitudes Realizadas'
-                }
-            },
-            {
-                path: 'retiro-garantias/buzon',
-                name: 'retiro-garantias-buzon',
-                component: () => import('@/views/retiro-garantias/validacion/BuzonSolicitudesView.vue'),
-                meta: {
-                    title: 'Buzón de Solicitudes (Archivo)'
-                }
-            },
-            {
-                path: 'retiro-garantias/entrega',
-                name: 'retiro-garantias-entrega',
-                component: () => import('@/views/retiro-garantias/validacion/EntregaGarantiasView.vue'),
-                meta: {
-                    title: 'Entrega de Garantías'
-                }
-            },
-            {
-                path: 'retiro-garantias/entregadas',
-                name: 'retiro-garantias-entregadas',
-                component: () => import('@/views/retiro-garantias/validacion/BuzonEntregasView.vue'),
-                meta: {
-                    title: 'Buzón de Garantías Entregadas'
-                }
-            },
-            {
-                path: 'retiro-garantias/historico-general',
-                name: 'retiro-garantias-historico-general',
-                component: () => import('@/views/retiro-garantias/validacion/BuzonHistoricoGeneralView.vue'),
-                meta: {
-                    title: 'Histórico General de Garantías'
-                }
-            },
-
-            // Retiro Administrativo
-            {
-                path: 'retiro-administrativo/usuario/solicitar',
-                name: 'retiro-administrativo-solicitar',
-                component: () => import('@/views/retiro-administrativo/usuario/SolicitarRetiroAdminView.vue'),
-                meta: {
-                    title: 'Solicitar Retiro Administrativo'
-                }
-            },
-            {
-                path: 'retiro-administrativo/admin/despacho',
-                name: 'retiro-administrativo-despacho',
-                component: () => import('@/views/retiro-administrativo/admin/DespachoRetiroAdminView.vue'),
-                meta: {
-                    title: 'Despacho y Reingreso'
-                }
-            },
-
-            // Asesores de Crédito
-            {
-                path: 'asesores/nuevos',
-                name: 'asesores-nuevos',
-                component: () => import('@/views/asesores-creditos/NuevosPendientesView.vue'),
-                meta: {
-                    title: 'Nuevos / Pendientes'
-                }
-            },
-            {
-                path: 'asesores/finalizados',
-                name: 'asesores-finalizados',
-                component: () => import('@/views/asesores-creditos/FinalizadosView.vue'),
-                meta: {
-                    title: 'Finalizados (Histórico)'
-                }
-            },
-            {
-                path: 'asesores/seguimiento',
-                name: 'asesores-seguimiento',
-                component: () => import('@/views/asesores-creditos/EnSeguimientoView.vue'),
-                meta: {
-                    title: 'En Seguimiento'
-                }
-            },
-            {
-                path: 'asesores/retornados',
-                name: 'asesores-retornados',
-                component: () => import('@/views/asesores-creditos/RetornadosView.vue'),
-                meta: {
-                    title: 'Retornados'
-                }
-            },
-            {
-                path: 'configuracion/traslado-expedientes',
-                name: 'admin-traslado-expedientes',
-                component: () => import('@/views/admin/configuracion/TrasladoExpedientesView.vue'),
-                meta: {
-                    title: 'Traslado de Expedientes/Cartera'
-                }
-            },
-            {
-                path: 'configuracion/editar-seguimiento',
-                name: 'admin-editar-seguimiento',
-                component: () => import('@/views/admin/configuracion/EditarSeguimientoView.vue'),
-                meta: {
-                    title: 'Editar Seguimiento (Admin)'
-                }
-            },
+            // ==========================================
+            // MÓDULO: CONFIRMACIÓN DOCUMENTOS 
+            // ==========================================
             {
                 path: 'confirmacion-documentos/solicitud',
                 name: 'admin-confirmacion-solicitud',
                 component: () => import('@/views/confirmacion-documentos/solicitud/SolicitudConfirmacionView.vue'),
-                meta: {
-                    title: 'Solicitud de Confirmación'
-                }
-            },
-            {
-                path: 'confirmacion-documentos/buzon',
-                name: 'admin-confirmacion-buzon',
-                component: () => import('@/views/confirmacion-documentos/validacion/BuzonConfirmacionesView.vue'),
-                meta: {
-                    title: 'Buzón de Confirmaciones'
-                }
+                meta: { title: 'Nueva Solicitud Confirmación', permission: 'confirmar_documentos' }
             },
             {
                 path: 'confirmacion-documentos/resultados',
                 name: 'admin-confirmacion-resultados',
                 component: () => import('@/views/confirmacion-documentos/solicitud/ResultadosConfirmacionView.vue'),
-                meta: {
-                    title: 'Resultados de Confirmación'
-                }
+                meta: { title: 'Resultados de Confirmación', permission: 'confirmar_documentos' }
+            },
+            {
+                path: 'confirmacion-documentos/buzon',
+                name: 'admin-confirmacion-buzon',
+                component: () => import('@/views/confirmacion-documentos/validacion/BuzonConfirmacionesView.vue'),
+                meta: { title: 'Buzón Validar Confirmación', permission: 'archivo' }
             },
             {
                 path: 'confirmacion-documentos/historico',
                 name: 'admin-confirmacion-historico',
                 component: () => import('@/views/confirmacion-documentos/validacion/HistoricoConfirmacionesView.vue'),
-                meta: {
-                    title: 'Histórico de Confirmaciones'
-                }
+                meta: { title: 'Histórico de Validaciones', permission: 'archivo' }
             },
+
+            // ==========================================
+            // MÓDULO: RETIRO DE GARANTÍAS
+            // ==========================================
+            {
+                path: 'retiro-garantias/buzon',
+                name: 'retiro-garantias-buzon',
+                component: () => import('@/views/retiro-garantias/validacion/BuzonSolicitudesView.vue'),
+                meta: { title: 'Buzón Solicitudes Archivo', permission: 'retiro_garantias' }
+            },
+            {
+                path: 'retiro-garantias/historico-general',
+                name: 'retiro-garantias-historico-general',
+                component: () => import('@/views/retiro-garantias/validacion/BuzonHistoricoGeneralView.vue'),
+                meta: { title: 'Histórico General Garantías', permission: 'retiro_garantias' }
+            },
+            {
+                path: 'retiro-garantias/solicitar',
+                name: 'retiro-garantias-solicitar',
+                component: () => import('@/views/retiro-garantias/solicitud/SolicitudRetiroView.vue'),
+                meta: { title: 'Solicitar Retiro', permission: 'archivo' }
+            },
+            {
+                path: 'retiro-garantias/entrega',
+                name: 'retiro-garantias-entrega',
+                component: () => import('@/views/retiro-garantias/validacion/EntregaGarantiasView.vue'),
+                meta: { title: 'Entrega de Garantías', permission: 'archivo' }
+            },
+            {
+                path: 'retiro-garantias/entregadas',
+                name: 'retiro-garantias-entregadas',
+                component: () => import('@/views/retiro-garantias/validacion/BuzonEntregasView.vue'),
+                meta: { title: 'Buzón Entregas', permission: 'archivo' }
+            },
+            {
+                path: 'retiro-garantias/historico-cliente',
+                name: 'retiro-garantias-historico-cliente',
+                component: () => import('@/views/retiro-garantias/solicitud/SolicitudRetiroHistoricoClienteView.vue'),
+                meta: { title: 'Histórico Realizadas', permission: 'archivo' }
+            },
+
+            // ==========================================
+            // MÓDULO: RETIRO DOC ADMINISTRATIVO
+            // ==========================================
+            {
+                path: 'retiro-administrativo/usuario/solicitar',
+                name: 'retiro-administrativo-solicitar',
+                component: () => import('@/views/retiro-administrativo/usuario/SolicitarRetiroAdminView.vue'),
+                meta: { title: 'Solicitar Retiro Administrativo', permission: 'retiro_doc_administrativo' }
+            },
+            {
+                path: 'retiro-administrativo/admin/despacho',
+                name: 'retiro-administrativo-despacho',
+                component: () => import('@/views/retiro-administrativo/admin/DespachoRetiroAdminView.vue'),
+                meta: { title: 'Despacho Doc. Administrativo', permission: 'secretaria_agencia' }
+            },
+
+            // ==========================================
+            // MÓDULO: AJUSTES (Carga de Datos)
+            // ==========================================
+            {
+                path: 'carga-datos/clientes',
+                name: 'admin-carga-clientes',
+                component: () => import('@/views/carga-datos/ExpedientesHistoricosImportView.vue'),
+                meta: { title: 'Expedientes Históricos', permission: 'ajustes' }
+            },
+            {
+                path: 'carga-datos/nuevos-expedientes',
+                name: 'admin-carga-nuevos-expedientes',
+                component: () => import('@/views/carga-datos/NuevosExpedientesImportView.vue'),
+                meta: { title: 'Cargar Expedientes', permission: 'ajustes' }
+            },
+
+            // ==========================================
+            // MÓDULO: CONFIGURACIONES (CATÁLOGOS)
+            // ==========================================
+            {
+                path: 'catalogos/garantias',
+                name: 'admin-catalogos-garantias',
+                component: () => import('@/views/catalogos/GarantiasView.vue'),
+                meta: { title: 'Catálogo de Garantías', permission: 'ajustes' }
+            },
+            {
+                path: 'catalogos/tipo-documentos',
+                name: 'admin-catalogos-tipo-documentos',
+                component: () => import('@/views/catalogos/TipoDocumentosView.vue'),
+                meta: { title: 'Catálogo de Tipo Documentos', permission: 'ajustes' }
+            },
+            {
+                path: 'catalogos/agencias',
+                name: 'admin-catalogos-agencias',
+                component: () => import('@/views/catalogos/AgenciasView.vue'),
+                meta: { title: 'Agencias', permission: 'ajustes' }
+            },
+            {
+                path: 'catalogos/bufetes',
+                name: 'admin-catalogos-bufetes',
+                component: () => import('@/views/catalogos/BufetesView.vue'),
+                meta: { title: 'Catálogo de Bufetes', permission: 'ajustes' }
+            },
+            {
+                path: 'catalogos/registros-propiedad',
+                name: 'admin-catalogos-registros-propiedad',
+                component: () => import('@/views/catalogos/RegistrosPropiedadView.vue'),
+                meta: { title: 'Registros de Propiedad', permission: 'ajustes' }
+            },
+            {
+                path: 'catalogos/tipo-estados',
+                name: 'admin-catalogos-tipo-estados',
+                component: () => import('@/views/catalogos/TipoEstadosView.vue'),
+                meta: { title: 'Tipos de Estado', permission: 'ajustes' }
+            },
+            {
+                path: 'configuracion/traslado-expedientes',
+                name: 'admin-traslado-expedientes',
+                component: () => import('@/views/admin/configuracion/TrasladoExpedientesView.vue'),
+                meta: { title: 'Traslado de Expedientes', permission: 'ajustes' }
+            },
+            {
+                path: 'configuracion/editar-seguimiento',
+                name: 'admin-editar-seguimiento',
+                component: () => import('@/views/admin/configuracion/EditarSeguimientoView.vue'),
+                meta: { title: 'Editar Seguimiento', permission: 'ajustes' }
+            },
+
+            // ==========================================
+            // MÓDULO: REPORTES
+            // ==========================================
             {
                 path: 'reportes',
                 name: 'admin-reportes',
                 component: () => import('@/views/reportes/ReportesView.vue'),
-                meta: {
-                    title: 'Reportes y Analítica'
-                }
+                meta: { title: 'Reportes y Analítica', permission: 'reportes' }
             }
-
         ]
     },
 
@@ -443,28 +393,40 @@ router.beforeEach(async (to, _from) => {
             }
         }
 
-        // Verificar permiso
-        if (to.meta.permission && !authStore.hasPermission(to.meta.permission)) {
-
-
-            console.warn(
-                `⛔ Acceso denegado: Usuario no tiene el permiso '${to.meta.permission}'.`
-            )
-
-            // window.location.href = `${motherAppUrl}/apps`
-            return false
+        // Helper de permisos combinados (A || B)
+        const hasRequiredPermission = (permStr: string) => {
+            if (!permStr) return false
+            if (permStr.includes('||')) {
+                return permStr.split('||').some(p => authStore.hasPermission(p.trim()))
+            }
+            return authStore.hasPermission(permStr)
         }
 
-        // Verificar rol
-        if (to.meta.role && !authStore.hasRole(to.meta.role)) {
+        const isSuperAdmin = authStore.hasRole('Super Admin');
+        const motherAppUrl = import.meta.env.VITE_MOTHER_APP_URL || '';
 
+        // 1) Verificamos cadena de permisos anidados (ej. /admin exige 'app_sadec', /ruta_hija exige otro)
+        if (!isSuperAdmin) {
+            for (const record of to.matched) {
+                if (record.meta.permission) {
+                    const requiredPerm = record.meta.permission as string;
+                    if (!hasRequiredPermission(requiredPerm)) {
+                        console.warn(`⛔ Acceso denegado: Usuario carece del permiso jerárquico '${requiredPerm}'.`)
+                        window.location.href = `${motherAppUrl}/apps`
+                        return false
+                    }
+                }
 
-            console.warn(
-                `⛔ Acceso denegado: Usuario no tiene el rol '${to.meta.role}'.`
-            )
-
-            // window.location.href = `${motherAppUrl}/apps`
-            return false
+                // 2) Verificamos cadena de roles
+                if (record.meta.role) {
+                    const requiredRole = record.meta.role as string;
+                    if (!authStore.hasRole(requiredRole)) {
+                        console.warn(`⛔ Acceso denegado: Usuario carece del rol '${requiredRole}'.`)
+                        window.location.href = `${motherAppUrl}/apps`
+                        return false
+                    }
+                }
+            }
         }
     }
 
