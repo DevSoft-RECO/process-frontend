@@ -251,6 +251,41 @@ export const useReportStore = defineStore('report', {
             }
         },
 
+        async deleteAllMyReports() {
+            const result = await Swal.fire({
+                title: '¿Limpiar todo el historial?',
+                text: "Se borrarán todos los reportes generados y sus archivos de Excel. Esta acción no se puede deshacer.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, borrar todo',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    await api.delete(`/exportar/borrar-todos`);
+
+                    this.myReports = [];
+                    this.isWidgetVisible = false;
+
+                    Swal.fire({
+                        title: 'Historial Limpiado',
+                        text: 'Tus descargas fueron purgadas del servidor.',
+                        icon: 'success',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                } catch (error) {
+                    console.error('Fallo al limpiar historial', error);
+                    Swal.fire('Error', 'Hubo un fallo limpiando los archivos', 'error');
+                }
+            }
+        },
+
         startPolling() {
             if (this.pollingInterval) return;
 
