@@ -165,6 +165,31 @@
         </button>
       </div>
 
+    <!-- Export Confirmacion de Documentos -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col hover:shadow-md dark:hover:shadow-black/40 transition-all duration-300 group">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="w-12 h-12 shrink-0 rounded-xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center border border-teal-100 dark:border-teal-800/50 group-hover:bg-teal-100 dark:group-hover:bg-teal-800/60 transition-colors">
+            <svg class="w-6 h-6 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors leading-tight">Confirmación Física</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Garantías Físicas</p>
+          </div>
+        </div>
+        <p class="text-sm text-gray-600 dark:text-gray-300 flex-grow mb-6 leading-relaxed">
+          Historial de verificación de existencia física de garantías documentadas al interior de Archivo Central.
+        </p>
+        <button 
+          @click="dispararReporteConfirmaciones" 
+          :disabled="reportStore.isRequesting"
+          class="w-full flex justify-center items-center gap-2 bg-gray-50 hover:bg-teal-500 dark:bg-gray-700/50 dark:hover:bg-teal-600 text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white font-medium py-2 px-4 rounded-xl border border-gray-200 hover:border-transparent dark:border-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+        >
+          <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin"></i>
+          <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          Extraer Analítica
+        </button>
+      </div>
+
     </div>
     
     <!-- Modal Selection Agencias -->
@@ -210,5 +235,9 @@ const dispararReporteSolicitudesAdmin = async () => {
 
 const dispararReporteSolicitudesRetiro = async () => {
     await reportStore.requestReporteSolicitudesRetiro();
+};
+
+const dispararReporteConfirmaciones = async () => {
+    await reportStore.requestReporteConfirmaciones();
 };
 </script>

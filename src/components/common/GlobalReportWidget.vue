@@ -116,6 +116,7 @@ const getReportName = (code: string) => {
         case 'general_documentos': return 'Garantías y Documentos';
         case 'general_solicitudes_admin': return 'Préstamos de Exps.';
         case 'general_solicitudes_retiros': return 'Retiros de Garantías';
+        case 'general_confirmaciones': return 'Confirmaciones de Físico';
         case 'gerencial_tiempos': return 'Analítica de Tiempos';
         default: return 'Reporte Exportado';
     }
