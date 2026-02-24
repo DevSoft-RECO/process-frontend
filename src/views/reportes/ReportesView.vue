@@ -130,6 +130,29 @@
         </button>
       </div>
 
+    <!-- Export Retiro de Garantías (Solicitudes de Retiro) -->
+      <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+        <div class="flex-grow">
+          <div class="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-red-100">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">Retiro de Garantías</h3>
+          <p class="text-gray-500 mb-8 leading-relaxed">
+            Concentrado de bitácoras sobre salidas definitivas o temporales de créditos e hipotecas asignadas.
+          </p>
+        </div>
+        
+        <button 
+          @click="dispararReporteSolicitudesRetiro" 
+          :disabled="reportStore.isRequesting"
+          class="w-full flex justify-center items-center gap-3 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold py-3.5 px-6 rounded-2xl transition-all shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed group"
+        >
+          <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin text-lg"></i>
+          <svg v-else class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          Extraer Retiros
+        </button>
+      </div>
+
     </div>
     
     <!-- Modal Selection Agencias -->
@@ -171,5 +194,9 @@ const dispararReporteDocumentos = async () => {
 
 const dispararReporteSolicitudesAdmin = async () => {
     await reportStore.requestReporteSolicitudesAdmin();
+};
+
+const dispararReporteSolicitudesRetiro = async () => {
+    await reportStore.requestReporteSolicitudesRetiro();
 };
 </script>
