@@ -32,7 +32,7 @@ const routes: RouteRecordRaw[] = [
         component: AdminLayout,
         meta: {
             requiresAuth: true,
-            permission: 'app_gestiones'
+            permission: 'app_sadec'
         },
         children: [
             {

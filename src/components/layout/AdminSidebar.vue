@@ -226,11 +226,11 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useLayoutStore } from '@/stores/layout'
-// import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const layoutStore = useLayoutStore()
-// const authStore = useAuthStore()
+const authStore = useAuthStore()
 const openGroups = ref<string[]>([])
 
 // --- NUEVA FUNCIÓN PARA CERRAR EN MÓVIL ---
@@ -268,7 +268,7 @@ const menuItems = computed(() => {
     ];
     */
 
-    const items = [
+    const items: any[] = [
         {
             id: 'home',
             label: 'Dashboard',
@@ -281,7 +281,7 @@ const menuItems = computed(() => {
             id: 'asesores-creditos',
             label: 'Asesores de Créditos',
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />',
-            show: true,
+            permission: 'asesores_credito',
             children: [
                 {
                     label: 'Cargados / Pendientes',
@@ -622,7 +622,31 @@ const menuItems = computed(() => {
         */
     ]
 
-    return items.filter(item => item.show)
+    const isSuperAdmin = authStore.hasRole('Super Admin')
+
+    return items.filter(item => {
+        // 1) Dashboard público para cualquiera que ingrese
+        if (item.id === 'home') return true
+
+        // 2) Super Admins ven TODO automáticamente
+        if (isSuperAdmin) return true
+
+        // 3) Si es un divisor, por defecto lo ocultamos para usuarios normales 
+        // a menos que opcionalmente le pongan un permiso explícito
+        if (item.isDivider) {
+            if (item.permission && authStore.hasPermission(item.permission)) return true
+            return false 
+        }
+
+        // 4) Para el resto de módulos: solo visible si el ítem tiene definido 
+        // explícitamente el atributo `permission` y el usuario lo posee.
+        if (item.permission && authStore.hasPermission(item.permission)) {
+            return true
+        }
+
+        // Por defecto, nadie más ve nada.
+        return false
+    })
 })
 
 const isActive = (path: string) => route.path === path
