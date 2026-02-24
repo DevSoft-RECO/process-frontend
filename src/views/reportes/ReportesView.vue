@@ -1,7 +1,7 @@
 <template>
-  <div class="h-full flex flex-col pt-8 px-4 md:px-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300 overflow-y-auto w-full mx-auto">
+  <div class="h-full flex flex-col pt-8 px-4 md:px-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300 overflow-y-auto w-full">
     <!-- Header -->
-    <div class="mb-8 max-w-7xl mx-auto w-full">
+    <div class="mb-8 w-full">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
         <div class="bg-blue-600 dark:bg-blue-500 text-white p-2.5 rounded-xl shadow-md flex items-center justify-center shrink-0">
             <i class="fas fa-chart-pie text-xl"></i>
@@ -13,181 +13,273 @@
       </p>
     </div>
 
-    <!-- Reports Grid (Horizontal-Header Cards, 2/3 columns max) -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6 pb-12 w-full max-w-7xl mx-auto items-start">
+    <!-- Reports Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12 w-full items-start animate-fade-in">
       
-      <!-- Export Seguimiento General -->
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col hover:shadow-md dark:hover:shadow-black/40 transition-all duration-300 group">
-        <div class="flex items-center gap-4 mb-4">
-          <div class="w-12 h-12 shrink-0 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center border border-emerald-100 dark:border-emerald-800/50 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-800/60 transition-colors">
-            <i class="fas fa-file-csv text-emerald-600 dark:text-emerald-400 text-xl"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-tight">Seguimiento Principal</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Histórico general</p>
-          </div>
-        </div>
-        <p class="text-sm text-gray-600 dark:text-gray-300 flex-grow mb-6 leading-relaxed">
-          Consolidado de fechas y estados para medir los tiempos de la operación legal en general.
-        </p>
-        <button 
-          @click="reportStore.requestSegaCSV()" 
-          :disabled="reportStore.isRequesting"
-          class="w-full flex justify-center items-center gap-2 bg-gray-50 hover:bg-emerald-500 dark:bg-gray-700/50 dark:hover:bg-emerald-600 text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white font-medium py-2 px-4 rounded-xl border border-gray-200 hover:border-transparent dark:border-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-        >
-          <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin"></i>
-          <i v-else class="fas fa-cloud-download-alt"></i>
-          {{ reportStore.isRequesting ? 'Procesando...' : 'Generar Reporte' }}
-        </button>
+      <!-- Export Seguimiento General (Emerald) -->
+      <div class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(16,185,129,0.5)]"
+         :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
+         @click="reportStore.requestSegaCSV()"
+      >
+         <div class="absolute inset-0 bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600"></div>
+         <div class="relative flex h-full flex-col justify-between rounded-[22px] bg-white p-8 transition-colors duration-300 dark:bg-gray-950">
+           <div class="mb-6 flex items-start justify-between">
+             <div class="relative">
+               <div class="absolute inset-0 scale-150 bg-emerald-500/20 blur-2xl transition-opacity group-hover:opacity-100"></div>
+               <div class="relative rounded-2xl bg-emerald-50 p-4 transition-transform duration-500 group-hover:rotate-6 dark:bg-emerald-900/20">
+                 <i class="fas fa-file-alt text-2xl text-emerald-600 dark:text-emerald-400"></i>
+               </div>
+             </div>
+             <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
+               Histórico Sistema
+             </span>
+           </div>
+           <div class="mb-8">
+             <h3 class="mb-3 text-2xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-emerald-600 dark:text-white dark:group-hover:text-emerald-400">
+               Seguimiento Principal
+             </h3>
+             <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+               Consolidado de fechas y estados para medir los tiempos de la operación legal en general.
+             </p>
+           </div>
+           <div class="flex items-center font-bold text-emerald-600 dark:text-emerald-400">
+             <span class="text-sm transition-all duration-300 group-hover:mr-3">
+               {{ reportStore.isRequesting ? 'Procesando...' : 'Generar Reporte' }}
+             </span>
+             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 opacity-0 transition-all duration-300 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 dark:bg-emerald-900/30">
+               <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin text-emerald-600 dark:text-emerald-400"></i>
+               <i v-else class="fas fa-arrow-right text-emerald-600 dark:text-emerald-400"></i>
+             </div>
+           </div>
+         </div>
       </div>
       
-      <!-- Export General Agencias -->
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col hover:shadow-md dark:hover:shadow-black/40 transition-all duration-300 group">
-        <div class="flex items-center gap-4 mb-4">
-          <div class="w-12 h-12 shrink-0 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center border border-blue-100 dark:border-blue-800/50 group-hover:bg-blue-100 dark:group-hover:bg-blue-800/60 transition-colors">
-            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">Consolidado Agencias</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Multi-Sucursal</p>
-          </div>
-        </div>
-        <p class="text-sm text-gray-600 dark:text-gray-300 flex-grow mb-6 leading-relaxed">
-          Análisis específico seleccionando sucursales o un volumen total consolidado.
-        </p>
-        <button 
-          @click="isModalOpen = true" 
-          :disabled="reportStore.isRequesting"
-          class="w-full flex justify-center items-center gap-2 bg-gray-50 hover:bg-blue-600 dark:bg-gray-700/50 dark:hover:bg-blue-600 text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white font-medium py-2 px-4 rounded-xl border border-gray-200 hover:border-transparent dark:border-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-          Filtrar y Exportar
-        </button>
+      <!-- Export General Agencias (Blue) -->
+      <div class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.5)]"
+         :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
+         @click="isModalOpen = true"
+      >
+         <div class="absolute inset-0 bg-gradient-to-br from-blue-400 via-indigo-500 to-violet-600"></div>
+         <div class="relative flex h-full flex-col justify-between rounded-[22px] bg-white p-8 transition-colors duration-300 dark:bg-gray-950">
+           <div class="mb-6 flex items-start justify-between">
+             <div class="relative">
+               <div class="absolute inset-0 scale-150 bg-blue-500/20 blur-2xl transition-opacity group-hover:opacity-100"></div>
+               <div class="relative rounded-2xl bg-blue-50 p-4 transition-transform duration-500 group-hover:rotate-6 dark:bg-blue-900/20">
+                 <i class="fas fa-building text-2xl text-blue-600 dark:text-blue-400"></i>
+               </div>
+             </div>
+             <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">
+               Multi-Sucursal
+             </span>
+           </div>
+           <div class="mb-8">
+             <h3 class="mb-3 text-2xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+               Consolidado Agencias
+             </h3>
+             <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+               Análisis específico seleccionando sucursales o un volumen total consolidado.
+             </p>
+           </div>
+           <div class="flex items-center font-bold text-blue-600 dark:text-blue-400">
+             <span class="text-sm transition-all duration-300 group-hover:mr-3">
+               {{ reportStore.isRequesting ? 'Procesando...' : 'Filtrar y Exportar' }}
+             </span>
+             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 opacity-0 transition-all duration-300 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 dark:bg-blue-900/30">
+               <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin text-blue-600 dark:text-blue-400"></i>
+               <i v-else class="fas fa-arrow-right text-blue-600 dark:text-blue-400"></i>
+             </div>
+           </div>
+         </div>
       </div>
 
-      <!-- Export General (Asesor Logueado) -->
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col hover:shadow-md dark:hover:shadow-black/40 transition-all duration-300 group">
-        <div class="flex items-center gap-4 mb-4">
-          <div class="w-12 h-12 shrink-0 rounded-xl bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center border border-purple-100 dark:border-purple-800/50 group-hover:bg-purple-100 dark:group-hover:bg-purple-800/60 transition-colors">
-            <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors leading-tight">Rendimiento Personal</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Usuario: {{ authStore.user?.username || 'Invitado' }}</p>
-          </div>
-        </div>
-        <p class="text-sm text-gray-600 dark:text-gray-300 flex-grow mb-6 leading-relaxed">
-          Consolidado exclusivo de los expedientes bajo tu supervisión directa y de manera local.
-        </p>
-        <button 
-          @click="dispararReporteAsesor" 
-          :disabled="reportStore.isRequesting || (!authStore.user?.username && !authStore.user?.name)"
-          class="w-full flex justify-center items-center gap-2 bg-gray-50 hover:bg-purple-600 dark:bg-gray-700/50 dark:hover:bg-purple-600 text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white font-medium py-2 px-4 rounded-xl border border-gray-200 hover:border-transparent dark:border-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-        >
-          <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin"></i>
-          <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.956 11.956 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-          Generar Reporte
-        </button>
+      <!-- Export General (Asesor Logueado) (Purple) -->
+      <div class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(139,92,246,0.5)]"
+         :class="{'pointer-events-none opacity-80': reportStore.isRequesting || (!authStore.user?.username && !authStore.user?.name)}"
+         @click="dispararReporteAsesor"
+      >
+         <div class="absolute inset-0 bg-gradient-to-br from-violet-400 via-purple-500 to-fuchsia-600"></div>
+         <div class="relative flex h-full flex-col justify-between rounded-[22px] bg-white p-8 transition-colors duration-300 dark:bg-gray-950">
+           <div class="mb-6 flex items-start justify-between">
+             <div class="relative">
+               <div class="absolute inset-0 scale-150 bg-violet-500/20 blur-2xl transition-opacity group-hover:opacity-100"></div>
+               <div class="relative rounded-2xl bg-violet-50 p-4 transition-transform duration-500 group-hover:rotate-6 dark:bg-violet-900/20">
+                 <i class="fas fa-user-circle text-2xl text-violet-600 dark:text-violet-400"></i>
+               </div>
+             </div>
+             <span class="rounded-full bg-violet-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-violet-800 dark:bg-violet-900/50 dark:text-violet-300 truncate max-w-[120px]">
+               {{ authStore.user?.username || 'Asesor' }}
+             </span>
+           </div>
+           <div class="mb-8">
+             <h3 class="mb-3 text-2xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-violet-600 dark:text-white dark:group-hover:text-violet-400">
+               Rendimiento Personal
+             </h3>
+             <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+               Consolidado exclusivo de los expedientes bajo tu supervisión directa y de manera local.
+             </p>
+           </div>
+           <div class="flex items-center font-bold text-violet-600 dark:text-violet-400">
+             <span class="text-sm transition-all duration-300 group-hover:mr-3">
+               {{ reportStore.isRequesting ? 'Procesando...' : 'Generar Reporte' }}
+             </span>
+             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 opacity-0 transition-all duration-300 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 dark:bg-violet-900/30">
+               <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin text-violet-600 dark:text-violet-400"></i>
+               <i v-else class="fas fa-arrow-right text-violet-600 dark:text-violet-400"></i>
+             </div>
+           </div>
+         </div>
       </div>
 
-      <!-- Export Documentos Generales (Garantías) -->
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col hover:shadow-md dark:hover:shadow-black/40 transition-all duration-300 group">
-        <div class="flex items-center gap-4 mb-4">
-          <div class="w-12 h-12 shrink-0 rounded-xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center border border-orange-100 dark:border-orange-800/50 group-hover:bg-orange-100 dark:group-hover:bg-orange-800/60 transition-colors">
-            <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors leading-tight">Garantías Reales</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Archivología Global</p>
-          </div>
-        </div>
-        <p class="text-sm text-gray-600 dark:text-gray-300 flex-grow mb-6 leading-relaxed">
-          Todo el registro central de Documentos físicos registrados en el inventario de las bóvedas.
-        </p>
-        <button 
-          @click="dispararReporteDocumentos" 
-          :disabled="reportStore.isRequesting"
-          class="w-full flex justify-center items-center gap-2 bg-gray-50 hover:bg-orange-500 dark:bg-gray-700/50 dark:hover:bg-orange-600 text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white font-medium py-2 px-4 rounded-xl border border-gray-200 hover:border-transparent dark:border-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-        >
-          <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin"></i>
-          <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          Extraer Excel
-        </button>
+      <!-- Export Documentos Generales (Garantías) (Orange) -->
+      <div class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(249,115,22,0.5)]"
+         :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
+         @click="dispararReporteDocumentos"
+      >
+         <div class="absolute inset-0 bg-gradient-to-br from-orange-400 via-amber-500 to-yellow-600"></div>
+         <div class="relative flex h-full flex-col justify-between rounded-[22px] bg-white p-8 transition-colors duration-300 dark:bg-gray-950">
+           <div class="mb-6 flex items-start justify-between">
+             <div class="relative">
+               <div class="absolute inset-0 scale-150 bg-orange-500/20 blur-2xl transition-opacity group-hover:opacity-100"></div>
+               <div class="relative rounded-2xl bg-orange-50 p-4 transition-transform duration-500 group-hover:rotate-6 dark:bg-orange-900/20">
+                 <i class="fas fa-folder-open text-2xl text-orange-600 dark:text-orange-400"></i>
+               </div>
+             </div>
+             <span class="rounded-full bg-orange-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-orange-800 dark:bg-orange-900/50 dark:text-orange-300">
+               Archivo Central
+             </span>
+           </div>
+           <div class="mb-8">
+             <h3 class="mb-3 text-2xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-orange-600 dark:text-white dark:group-hover:text-orange-400">
+              Estado Garantías Reales
+             </h3>
+             <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+               Todo el registro central de Documentos físicos registrados en el inventario de las bóvedas.
+             </p>
+           </div>
+           <div class="flex items-center font-bold text-orange-600 dark:text-orange-400">
+             <span class="text-sm transition-all duration-300 group-hover:mr-3">
+               {{ reportStore.isRequesting ? 'Procesando...' : 'Extraer Excel' }}
+             </span>
+             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100 opacity-0 transition-all duration-300 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 dark:bg-orange-900/30">
+               <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin text-orange-600 dark:text-orange-400"></i>
+               <i v-else class="fas fa-arrow-right text-orange-600 dark:text-orange-400"></i>
+             </div>
+           </div>
+         </div>
       </div>
 
-      <!-- Export Préstamos de Expedientes (Solicitudes Admin) -->
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col hover:shadow-md dark:hover:shadow-black/40 transition-all duration-300 group">
-        <div class="flex items-center gap-4 mb-4">
-          <div class="w-12 h-12 shrink-0 rounded-xl bg-sky-50 dark:bg-sky-900/30 flex items-center justify-center border border-sky-100 dark:border-sky-800/50 group-hover:bg-sky-100 dark:group-hover:bg-sky-800/60 transition-colors">
-            <svg class="w-6 h-6 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-tight">Préstamo Interno</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Soluciones Administrativas</p>
-          </div>
-        </div>
-        <p class="text-sm text-gray-600 dark:text-gray-300 flex-grow mb-6 leading-relaxed">
-          Logística de Archivo Interno: rastrear las solicitudes de consulta administrativa y préstamo.
-        </p>
-        <button 
-          @click="dispararReporteSolicitudesAdmin" 
-          :disabled="reportStore.isRequesting"
-          class="w-full flex justify-center items-center gap-2 bg-gray-50 hover:bg-sky-500 dark:bg-gray-700/50 dark:hover:bg-sky-600 text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white font-medium py-2 px-4 rounded-xl border border-gray-200 hover:border-transparent dark:border-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-        >
-          <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin"></i>
-          <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          Extraer Préstamos
-        </button>
+      <!-- Export Préstamos de Expedientes (Solicitudes Admin) (Sky) -->
+      <div class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(14,165,233,0.5)]"
+         :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
+         @click="dispararReporteSolicitudesAdmin"
+      >
+         <div class="absolute inset-0 bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600"></div>
+         <div class="relative flex h-full flex-col justify-between rounded-[22px] bg-white p-8 transition-colors duration-300 dark:bg-gray-950">
+           <div class="mb-6 flex items-start justify-between">
+             <div class="relative">
+               <div class="absolute inset-0 scale-150 bg-sky-500/20 blur-2xl transition-opacity group-hover:opacity-100"></div>
+               <div class="relative rounded-2xl bg-sky-50 p-4 transition-transform duration-500 group-hover:rotate-6 dark:bg-sky-900/20">
+                 <i class="fas fa-file-export text-2xl text-sky-600 dark:text-sky-400"></i>
+               </div>
+             </div>
+             <span class="rounded-full bg-sky-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-sky-800 dark:bg-sky-900/50 dark:text-sky-300">
+               Archivos Adminsitrativos
+             </span>
+           </div>
+           <div class="mb-8">
+             <h3 class="mb-3 text-2xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-sky-600 dark:text-white dark:group-hover:text-sky-400">
+               Archivos Adminsitrativos
+             </h3>
+             <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+               Logística de Archivo Interno: rastrear las solicitudes de consulta administrativa y préstamo.
+             </p>
+           </div>
+           <div class="flex items-center font-bold text-sky-600 dark:text-sky-400">
+             <span class="text-sm transition-all duration-300 group-hover:mr-3">
+               {{ reportStore.isRequesting ? 'Procesando...' : 'Extraer Préstamos' }}
+             </span>
+             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 opacity-0 transition-all duration-300 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 dark:bg-sky-900/30">
+               <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin text-sky-600 dark:text-sky-400"></i>
+               <i v-else class="fas fa-arrow-right text-sky-600 dark:text-sky-400"></i>
+             </div>
+           </div>
+         </div>
       </div>
 
-    <!-- Export Retiro de Garantías (Solicitudes de Retiro) -->
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col hover:shadow-md dark:hover:shadow-black/40 transition-all duration-300 group">
-        <div class="flex items-center gap-4 mb-4">
-          <div class="w-12 h-12 shrink-0 rounded-xl bg-red-50 dark:bg-red-900/30 flex items-center justify-center border border-red-100 dark:border-red-800/50 group-hover:bg-red-100 dark:group-hover:bg-red-800/60 transition-colors">
-            <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors leading-tight">Retiro Garantías</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Salidas a Asesorías/Asociados</p>
-          </div>
-        </div>
-        <p class="text-sm text-gray-600 dark:text-gray-300 flex-grow mb-6 leading-relaxed">
-          Concentrado de transacciones sobre salidas definitivas o temporales de créditos e hipotecas físicas.
-        </p>
-        <button 
-          @click="dispararReporteSolicitudesRetiro" 
-          :disabled="reportStore.isRequesting"
-          class="w-full flex justify-center items-center gap-2 bg-gray-50 hover:bg-red-500 dark:bg-gray-700/50 dark:hover:bg-red-600 text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white font-medium py-2 px-4 rounded-xl border border-gray-200 hover:border-transparent dark:border-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-        >
-          <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin"></i>
-          <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          Extraer Retiros
-        </button>
+    <!-- Export Retiro de Garantías (Solicitudes de Retiro) (Red) -->
+      <div class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(244,63,94,0.5)]"
+         :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
+         @click="dispararReporteSolicitudesRetiro"
+      >
+         <div class="absolute inset-0 bg-gradient-to-br from-rose-400 via-red-500 to-pink-600"></div>
+         <div class="relative flex h-full flex-col justify-between rounded-[22px] bg-white p-8 transition-colors duration-300 dark:bg-gray-950">
+           <div class="mb-6 flex items-start justify-between">
+             <div class="relative">
+               <div class="absolute inset-0 scale-150 bg-red-500/20 blur-2xl transition-opacity group-hover:opacity-100"></div>
+               <div class="relative rounded-2xl bg-red-50 p-4 transition-transform duration-500 group-hover:rotate-6 dark:bg-red-900/20">
+                 <i class="fas fa-file-import text-2xl text-red-600 dark:text-red-400"></i>
+               </div>
+             </div>
+             <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-red-800 dark:bg-red-900/50 dark:text-red-300">
+               Salidas a Permanentes/Temp
+             </span>
+           </div>
+           <div class="mb-8">
+             <h3 class="mb-3 text-2xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-red-600 dark:text-white dark:group-hover:text-red-400">
+               Retiro Garantías
+             </h3>
+             <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+               Concentrado de transacciones sobre salidas definitivas o temporales de créditos e hipotecas físicas.
+             </p>
+           </div>
+           <div class="flex items-center font-bold text-red-600 dark:text-red-400">
+             <span class="text-sm transition-all duration-300 group-hover:mr-3">
+               {{ reportStore.isRequesting ? 'Procesando...' : 'Extraer Retiros' }}
+             </span>
+             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 opacity-0 transition-all duration-300 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 dark:bg-red-900/30">
+               <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin text-red-600 dark:text-red-400"></i>
+               <i v-else class="fas fa-arrow-right text-red-600 dark:text-red-400"></i>
+             </div>
+           </div>
+         </div>
       </div>
 
-    <!-- Export Confirmacion de Documentos -->
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col hover:shadow-md dark:hover:shadow-black/40 transition-all duration-300 group">
-        <div class="flex items-center gap-4 mb-4">
-          <div class="w-12 h-12 shrink-0 rounded-xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center border border-teal-100 dark:border-teal-800/50 group-hover:bg-teal-100 dark:group-hover:bg-teal-800/60 transition-colors">
-            <svg class="w-6 h-6 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors leading-tight">Confirmación Física</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Garantías Físicas</p>
-          </div>
-        </div>
-        <p class="text-sm text-gray-600 dark:text-gray-300 flex-grow mb-6 leading-relaxed">
-          Historial de verificación de existencia física de garantías documentadas al interior de Archivo Central.
-        </p>
-        <button 
-          @click="dispararReporteConfirmaciones" 
-          :disabled="reportStore.isRequesting"
-          class="w-full flex justify-center items-center gap-2 bg-gray-50 hover:bg-teal-500 dark:bg-gray-700/50 dark:hover:bg-teal-600 text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white font-medium py-2 px-4 rounded-xl border border-gray-200 hover:border-transparent dark:border-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-        >
-          <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin"></i>
-          <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          Extraer Analítica
-        </button>
+    <!-- Export Confirmacion de Documentos (Teal) -->
+      <div class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(20,184,166,0.5)]"
+         :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
+         @click="dispararReporteConfirmaciones"
+      >
+         <div class="absolute inset-0 bg-gradient-to-br from-teal-400 via-emerald-500 to-green-600"></div>
+         <div class="relative flex h-full flex-col justify-between rounded-[22px] bg-white p-8 transition-colors duration-300 dark:bg-gray-950">
+           <div class="mb-6 flex items-start justify-between">
+             <div class="relative">
+               <div class="absolute inset-0 scale-150 bg-teal-500/20 blur-2xl transition-opacity group-hover:opacity-100"></div>
+               <div class="relative rounded-2xl bg-teal-50 p-4 transition-transform duration-500 group-hover:rotate-6 dark:bg-teal-900/20">
+                 <i class="fas fa-check-circle text-2xl text-teal-600 dark:text-teal-400"></i>
+               </div>
+             </div>
+             <span class="rounded-full bg-teal-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-teal-800 dark:bg-teal-900/50 dark:text-teal-300">
+               Garantías Físicas
+             </span>
+           </div>
+           <div class="mb-8">
+             <h3 class="mb-3 text-2xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-teal-600 dark:text-white dark:group-hover:text-teal-400">
+               Confirmación Física
+             </h3>
+             <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+               Historial de verificación de existencia física de garantías documentadas al interior de Archivo Central.
+             </p>
+           </div>
+           <div class="flex items-center font-bold text-teal-600 dark:text-teal-400">
+             <span class="text-sm transition-all duration-300 group-hover:mr-3">
+               {{ reportStore.isRequesting ? 'Procesando...' : 'Extraer Analítica' }}
+             </span>
+             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-teal-100 opacity-0 transition-all duration-300 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 dark:bg-teal-900/30">
+               <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin text-teal-600 dark:text-teal-400"></i>
+               <i v-else class="fas fa-arrow-right text-teal-600 dark:text-teal-400"></i>
+             </div>
+           </div>
+         </div>
       </div>
 
     </div>
