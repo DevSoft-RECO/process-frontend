@@ -533,7 +533,8 @@ const menuItems = computed(() => {
         {
             isDivider: true,
             label: 'Ajustes',
-            show: true
+            permission: 'ajustes',
+           
         },
         {
             id: 'carga-datos',
@@ -562,11 +563,13 @@ const menuItems = computed(() => {
             children: [
                 {
                     label: 'Garantías',
-                    route: '/admin/catalogos/garantias'
+                    route: '/admin/catalogos/garantias',
+                    permission: 'ajustes',
                 },
                 {
                     label: 'Tipo Documentos',
-                    route: '/admin/catalogos/tipo-documentos'
+                    route: '/admin/catalogos/tipo-documentos',
+                    permission: 'ajustes',
                 },
                 {
                     label: 'Agencias',
@@ -574,11 +577,13 @@ const menuItems = computed(() => {
                 },
                 {
                     label: 'Bufetes',
-                    route: '/admin/catalogos/bufetes'
+                    route: '/admin/catalogos/bufetes',
+                    permission: 'ajustes',
                 },
                 {
                     label: 'Registros Propiedad',
-                    route: '/admin/catalogos/registros-propiedad'
+                    route: '/admin/catalogos/registros-propiedad',
+                    permission: 'ajustes',
                 },
                 {
                     label: 'Tipos de Estado',
@@ -599,13 +604,13 @@ const menuItems = computed(() => {
         {
             isDivider: true,
             label: 'Reportes y Analítica',
-            show: true
+            permission: 'reportes',
         },
         {
             id: 'reportes-gerencia',
             label: 'Reportes CSV',
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />',
-            show: true,
+            permission: 'reportes',
             route: '/admin/reportes'
         },
 
@@ -632,28 +637,40 @@ const menuItems = computed(() => {
         return authStore.hasPermission(permStr)
     }
 
-    return items.filter(item => {
-        // 1) Dashboard público para cualquiera que ingrese
-        if (item.id === 'home') return true
+    return items.map(item => {
+        if (isSuperAdmin || item.id === 'home') return item;
 
-        // 2) Super Admins ven TODO automáticamente
-        if (isSuperAdmin) return true
+        // Determinamos si el usuario tiene el permiso general del nivel "Padre"
+        const hasParentPerm = item.permission ? hasRequiredPermission(item.permission) : false;
 
-        // 3) Si es un divisor, por defecto lo ocultamos para usuarios normales 
-        // a menos que opcionalmente le pongan un permiso explícito
+        if (item.children) {
+            const visibleChildren = item.children.filter((child: any) => {
+                // Si el hijo exige un permiso propio específico evaluamos eso, o si el papá tiene el acceso general
+                if (child.permission) {
+                    return hasRequiredPermission(child.permission) || hasParentPerm;
+                }
+                // Si el hijo NO tiene permiso explícito, se rige si el usuario tiene el permiso general del papá
+                return hasParentPerm;
+            });
+            return { ...item, children: visibleChildren };
+        }
+
+        return item;
+    }).filter(item => {
+        if (isSuperAdmin || item.id === 'home') return true;
+
+        // Los divisores se muestran si se tiene el permiso respectivo
         if (item.isDivider) {
-            if (item.permission && hasRequiredPermission(item.permission)) return true
-            return false 
+            return item.permission ? hasRequiredPermission(item.permission) : false;
         }
 
-        // 4) Para el resto de módulos: solo visible si el ítem tiene definido 
-        // explícitamente el atributo `permission` y el usuario lo posee.
-        if (item.permission && hasRequiredPermission(item.permission)) {
-            return true
+        // Si es un menú desplegable (Padre), se muestra siempre y cuando al menos 1 hijo haya sobrevivido el map
+        if (item.children) {
+            return item.children.length > 0;
         }
 
-        // Por defecto, nadie más ve nada.
-        return false
+        // Elementos individuales que no son grupos ni divisores
+        return item.permission ? hasRequiredPermission(item.permission) : false;
     })
 })
 
