@@ -6,11 +6,31 @@
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Dashboard Analítico</h1>
                 <p class="text-gray-500 dark:text-gray-400 text-sm">Panorama general del rendimiento y cuellos de botella.</p>
             </div>
-            <button @click="loadAll" :disabled="loading" class="p-2 text-gray-500 hover:text-verde-cope transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-            </button>
+            <div class="flex items-center gap-4 bg-white dark:bg-gray-800 p-2 sm:px-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span class="text-sm font-bold text-gray-700 dark:text-gray-300 hidden sm:inline">Período:</span>
+                </div>
+                <input 
+                    type="month" 
+                    v-model="selectedMonth" 
+                    @change="loadAll" 
+                    class="px-4 py-2 text-base font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-200 dark:border-blue-800 rounded-lg shadow-inner focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors cursor-pointer"
+                >
+                <div class="w-px h-8 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                <button 
+                    @click="loadAll" 
+                    :disabled="loading" 
+                    class="p-2 text-gray-500 hover:text-white transition rounded-lg hover:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:opacity-50 group"
+                    title="Actualizar Datos"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- KPIs Grid -->
@@ -171,6 +191,7 @@
                                 <th class="px-4 py-3 rounded-l-lg">Asesor</th>
                                 <th class="px-4 py-3 text-center">Activos</th>
                                 <th class="px-4 py-3 text-center">Rechazos Hist.</th>
+                                <th class="px-4 py-3 text-right">Créditos</th>
                                 <th class="px-4 py-3 text-center">Tasa Exito</th>
                                 <th class="px-4 py-3 text-right rounded-r-lg">Tasa Rechazo</th>
                             </tr>
@@ -187,6 +208,9 @@
                                 </td>
                                 <td class="px-4 py-3 text-center text-red-600 dark:text-red-400 font-medium">
                                     {{ adv.rejected_cases }}
+                                </td>
+                                <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">
+                                    {{ formatCurrency(adv.creditos ?? 0) }}
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <div class="flex items-center justify-center gap-2">
@@ -246,6 +270,7 @@
                                 <th class="px-4 py-3 rounded-l-lg">Agencia</th>
                                 <th class="px-4 py-3 text-center">Activos</th>
                                 <th class="px-4 py-3 text-center">Rechazos Hist.</th>
+                                <th class="px-4 py-3 text-right">Créditos</th>
                                 <th class="px-4 py-3 text-center">Tasa Exito</th>
                                 <th class="px-4 py-3 text-right rounded-r-lg">Tasa Rechazo</th>
                             </tr>
@@ -262,6 +287,9 @@
                                 </td>
                                 <td class="px-4 py-3 text-center text-red-600 dark:text-red-400 font-medium">
                                     {{ agency.rejected_cases }}
+                                </td>
+                                <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">
+                                    {{ formatCurrency(agency.creditos ?? 0) }}
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <div class="flex items-center justify-center gap-2">
@@ -314,18 +342,19 @@ const trends = ref<any[]>([])
 const times = ref({ creation_to_secretary: 0, secretary_internal: 0, secretary_to_lawyer: 0, lawyer_return: 0 })
 const agenciesList = ref<{ id: number, nombre: string }[]>([])
 const selectedAgency = ref<number | null>(null)
+const selectedMonth = ref(new Date().toISOString().slice(0, 7))
 
 const loadAll = async () => {
     loading.value = true
     try {
         const [kpiRes, pipeRes, advRes, rejRes, agRes, trRes, timeRes, agListRes] = await Promise.all([
-            DashboardService.getKpi(),
-            DashboardService.getPipeline(),
-            DashboardService.getAdvisors(1), // Initial load without filter
+            DashboardService.getKpi(selectedMonth.value),
+            DashboardService.getPipeline(selectedMonth.value),
+            DashboardService.getAdvisors(1, null, selectedMonth.value), // Initial load without filter
             DashboardService.getRejections(),
-            DashboardService.getAgencies(1),
+            DashboardService.getAgencies(1, selectedMonth.value),
             DashboardService.getTrends(),
-            DashboardService.getProcessingTimes(),
+            DashboardService.getProcessingTimes(selectedMonth.value),
             DashboardService.getAgenciesList()
         ])
 
@@ -348,7 +377,7 @@ const loadAll = async () => {
 const filterAdvisors = async () => {
     loading.value = true
     try {
-        const res = await DashboardService.getAdvisors(1, selectedAgency.value)
+        const res = await DashboardService.getAdvisors(1, selectedAgency.value, selectedMonth.value)
         advisors.value = res
     } catch (e) {
         console.error("Error filtering advisors", e)
@@ -361,7 +390,7 @@ const changeAdvisorPage = async (page: number) => {
     if (page < 1 || page > advisors.value.last_page) return
     loading.value = true
     try {
-        const res = await DashboardService.getAdvisors(page, selectedAgency.value)
+        const res = await DashboardService.getAdvisors(page, selectedAgency.value, selectedMonth.value)
         advisors.value = res
     } catch (e) {
         console.error("Error changing advisor page", e)
@@ -374,7 +403,7 @@ const changeAgencyPage = async (page: number) => {
     if (page < 1 || page > agencies.value.last_page) return
     loading.value = true
     try {
-        const res = await DashboardService.getAgencies(page)
+        const res = await DashboardService.getAgencies(page, selectedMonth.value)
         agencies.value = res
     } catch (e) {
         console.error("Error changing agency page", e)

@@ -20,6 +20,7 @@ interface AdvisorData {
         total_cases: number
         rejection_rate: number
         success_rate: number
+        creditos: number
     }[]
     current_page: number
     per_page: number
@@ -41,6 +42,7 @@ interface AgencyData {
         total: number
         rejection_rate: number
         success_rate: number
+        creditos: number
     }[]
     current_page: number
     per_page: number
@@ -55,18 +57,29 @@ interface TrendData {
 }
 
 export default {
-    async getKpi(): Promise<KpiData> {
-        const res = await api.get('/dashboard/kpi')
+    async getKpi(month?: string): Promise<KpiData> {
+        let url = '/dashboard/kpi'
+        if (month) {
+            url += `?month=${month}`
+        }
+        const res = await api.get(url)
         return res.data
     },
-    async getPipeline(): Promise<PipelineData[]> {
-        const res = await api.get('/dashboard/pipeline')
+    async getPipeline(month?: string): Promise<PipelineData[]> {
+        let url = '/dashboard/pipeline'
+        if (month) {
+            url += `?month=${month}`
+        }
+        const res = await api.get(url)
         return res.data
     },
-    async getAdvisors(page = 1, agencyId?: number | null): Promise<AdvisorData> {
+    async getAdvisors(page = 1, agencyId?: number | null, month?: string): Promise<AdvisorData> {
         let url = `/dashboard/advisors?page=${page}`
         if (agencyId) {
             url += `&agency_id=${agencyId}`
+        }
+        if (month) {
+            url += `&month=${month}`
         }
         const res = await api.get(url)
         return res.data
@@ -75,8 +88,12 @@ export default {
         const res = await api.get('/dashboard/rejections')
         return res.data
     },
-    async getAgencies(page = 1): Promise<AgencyData> {
-        const res = await api.get(`/dashboard/agencies?page=${page}`)
+    async getAgencies(page = 1, month?: string): Promise<AgencyData> {
+        let url = `/dashboard/agencies?page=${page}`
+        if (month) {
+            url += `&month=${month}`
+        }
+        const res = await api.get(url)
         return res.data
     },
     async getAgenciesList(): Promise<{ id: number, nombre: string }[]> {
@@ -87,8 +104,12 @@ export default {
         const res = await api.get('/dashboard/trends')
         return res.data
     },
-    async getProcessingTimes(): Promise<any> {
-        const res = await api.get('/dashboard/processing-times')
+    async getProcessingTimes(month?: string): Promise<any> {
+        let url = '/dashboard/processing-times'
+        if (month) {
+            url += `?month=${month}`
+        }
+        const res = await api.get(url)
         return res.data
     }
 }
