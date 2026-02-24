@@ -311,7 +311,7 @@ const menuItems = computed(() => {
             label: 'Buzón Secre. Agencia',
             // Office Building Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />',
-            show: true,
+            permission: 'secretaria_agencia',
             children: [
                 {
                     label: 'Bandeja Principal',
@@ -332,7 +332,7 @@ const menuItems = computed(() => {
             label: 'Buzón Secre. Créditos',
             // Clipboard List Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />',
-            show: true,
+            permission: 'secretaria_credito',
             children: [
                 {
                     label: 'Buzón Entrantes',
@@ -367,7 +367,7 @@ const menuItems = computed(() => {
             iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
             </svg>`,
-            show: true,
+            permission: 'abogado',
             children: [
                 {
                     label: 'Bandeja de Entrada',
@@ -384,7 +384,7 @@ const menuItems = computed(() => {
             label: 'Archivo',
             // Archive Box Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />',
-            show: true,
+            permission: 'archivo',
             children: [
                 {
                     label: 'Buzón Recibidos',
@@ -411,14 +411,14 @@ const menuItems = computed(() => {
         {
             isDivider: true,
             label: 'Confirmacion Documentos',
-            show: true
+            permission: 'confirmar_documentos || archivo'
         },
         {
             id: 'solicitudes-confirmacion',
             label: 'Solicitudes Confirmación',
             // Search Circle Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />',
-            show: true,
+            permission: 'confirmar_documentos ',
             children: [
                 {
                     label: 'Nueva Solicitud',
@@ -437,7 +437,7 @@ const menuItems = computed(() => {
             label: 'Validación Documentos',
             // Badge Check Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />',
-            show: true,
+            permission: 'archivo',
             children: [
                 {
                     label: 'Buzón Entrantes',
@@ -453,14 +453,14 @@ const menuItems = computed(() => {
         {
             isDivider: true,
             label: 'Retiro de Garantías',
-            show: true
+            permission: 'retiro_garantias || archivo'
         },
         {
             id: 'validacion-garantias',
             label: 'Validación Garantías',
             // Shield Check Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />',
-            show: true,
+            permission: 'retiro_garantias',
             children: [
                 {
                     label: 'Buzón Archivo',
@@ -478,7 +478,7 @@ const menuItems = computed(() => {
             label: 'Retiro de Garantías',
             // External Link / Logout Icon (symbolizing removal)
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />',
-            show: true,
+            permission: 'archivo',
             children: [
                 {
                     label: 'Solicitar Retiro',
@@ -502,14 +502,14 @@ const menuItems = computed(() => {
         {
             isDivider: true,
             label: 'Retiro doc Administrativo',
-            show: true
+            permission: 'retiro_doc_administrativo || secretaria_agencia'
         },
         {
             id: 'retiro-administrativo-agencia',
             label: 'Agencia (Solicita)',
             // Document Arrow Up Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-3-3v6m-9 1V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2H6a2 2 0 01-2-2z" />',
-            show: true,
+            permission: 'retiro_doc_administrativo',
             children: [
                 {
                     label: 'Solicitar Retiro',
@@ -521,7 +521,7 @@ const menuItems = computed(() => {
             id: 'gestion-central-archivo',
             label: 'Central (Despacha)',
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />',
-            show: true,
+            permission: 'secretaria_agencia',
             children: [
                 {
                     label: 'Buzón de Solicitudes',
@@ -624,6 +624,14 @@ const menuItems = computed(() => {
 
     const isSuperAdmin = authStore.hasRole('Super Admin')
 
+    const hasRequiredPermission = (permStr: string) => {
+        if (!permStr) return false
+        if (permStr.includes('||')) {
+            return permStr.split('||').some(p => authStore.hasPermission(p.trim()))
+        }
+        return authStore.hasPermission(permStr)
+    }
+
     return items.filter(item => {
         // 1) Dashboard público para cualquiera que ingrese
         if (item.id === 'home') return true
@@ -634,13 +642,13 @@ const menuItems = computed(() => {
         // 3) Si es un divisor, por defecto lo ocultamos para usuarios normales 
         // a menos que opcionalmente le pongan un permiso explícito
         if (item.isDivider) {
-            if (item.permission && authStore.hasPermission(item.permission)) return true
+            if (item.permission && hasRequiredPermission(item.permission)) return true
             return false 
         }
 
         // 4) Para el resto de módulos: solo visible si el ítem tiene definido 
         // explícitamente el atributo `permission` y el usuario lo posee.
-        if (item.permission && authStore.hasPermission(item.permission)) {
+        if (item.permission && hasRequiredPermission(item.permission)) {
             return true
         }
 
