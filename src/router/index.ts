@@ -78,12 +78,6 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/consultas/ExpedientesHistoricosView.vue'),
                 meta: { title: 'Listado Histórico', permission: 'asesores_credito' }
             },
-            {
-                path: 'consultas/mis-expedientes',
-                name: 'admin-consultas-mis-expedientes',
-                component: () => import('@/views/consultas/MisExpedientesView.vue'),
-                meta: { title: 'Mis Expedientes (Nuevos)', permission: 'asesores_credito' }
-            },
 
             // ==========================================
             // MÓDULO: BUZÓN SECRE. AGENCIA
