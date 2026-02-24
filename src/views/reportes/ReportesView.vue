@@ -17,7 +17,8 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12 w-full items-start animate-fade-in">
       
       <!-- Export Seguimiento General (Emerald) -->
-      <div class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(16,185,129,0.5)]"
+      <div v-if="hasRequiredPermission('Seguimiento_Principal')"
+           class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(16,185,129,0.5)]"
          :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
          @click="reportStore.requestSegaCSV()"
       >
@@ -55,7 +56,8 @@
       </div>
       
       <!-- Export General Agencias (Blue) -->
-      <div class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.5)]"
+      <div v-if="hasRequiredPermission('Consolidado_Agencias')"
+           class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.5)]"
          :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
          @click="isModalOpen = true"
       >
@@ -93,7 +95,8 @@
       </div>
 
       <!-- Export General (Asesor Logueado) (Purple) -->
-      <div class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(139,92,246,0.5)]"
+      <div v-if="hasRequiredPermission('Rendimiento_Personal')"
+           class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(139,92,246,0.5)]"
          :class="{'pointer-events-none opacity-80': reportStore.isRequesting || (!authStore.user?.username && !authStore.user?.name)}"
          @click="dispararReporteAsesor"
       >
@@ -131,7 +134,8 @@
       </div>
 
       <!-- Export Documentos Generales (Garantías) (Orange) -->
-      <div class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(249,115,22,0.5)]"
+      <div v-if="hasRequiredPermission('Estado_Garantías_Reales')"
+           class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(249,115,22,0.5)]"
          :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
          @click="dispararReporteDocumentos"
       >
@@ -169,7 +173,8 @@
       </div>
 
       <!-- Export Préstamos de Expedientes (Solicitudes Admin) (Sky) -->
-      <div class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(14,165,233,0.5)]"
+      <div v-if="hasRequiredPermission('Archivos_Administrativos')"
+           class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(14,165,233,0.5)]"
          :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
          @click="dispararReporteSolicitudesAdmin"
       >
@@ -183,12 +188,12 @@
                </div>
              </div>
              <span class="rounded-full bg-sky-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-sky-800 dark:bg-sky-900/50 dark:text-sky-300">
-               Archivos Adminsitrativos
+               Archivos Administrativos
              </span>
            </div>
            <div class="mb-8">
              <h3 class="mb-3 text-2xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-sky-600 dark:text-white dark:group-hover:text-sky-400">
-               Archivos Adminsitrativos
+               Archivos Administrativos
              </h3>
              <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
                Logística de Archivo Interno: rastrear las solicitudes de consulta administrativa y préstamo.
@@ -207,7 +212,8 @@
       </div>
 
     <!-- Export Retiro de Garantías (Solicitudes de Retiro) (Red) -->
-      <div class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(244,63,94,0.5)]"
+      <div v-if="hasRequiredPermission('Retiro_Garantías')"
+           class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(244,63,94,0.5)]"
          :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
          @click="dispararReporteSolicitudesRetiro"
       >
@@ -245,7 +251,8 @@
       </div>
 
     <!-- Export Confirmacion de Documentos (Teal) -->
-      <div class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(20,184,166,0.5)]"
+      <div v-if="hasRequiredPermission('Confirmación_Física')"
+           class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(20,184,166,0.5)]"
          :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
          @click="dispararReporteConfirmaciones"
       >
@@ -303,6 +310,10 @@ import Swal from 'sweetalert2';
 const reportStore = useReportStore();
 const authStore = useAuthStore();
 const isModalOpen = ref(false);
+
+const hasRequiredPermission = (permStr) => {
+    return authStore.hasRole('Super Admin') || authStore.hasPermission(permStr);
+};
 
 const handleGenerarAgencias = async (agenciasSeleccionadas) => {
     await reportStore.requestReporteGeneralAgencias(agenciasSeleccionadas);
