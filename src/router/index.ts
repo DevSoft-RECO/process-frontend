@@ -276,13 +276,13 @@ const routes: RouteRecordRaw[] = [
                 path: 'carga-datos/clientes',
                 name: 'admin-carga-clientes',
                 component: () => import('@/views/carga-datos/ExpedientesHistoricosImportView.vue'),
-                meta: { title: 'Expedientes Históricos', permission: 'ajustes' }
+                meta: { title: 'Expedientes Históricos' }
             },
             {
                 path: 'carga-datos/nuevos-expedientes',
                 name: 'admin-carga-nuevos-expedientes',
                 component: () => import('@/views/carga-datos/NuevosExpedientesImportView.vue'),
-                meta: { title: 'Cargar Expedientes', permission: 'ajustes' }
+                meta: { title: 'Cargar Expedientes' }
             },
 
             // ==========================================
@@ -304,7 +304,7 @@ const routes: RouteRecordRaw[] = [
                 path: 'catalogos/agencias',
                 name: 'admin-catalogos-agencias',
                 component: () => import('@/views/catalogos/AgenciasView.vue'),
-                meta: { title: 'Agencias', permission: 'ajustes' }
+                meta: { title: 'Agencias' }
             },
             {
                 path: 'catalogos/bufetes',
@@ -322,19 +322,19 @@ const routes: RouteRecordRaw[] = [
                 path: 'catalogos/tipo-estados',
                 name: 'admin-catalogos-tipo-estados',
                 component: () => import('@/views/catalogos/TipoEstadosView.vue'),
-                meta: { title: 'Tipos de Estado', permission: 'ajustes' }
+                meta: { title: 'Tipos de Estado' }
             },
             {
                 path: 'configuracion/traslado-expedientes',
                 name: 'admin-traslado-expedientes',
                 component: () => import('@/views/admin/configuracion/TrasladoExpedientesView.vue'),
-                meta: { title: 'Traslado de Expedientes', permission: 'ajustes' }
+                meta: { title: 'Traslado de Expedientes' }
             },
             {
                 path: 'configuracion/editar-seguimiento',
                 name: 'admin-editar-seguimiento',
                 component: () => import('@/views/admin/configuracion/EditarSeguimientoView.vue'),
-                meta: { title: 'Editar Seguimiento', permission: 'ajustes' }
+                meta: { title: 'Editar Seguimiento' }
             },
 
             // ==========================================
@@ -344,7 +344,7 @@ const routes: RouteRecordRaw[] = [
                 path: 'reportes',
                 name: 'admin-reportes',
                 component: () => import('@/views/reportes/ReportesView.vue'),
-                meta: { title: 'Reportes y Analítica', permission: 'reportes' }
+                meta: { title: 'Reportes y Analítica' }
             }
         ]
     },
