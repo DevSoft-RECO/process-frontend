@@ -10,7 +10,7 @@
           v-model="searchTerm" 
           @keyup.enter="searchDocument"
           type="text" 
-          placeholder="Ingrese Número de Producto" 
+          placeholder="Ingrese Número de Producto o cuenta BW si el Ex es Antiguo" 
           class="flex-1 border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
         >
         <button 

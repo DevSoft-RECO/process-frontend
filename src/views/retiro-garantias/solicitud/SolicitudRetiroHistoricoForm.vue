@@ -22,7 +22,7 @@
            Indique en la justificación cuál de ellos desea retirar.
          </p>
          <p class="font-semibold text-blue-900">
-           Puede insertar manualmente el Número de Documento y la Fecha del Documento para agilizar la búsqueda posterior, aunque estos campos son opcionales pero puede ingresar la información para agilizar el proceso.
+          Insertar manualmente el Número de Documento y la Fecha del Documento para agilizar la búsqueda en archivo.
          </p>
      </div>
 
