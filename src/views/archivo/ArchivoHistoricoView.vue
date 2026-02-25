@@ -16,7 +16,7 @@
                 v-model="searchQuery" 
                 @keyup.enter="handleSearch"
                 type="text" 
-                placeholder="Buscar por Contrato..." 
+                placeholder="Buscar por Producto o cta bw..." 
                 class="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-verde-cope focus:border-transparent outline-none w-full md:w-64 transition-all"
             />
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
