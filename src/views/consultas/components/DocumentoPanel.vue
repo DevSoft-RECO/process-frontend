@@ -601,6 +601,28 @@ const submitDocumento = async () => {
     }
 }
 
+watch(() => docForm.tipo_documento_id, (newTypeId) => {
+    if (!newTypeId) return
+    
+    // Al cambiar el tipo, limpiamos los campos que NO son visibles para el nuevo tipo.
+    // Esto evita que se queden datos "basura" de un tipo anterior.
+    const fieldsToCheck = [
+        'propietario', 'autorizador', 'no_finca', 'folio', 'libro', 
+        'no_dominio', 'referencia', 'monto_poliza', 'observacion', 
+        'registro_propiedad_id'
+    ]
+
+    fieldsToCheck.forEach(field => {
+        if (!isFieldVisible(field)) {
+            // @ts-ignore
+            docForm[field] = field === 'registro_propiedad_id' ? '' : (field === 'monto_poliza' ? '' : '')
+            if (field === 'monto_poliza') docForm.monto_poliza = ''
+            else if (field === 'registro_propiedad_id') docForm.registro_propiedad_id = ''
+            else (docForm as any)[field] = ''
+        }
+    })
+})
+
 // Initialize logic moved to end to ensures access to initModal
 watch(() => props.expediente, (newVal) => {
     if (newVal) {
