@@ -596,6 +596,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Editar Seguimiento',
                     route: '/admin/configuracion/editar-seguimiento'
+                },
+                {
+                    label: 'Editar Garantías',
+                    route: '/admin/configuracion/editar-garantias'
                 }
             ]
         },

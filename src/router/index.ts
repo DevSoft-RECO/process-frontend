@@ -336,6 +336,12 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/admin/configuracion/EditarSeguimientoView.vue'),
                 meta: { title: 'Editar Seguimiento' }
             },
+            {
+                path: 'configuracion/editar-garantias',
+                name: 'admin-editar-garantias',
+                component: () => import('@/views/admin/configuracion/EditarGarantiasView.vue'),
+                meta: { title: 'Editar Garantías' }
+            },
 
             // ==========================================
             // MÓDULO: REPORTES
