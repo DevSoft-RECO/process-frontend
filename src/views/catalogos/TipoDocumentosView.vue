@@ -82,21 +82,43 @@
             
             <form @submit.prevent="saveItem">
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre del Tipo</label>
                     <input 
                         v-model="form.nombre" 
                         type="text" 
                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                         required
+                        placeholder="Ej. Escritura de Venta"
                     />
                 </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase text-xs tracking-wider">Configuración de Campos Requeridos</label>
+                    <p class="text-[10px] text-gray-500 mb-3 italic">Marque los campos que serán obligatorios para este tipo de documento:</p>
+                    
+                    <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border border-gray-100 dark:border-gray-700 rounded-lg">
+                        <div v-for="field in availableFields" :key="field.key" class="flex items-center gap-2 p-1 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
+                            <input 
+                                type="checkbox" 
+                                :id="'field-' + field.key"
+                                v-model="form.config_campos[field.key]"
+                                :true-value="'1'"
+                                :false-value="'0'"
+                                class="rounded border-gray-300 text-verde-cope focus:ring-verde-cope"
+                            />
+                            <label :for="'field-' + field.key" class="text-xs text-gray-600 dark:text-gray-400 cursor-pointer capitalize">
+                                {{ field.label }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
                 
-                <div class="flex justify-end gap-2">
-                    <button type="button" @click="closeModal" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300">
+                <div class="flex justify-end gap-2 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <button type="button" @click="closeModal" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 transition text-sm">
                         Cancelar
                     </button>
-                    <button type="submit" class="px-4 py-2 text-white bg-verde-cope rounded-lg hover:bg-green-700">
-                        Guardar
+                    <button type="submit" class="px-6 py-2 text-white bg-verde-cope rounded-lg hover:bg-green-700 transition text-sm font-bold shadow-md">
+                        {{ editingItem ? 'Actualizar' : 'Crear Tipo' }}
                     </button>
                 </div>
             </form>
@@ -115,7 +137,21 @@ import Encabezado from '../../components/common/encabezado.vue'
 interface TipoDocumento {
     id: number
     nombre: string
+    config_campos: Record<string, string | number | boolean> | null
 }
+
+const availableFields = [
+    { key: 'propietario', label: 'Propietario' },
+    { key: 'autorizador', label: 'Autorizador/Notario' },
+    { key: 'no_finca', label: 'No. Finca' },
+    { key: 'folio', label: 'Folio' },
+    { key: 'libro', label: 'Libro' },
+    { key: 'no_dominio', label: 'No. Dominio' },
+    { key: 'referencia', label: 'Referencia' },
+    { key: 'monto_poliza', label: 'Monto Póliza' },
+    { key: 'observacion', label: 'Observación' },
+    { key: 'registro_propiedad_id', label: 'Registro Propiedad' },
+]
 
 const items = ref<TipoDocumento[]>([])
 const loading = ref(false)
@@ -123,7 +159,18 @@ const nextPageUrl = ref<string | null>(null)
 
 const showModal = ref(false)
 const editingItem = ref<TipoDocumento | null>(null)
-const form = reactive({ nombre: '' })
+const form = reactive({ 
+    nombre: '',
+    config_campos: {} as Record<string, string>
+})
+
+const resetForm = () => {
+    form.nombre = ''
+    form.config_campos = {}
+    availableFields.forEach(f => {
+        form.config_campos[f.key] = '0'
+    })
+}
 
 const fetchItems = async (url: string | null = null) => {
     loading.value = true
@@ -150,15 +197,24 @@ const loadMore = () => {
 }
 
 const openModal = (item: TipoDocumento | null = null) => {
+    resetForm()
     editingItem.value = item
-    form.nombre = item ? item.nombre : ''
+    if (item) {
+        form.nombre = item.nombre
+        if (item.config_campos) {
+            // Merge existing config with defaults to ensure all keys exist
+            availableFields.forEach(f => {
+                form.config_campos[f.key] = item.config_campos![f.key]?.toString() || '0'
+            })
+        }
+    }
     showModal.value = true
 }
 
 const closeModal = () => {
     showModal.value = false
     editingItem.value = null
-    form.nombre = ''
+    resetForm()
 }
 
 const saveItem = async () => {
@@ -201,6 +257,7 @@ const deleteItem = async (id: number) => {
 }
 
 onMounted(() => {
+    resetForm()
     fetchItems()
 })
 </script>
