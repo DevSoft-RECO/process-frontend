@@ -604,6 +604,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Editar Detalle Garantía',
                     route: '/admin/configuracion/editar-detalle-garantia'
+                },
+                {
+                    label: 'Editar Nuevo Expediente',
+                    route: '/admin/configuracion/editar-nuevo-expediente'
                 }
             ]
         },
