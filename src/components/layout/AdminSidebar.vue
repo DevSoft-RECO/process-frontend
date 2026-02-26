@@ -600,6 +600,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Editar Garantías',
                     route: '/admin/configuracion/editar-garantias'
+                },
+                {
+                    label: 'Editar Detalle Garantía',
+                    route: '/admin/configuracion/editar-detalle-garantia'
                 }
             ]
         },
