@@ -60,6 +60,7 @@
             <tr>
               <th class="px-6 py-3">ID</th>
               <th class="px-6 py-3">Documento</th>
+              <th class="px-6 py-3">Fecha Doc.</th>
               <th class="px-6 py-3">Nombre/Título</th>
               <th class="px-6 py-3">Tipo</th>
               <th class="px-6 py-3">Fecha Solic.</th>
@@ -71,6 +72,7 @@
             <tr v-for="item in results" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
               <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ item.id }}</td>
               <td class="px-6 py-4">{{ item.numero_documento }}</td>
+              <td class="px-6 py-4">{{ item.fecha_documento ? formatDate(item.fecha_documento) : 'N/A' }}</td>
               <td class="px-6 py-4">{{ item.titulo_nombre }}</td>
               <td class="px-6 py-4">{{ item.tipo_retiro }}</td>
               <td class="px-6 py-4">{{ item.fecha_solicitud ? formatDate(item.fecha_solicitud) : 'N/A' }}</td>
