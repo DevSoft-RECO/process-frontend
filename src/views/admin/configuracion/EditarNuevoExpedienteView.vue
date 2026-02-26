@@ -16,12 +16,12 @@
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-gray-200 dark:border-gray-700">
       <form @submit.prevent="searchExpedientes" class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Buscar por Número de Documento (Garantía)</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Buscar por Número de Producto</label>
           <input
             v-model="searchQuery"
             type="text"
             required
-            placeholder="Ingrese el número de documento..."
+            placeholder="Ingrese el número de producto..."
             class="w-full rounded-md border-gray-300 shadow-sm focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
         </div>
