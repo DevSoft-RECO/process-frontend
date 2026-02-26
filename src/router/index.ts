@@ -354,6 +354,12 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/admin/configuracion/EditarNuevoExpedienteView.vue'),
                 meta: { title: 'Editar Nuevo Expediente' }
             },
+            {
+                path: 'configuracion/editar-solicitud-administrativa',
+                name: 'admin-editar-solicitud-administrativa',
+                component: () => import('@/views/admin/configuracion/EditarSolicitudAdministrativaView.vue'),
+                meta: { title: 'Editar Solicitud Administrativa' }
+            },
 
             // ==========================================
             // MÓDULO: REPORTES

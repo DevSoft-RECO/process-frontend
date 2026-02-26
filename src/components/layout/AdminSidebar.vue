@@ -608,6 +608,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Editar Nuevo Expediente',
                     route: '/admin/configuracion/editar-nuevo-expediente'
+                },
+                {
+                    label: 'Editar Solicitud Administrativa',
+                    route: '/admin/configuracion/editar-solicitud-administrativa'
                 }
             ]
         },
