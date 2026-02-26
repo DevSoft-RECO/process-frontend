@@ -69,39 +69,56 @@
                                     <span class="text-xs font-mono text-gray-400 uppercase">ID: {{ g.id }}</span>
                                 </div>
                                 
-                                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8" v-if="g.pivot">
                                     <!-- Codeudores -->
-                                    <div v-if="g.pivot">
-                                        <h4 class="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
-                                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                                            Codeudores
+                                    <div>
+                                        <h4 class="text-[10px] font-black text-gray-400 uppercase mb-3 flex items-center gap-2 tracking-widest">
+                                            <svg class="w-3 h-3 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                                            Principales / Codeudores
                                         </h4>
                                         <ul class="space-y-2 text-sm">
-                                            <li v-for="i in 4" :key="`c-${i}`" v-show="g.pivot[`codeudor${i}`]" class="flex items-start gap-2 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/30 p-2 rounded">
-                                                <span class="text-gray-400 text-xs mt-0.5">{{ i }}.</span>
+                                            <li v-for="i in 3" :key="`c-${i}`" v-show="g.pivot[`codeudor${i}`]" class="flex items-start gap-2 text-gray-700 dark:text-gray-300 bg-gray-50/50 dark:bg-gray-700/30 p-2 rounded border border-gray-100 dark:border-gray-700/50">
+                                                <span class="text-gray-400 text-xs font-bold mt-0.5">{{ i }}.</span>
                                                 <span class="font-medium">{{ g.pivot[`codeudor${i}`] }}</span>
                                             </li>
-                                            <li v-if="!g.pivot.codeudor1 && !g.pivot.codeudor2 && !g.pivot.codeudor3 && !g.pivot.codeudor4" class="text-gray-400 italic text-sm pl-2">
+                                            <li v-if="!g.pivot.codeudor1 && !g.pivot.codeudor2 && !g.pivot.codeudor3" class="text-gray-400 italic text-sm pl-2">
                                                 Sin codeudores registrados
                                             </li>
                                         </ul>
                                     </div>
 
                                     <!-- Observaciones -->
-                                    <div v-if="g.pivot">
-                                        <h4 class="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
-                                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                                    <div>
+                                        <h4 class="text-[10px] font-black text-gray-400 uppercase mb-3 flex items-center gap-2 tracking-widest">
+                                            <svg class="w-3 h-3 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
                                             Observaciones
                                         </h4>
                                          <ul class="space-y-2 text-sm">
-                                            <li v-for="i in 4" :key="`o-${i}`" v-show="g.pivot[`observacion${i}`]" class="flex items-start gap-2 text-gray-600 dark:text-gray-400">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-gray-300 mt-1.5 shrink-0"></span>
-                                                <span>{{ g.pivot[`observacion${i}`] }}</span>
+                                            <li v-for="i in 3" :key="`o-${i}`" v-show="g.pivot[`observacion${i}`]" class="flex items-start gap-2 p-2 rounded bg-gray-50/30 dark:bg-gray-800/50 border border-transparent hover:border-gray-100 dark:hover:border-gray-700">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 shrink-0"></span>
+                                                <span class="text-gray-600 dark:text-gray-400 italic leading-relaxed">{{ g.pivot[`observacion${i}`] }}</span>
                                             </li>
-                                             <li v-if="!g.pivot.observacion1 && !g.pivot.observacion2 && !g.pivot.observacion3 && !g.pivot.observacion4" class="text-gray-400 italic text-sm pl-2">
+                                             <li v-if="!g.pivot.observacion1 && !g.pivot.observacion2 && !g.pivot.observacion3" class="text-gray-400 italic text-sm pl-2">
                                                 Sin observaciones
                                             </li>
                                         </ul>
+                                    </div>
+
+                                    <!-- Mobiliarias (Paired with index 4) -->
+                                    <div v-if="g.pivot.codeudor4 || g.pivot.observacion4" class="col-span-1 md:col-span-2 pt-6 border-t border-gray-100 dark:border-gray-700 mt-2">
+                                        <p class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] mb-4 bg-blue-50 dark:bg-blue-900/20 w-fit px-3 py-1 rounded-full border border-blue-100 dark:border-blue-800/50">
+                                            Garantias Mobiliarias (Solo cuando aplica )
+                                        </p>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div class="bg-blue-50/30 dark:bg-blue-900/5 p-4 rounded-xl border border-blue-100/50 dark:border-blue-900/20">
+                                                <span class="block text-[10px] text-blue-600/70 dark:text-blue-400/70 font-black uppercase mb-2 tracking-wider">Título Garantía</span>
+                                                <span class="text-gray-900 dark:text-white font-bold text-base leading-tight">{{ g.pivot.codeudor4 || '-' }}</span>
+                                            </div>
+                                            <div class="bg-blue-50/30 dark:bg-blue-900/5 p-4 rounded-xl border border-blue-100/50 dark:border-blue-900/20">
+                                                <span class="block text-[10px] text-blue-600/70 dark:text-blue-400/70 font-black uppercase mb-2 tracking-wider">Observación Garantía</span>
+                                                <p class="text-gray-800 dark:text-gray-200 leading-relaxed italic text-sm">{{ g.pivot.observacion4 || '-' }}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
