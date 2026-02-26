@@ -66,14 +66,13 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.titulo_nombre }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{{ item.entregador?.name || 'N/A' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <a 
+                <button 
                   v-if="item.evidencia_entrega_path"
-                  :href="getFileUrl(item.evidencia_entrega_path)"
-                  target="_blank"
+                  @click="verEvidencia(item.id)"
                   class="text-blue-600 hover:text-blue-900 font-bold flex items-center"
                 >
                   <i class="fas fa-file-pdf mr-1"></i> Ver Evidencia
-                </a>
+                </button>
                 <span v-else class="text-gray-400 italic">Sin evidencia</span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -198,11 +197,16 @@ const formatDate = (dateString) => {
   return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 };
 
-const getFileUrl = (path) => {
-    if (!path) return '#';
-    // Ajustar URL base si es necesario, asumiendo que backend sirve public/
-    const baseUrl = import.meta.env.VITE_API_URL.replace('/api', ''); 
-    return `${baseUrl}/${path}`;
+const verEvidencia = async (id) => {
+    try {
+        const response = await api.get(`/solicitudes-retiro/${id}/ver-evidencia`);
+        if (response.data.success && response.data.url) {
+            window.open(response.data.url, '_blank');
+        }
+    } catch (error) {
+        console.error(error);
+        Swal.fire('Error', 'No se pudo generar la URL de la evidencia.', 'error');
+    }
 };
 
 
