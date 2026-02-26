@@ -68,24 +68,36 @@
 
                     <div class="grid grid-cols-1 gap-2">
                       <div v-if="g.codeudor1">
-                        <p class="text-[10px] font-black text-gray-500 uppercase">Codeudor 1</p>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Codeudor 1</p>
                         <p class="text-sm font-bold dark:text-white">{{ g.codeudor1 }}</p>
-                        <p v-if="g.observacion1" class="text-xs italic text-gray-500 mt-1">"{{ g.observacion1 }}"</p>
+                        <p v-if="g.observacion1" class="text-xs italic text-gray-500 mt-1 bg-gray-100/50 dark:bg-gray-800/50 p-1.5 rounded">"{{ g.observacion1 }}"</p>
                       </div>
                       <div v-if="g.codeudor2">
-                        <p class="text-[10px] font-black text-gray-500 uppercase">Codeudor 2</p>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Codeudor 2</p>
                         <p class="text-sm font-bold dark:text-white">{{ g.codeudor2 }}</p>
-                        <p v-if="g.observacion2" class="text-xs italic text-gray-500 mt-1">"{{ g.observacion2 }}"</p>
+                        <p v-if="g.observacion2" class="text-xs italic text-gray-500 mt-1 bg-gray-100/50 dark:bg-gray-800/50 p-1.5 rounded">"{{ g.observacion2 }}"</p>
                       </div>
                       <div v-if="g.codeudor3">
-                        <p class="text-[10px] font-black text-gray-500 uppercase">Codeudor 3</p>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Codeudor 3</p>
                         <p class="text-sm font-bold dark:text-white">{{ g.codeudor3 }}</p>
-                        <p v-if="g.observacion3" class="text-xs italic text-gray-500 mt-1">"{{ g.observacion3 }}"</p>
+                        <p v-if="g.observacion3" class="text-xs italic text-gray-500 mt-1 bg-gray-100/50 dark:bg-gray-800/50 p-1.5 rounded">"{{ g.observacion3 }}"</p>
                       </div>
-                      <div v-if="g.codeudor4">
-                        <p class="text-[10px] font-black text-gray-500 uppercase">Codeudor 4</p>
-                        <p class="text-sm font-bold dark:text-white">{{ g.codeudor4 }}</p>
-                        <p v-if="g.observacion4" class="text-xs italic text-gray-500 mt-1">"{{ g.observacion4 }}"</p>
+
+                      <!-- Mobiliarias -->
+                      <div v-if="g.codeudor4 || g.observacion4" class="mt-2 pt-3 border-t border-gray-100 dark:border-gray-600">
+                        <p class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.15em] mb-2">
+                          Garantias Mobiliarias (Solo cuando aplica )
+                        </p>
+                        <div class="grid grid-cols-1 gap-3">
+                          <div class="bg-blue-50/50 dark:bg-blue-900/10 p-2 rounded border border-blue-100 dark:border-blue-900/20">
+                            <span class="block text-[10px] text-blue-600 dark:text-blue-400 font-bold uppercase mb-0.5">Título Garantía</span>
+                            <span class="text-sm font-bold text-gray-900 dark:text-white">{{ g.codeudor4 || '-' }}</span>
+                          </div>
+                          <div class="bg-blue-50/50 dark:bg-blue-900/10 p-2 rounded border border-blue-100 dark:border-blue-900/20">
+                            <span class="block text-[10px] text-blue-600 dark:text-blue-400 font-bold uppercase mb-0.5">Observación Garantía</span>
+                            <p class="text-xs text-gray-800 dark:text-gray-200 italic leading-relaxed">{{ g.observacion4 || '-' }}</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
