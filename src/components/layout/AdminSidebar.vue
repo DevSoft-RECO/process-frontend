@@ -612,6 +612,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Editar Solicitud Administrativa',
                     route: '/admin/configuracion/editar-solicitud-administrativa'
+                },
+                {
+                    label: 'Editar Sol Retiro Garantias',
+                    route: '/admin/configuracion/editar-solicitud-retiro'
                 }
             ]
         },

@@ -360,6 +360,12 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/admin/configuracion/EditarSolicitudAdministrativaView.vue'),
                 meta: { title: 'Editar Solicitud Administrativa' }
             },
+            {
+                path: 'configuracion/editar-solicitud-retiro',
+                name: 'admin-editar-solicitud-retiro',
+                component: () => import('@/views/admin/configuracion/EditarSolicitudRetiroView.vue'),
+                meta: { title: 'Editar Sol Retiro Garantias' }
+            },
 
             // ==========================================
             // MÓDULO: REPORTES
