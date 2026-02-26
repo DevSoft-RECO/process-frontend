@@ -24,9 +24,10 @@
                 </select>
             </div>
 
-            <!-- Codeudores y Observaciones (Paired) -->
+            <!-- Codeudores y Observaciones -->
             <div class="space-y-4" v-if="shouldShowFields">
-                    <div v-for="i in 4" :key="i" class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Principales (1-3) -->
+                <div v-for="i in 3" :key="i" class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Codeudor Input -->
                     <div>
                         <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Codeudor {{ i }}</label>
@@ -36,6 +37,23 @@
                     <div>
                         <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Observación {{ i }}</label>
                         <input v-model="form[`observacion${i}` as keyof typeof form]" type="text" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" :placeholder="`Observación para Codeudor ${i}`" />
+                    </div>
+                </div>
+
+                <!-- Nueva Sección: Garantías Mobiliarias (Paired with index 4) -->
+                <div class="pt-4 border-t border-gray-100 dark:border-gray-700 space-y-4">
+                    <h3 class="text-xs font-bold text-azul-cope dark:text-blue-400 uppercase tracking-wider px-1">
+                        Garantias Mobiliarias (Solo cuando aplica )
+                    </h3>
+                    <div class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Título Garantía</label>
+                            <input v-model="form.codeudor4" type="text" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" placeholder="Título de la garantía mobiliaria" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Observación Garantía</label>
+                            <input v-model="form.observacion4" type="text" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" placeholder="Observaciones adicionales" />
+                        </div>
                     </div>
                 </div>
             </div>
