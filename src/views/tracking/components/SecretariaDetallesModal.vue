@@ -90,25 +90,40 @@
                                 <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" v-if="g.pivot">
                                     <!-- Codeudores -->
                                     <div class="bg-white dark:bg-gray-700/50 p-3 rounded-md">
-                                        <h5 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 border-b dark:border-gray-600 pb-1">Codeudores</h5>
+                                        <h5 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 border-b dark:border-gray-600 pb-1 uppercase text-[10px] tracking-wider">Principales / Codeudores</h5>
                                         <ul class="space-y-1">
-                                            <li v-if="g.pivot.codeudor1"><span class="text-gray-500 dark:text-gray-400">1.</span> {{ g.pivot.codeudor1 }}</li>
-                                            <li v-if="g.pivot.codeudor2"><span class="text-gray-500 dark:text-gray-400">2.</span> {{ g.pivot.codeudor2 }}</li>
-                                            <li v-if="g.pivot.codeudor3"><span class="text-gray-500 dark:text-gray-400">3.</span> {{ g.pivot.codeudor3 }}</li>
-                                            <li v-if="g.pivot.codeudor4"><span class="text-gray-500 dark:text-gray-400">4.</span> {{ g.pivot.codeudor4 }}</li>
-                                            <li v-if="!g.pivot.codeudor1 && !g.pivot.codeudor2 && !g.pivot.codeudor3 && !g.pivot.codeudor4" class="italic text-gray-400">Sin codeudores registrados</li>
+                                            <li v-if="g.pivot.codeudor1"><span class="text-gray-500 dark:text-gray-400 font-bold">1.</span> {{ g.pivot.codeudor1 }}</li>
+                                            <li v-if="g.pivot.codeudor2"><span class="text-gray-500 dark:text-gray-400 font-bold">2.</span> {{ g.pivot.codeudor2 }}</li>
+                                            <li v-if="g.pivot.codeudor3"><span class="text-gray-500 dark:text-gray-400 font-bold">3.</span> {{ g.pivot.codeudor3 }}</li>
+                                            <li v-if="!g.pivot.codeudor1 && !g.pivot.codeudor2 && !g.pivot.codeudor3" class="italic text-gray-400">Sin codeudores registrados</li>
                                         </ul>
                                     </div>
                                     <!-- Observaciones -->
                                     <div class="bg-white dark:bg-gray-700/50 p-3 rounded-md">
-                                        <h5 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 border-b dark:border-gray-600 pb-1">Observaciones</h5>
+                                        <h5 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 border-b dark:border-gray-600 pb-1 uppercase text-[10px] tracking-wider">Observaciones</h5>
                                          <ul class="space-y-1">
-                                            <li v-if="g.pivot.observacion1"><span class="text-gray-500 dark:text-gray-400">1.</span> {{ g.pivot.observacion1 }}</li>
-                                            <li v-if="g.pivot.observacion2"><span class="text-gray-500 dark:text-gray-400">2.</span> {{ g.pivot.observacion2 }}</li>
-                                            <li v-if="g.pivot.observacion3"><span class="text-gray-500 dark:text-gray-400">3.</span> {{ g.pivot.observacion3 }}</li>
-                                            <li v-if="g.pivot.observacion4"><span class="text-gray-500 dark:text-gray-400">4.</span> {{ g.pivot.observacion4 }}</li>
-                                            <li v-if="!g.pivot.observacion1 && !g.pivot.observacion2 && !g.pivot.observacion3 && !g.pivot.observacion4" class="italic text-gray-400">Sin observaciones registradas</li>
+                                            <li v-if="g.pivot.observacion1"><span class="text-gray-500 dark:text-gray-400 font-bold">1.</span> {{ g.pivot.observacion1 }}</li>
+                                            <li v-if="g.pivot.observacion2"><span class="text-gray-500 dark:text-gray-400 font-bold">2.</span> {{ g.pivot.observacion2 }}</li>
+                                            <li v-if="g.pivot.observacion3"><span class="text-gray-500 dark:text-gray-400 font-bold">3.</span> {{ g.pivot.observacion3 }}</li>
+                                            <li v-if="!g.pivot.observacion1 && !g.pivot.observacion2 && !g.pivot.observacion3" class="italic text-gray-400">Sin observaciones registradas</li>
                                         </ul>
+                                    </div>
+
+                                    <!-- Mobiliarias (Paired with index 4) -->
+                                    <div v-if="g.pivot.codeudor4 || g.pivot.observacion4" class="col-span-1 md:col-span-2 pt-2 border-t border-gray-100 dark:border-gray-600 mt-1">
+                                        <p class="text-[10px] font-black text-azul-cope dark:text-blue-400 uppercase tracking-[0.1em] mb-3">
+                                            Garantias Mobiliarias (Solo cuando aplica )
+                                        </p>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div class="bg-blue-50/50 dark:bg-blue-900/10 p-2 rounded border border-blue-100 dark:border-blue-900/30">
+                                                <span class="block text-[10px] text-blue-600 dark:text-blue-400 font-bold uppercase mb-1">Título Garantía</span>
+                                                <span class="text-gray-900 dark:text-white font-medium">{{ g.pivot.codeudor4 || '-' }}</span>
+                                            </div>
+                                            <div class="bg-blue-50/50 dark:bg-blue-900/10 p-2 rounded border border-blue-100 dark:border-blue-900/30">
+                                                <span class="block text-[10px] text-blue-600 dark:text-blue-400 font-bold uppercase mb-1">Observación Garantía</span>
+                                                <p class="text-gray-900 dark:text-white leading-tight italic">{{ g.pivot.observacion4 || '-' }}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                              </div>
