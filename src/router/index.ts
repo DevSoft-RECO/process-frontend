@@ -366,6 +366,12 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/admin/configuracion/EditarSolicitudRetiroView.vue'),
                 meta: { title: 'Editar Sol Retiro Garantias' }
             },
+            {
+                path: 'configuracion/editar-confirmacion-garantias',
+                name: 'admin-editar-confirmacion-garantias',
+                component: () => import('@/views/admin/configuracion/EditarConfirmacionGarantiasView.vue'),
+                meta: { title: 'Edición Confirmación Garantías' }
+            },
 
             // ==========================================
             // MÓDULO: REPORTES

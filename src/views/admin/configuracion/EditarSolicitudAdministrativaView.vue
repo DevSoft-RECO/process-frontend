@@ -63,7 +63,7 @@
               <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ item.id }}</td>
               <td class="px-6 py-4">{{ item.expediente?.numero_documento || 'ID: ' + item.id_expediente }}</td>
               <td class="px-6 py-4">{{ item.expediente?.nombre_asociado || 'N/A' }}</td>
-              <td class="px-6 py-4">{{ item.fecha_solicitud ? new Date(item.fecha_solicitud).toLocaleDateString() : 'N/A' }}</td>
+              <td class="px-6 py-4">{{ item.fecha_solicitud ? formatDate(item.fecha_solicitud) : 'N/A' }}</td>
               <td class="px-6 py-4">
                 <span :class="getStatusClass(item.estado_solicitud)" class="px-2 py-1 rounded-full text-xs font-bold uppercase">
                   {{ item.estado_solicitud || 'N/A' }}
@@ -324,6 +324,19 @@ const getStatusClass = (status: string) => {
     case 'archivado': return 'bg-green-100 text-green-800'
     default: return 'bg-gray-100 text-gray-800'
   }
+}
+
+const formatDate = (dateStr: string | null) => {
+  if (!dateStr) return 'N/A'
+  const datePart = (dateStr as string).split('T')[0] as string
+  const finalDatePart = datePart.split(' ')[0] as string
+  const parts = finalDatePart.split('-')
+  if (parts.length !== 3) return dateStr
+  const y = parseInt(parts[0] as string)
+  const m = parseInt(parts[1] as string)
+  const d = parseInt(parts[2] as string)
+  if (isNaN(y) || isNaN(m) || isNaN(d) || y === 0) return dateStr
+  return new Date(y, m - 1, d).toLocaleDateString()
 }
 
 onMounted(() => {

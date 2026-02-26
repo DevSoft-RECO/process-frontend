@@ -616,6 +616,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Editar Sol Retiro Garantias',
                     route: '/admin/configuracion/editar-solicitud-retiro'
+                },
+                {
+                    label: 'Edición Confirmación Garantías',
+                    route: '/admin/configuracion/editar-confirmacion-garantias'
                 }
             ]
         },
