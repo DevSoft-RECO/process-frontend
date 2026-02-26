@@ -602,7 +602,7 @@ const menuItems = computed(() => {
                     route: '/admin/configuracion/editar-garantias'
                 },
                 {
-                    label: 'Editar Detalle Garantía',
+                    label: 'Editar Tipo de Garantía',
                     route: '/admin/configuracion/editar-detalle-garantia'
                 },
                 {
