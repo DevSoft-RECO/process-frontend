@@ -401,28 +401,53 @@ const handleDocumentRegistered = () => {
 // -------------------------
 
 const dispatchRequest = async (req) => {
-  // Preparar opciones para SweetAlert
-  const agencyOptions = {};
-  agencies.value.forEach(a => {
-      agencyOptions[a.id] = a.nombre;
-  });
+  const requestingAgencyName = req.agencia?.nombre || 'la agencia solicitante';
+  const requestingAgencyId = req.id_agencia;
 
-  const { value: selectedAgencyId } = await Swal.fire({
+  // 1. Mostrar confirmación inicial (Camino rápido vs manual)
+  const result = await Swal.fire({
     title: 'Despachar Documento',
-    text: `Se enviará el documento ${req.numero_documento} como ${req.tipo_retiro}. Seleccione la agencia de destino:`,
-    input: 'select',
-    inputOptions: agencyOptions,
-    inputPlaceholder: 'Seleccione una agencia',
+    html: `¿Generar envío para <strong>${requestingAgencyName}</strong>?<br><br><small class="text-gray-500">Documento: ${req.numero_documento} (${req.tipo_retiro})</small>`,
+    icon: 'question',
     showCancelButton: true,
-    confirmButtonText: 'Despachar',
+    showDenyButton: true,
+    confirmButtonText: 'Sí, Despachar',
+    denyButtonText: 'Enviar a OTRA agencia',
     cancelButtonText: 'Cancelar',
-    inputValidator: (value) => {
-      if (!value) {
-        return 'Debe seleccionar una agencia de destino';
-      }
-    }
+    confirmButtonColor: '#059669', // Green-600
+    denyButtonColor: '#3B82F6',    // Blue-500
+    cancelButtonColor: '#6B7280',
   });
 
+  let selectedAgencyId = null;
+
+  if (result.isConfirmed) {
+    // Caso estándar: Agencia solicitante
+    selectedAgencyId = requestingAgencyId;
+  } else if (result.isDenied) {
+    // Caso manual: Selector de agencias
+    const agencyOptions = {};
+    agencies.value.forEach(a => {
+        agencyOptions[a.id] = a.nombre;
+    });
+
+    const { value: manualAgencyId } = await Swal.fire({
+      title: 'Seleccionar Agencia de Destino',
+      input: 'select',
+      inputOptions: agencyOptions,
+      inputPlaceholder: 'Seleccione una agencia',
+      showCancelButton: true,
+      confirmButtonText: 'Confirmar Envío',
+      cancelButtonText: 'Volver',
+      inputValidator: (value) => {
+        if (!value) return 'Debe seleccionar una agencia de destino';
+      }
+    });
+    
+    selectedAgencyId = manualAgencyId;
+  }
+
+  // 2. Ejecutar despacho si hay una agencia seleccionada o confirmada
   if (selectedAgencyId) {
     try {
       // Determinar estado destino: Temporal -> 2, Definitivo -> 3
@@ -437,7 +462,7 @@ const dispatchRequest = async (req) => {
       loadRequests();
     } catch (error) {
        console.error(error);
-       Swal.fire('Error', 'Error al despachar el documento', 'error');
+       Swal.fire('Error', 'No se pudo completar el despacho del documento', 'error');
     }
   }
 };
