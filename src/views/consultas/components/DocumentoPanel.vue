@@ -182,11 +182,11 @@
                     </div>
 
 
-                    <!-- Data Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Data Grid Dynamically Configured -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         
                         <!-- Columna 1 -->
-                            <div class="space-y-4">
+                        <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Documento *</label>
                                 <select v-model="docForm.tipo_documento_id" :disabled="existingDocFound && !isEditable" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800">
@@ -194,60 +194,80 @@
                                     <option v-for="t in tiposDocumentoList" :key="t.id" :value="t.id">{{ t.nombre }}</option>
                                 </select>
                             </div>
-                                <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monto Póliza</label>
-                                <input v-model="docForm.monto_poliza" :disabled="existingDocFound && !isEditable" type="number" step="0.01" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                            <div v-show="isFieldVisible('monto_poliza')">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Monto Póliza <span v-if="isFieldRequired('monto_poliza')" class="text-red-500">*</span>
+                                </label>
+                                <input v-model="docForm.monto_poliza" :disabled="existingDocFound && !isEditable" type="number" step="0.01" :required="isFieldRequired('monto_poliza')" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
-                            </div>
+                        </div>
 
-                            <!-- Columna 2 -->
-                            <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Registro de Propiedad *</label>
-                                <select v-model="docForm.registro_propiedad_id" :disabled="existingDocFound && !isEditable" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800">
+                        <!-- Columna 2 -->
+                        <div class="space-y-4">
+                            <div v-show="isFieldVisible('registro_propiedad_id')">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Registro de Propiedad <span v-if="isFieldRequired('registro_propiedad_id')" class="text-red-500">*</span>
+                                </label>
+                                <select v-model="docForm.registro_propiedad_id" :disabled="existingDocFound && !isEditable" :required="isFieldRequired('registro_propiedad_id')" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800">
                                     <option value="" disabled>Seleccione...</option>
                                     <option v-for="r in registrosList" :key="r.id" :value="r.id">{{ r.nombre }}</option>
                                 </select>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No. Finca</label>
-                                <input v-model="docForm.no_finca" :disabled="existingDocFound && !isEditable" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                            <div v-show="isFieldVisible('no_finca')">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    No. Finca <span v-if="isFieldRequired('no_finca')" class="text-red-500">*</span>
+                                </label>
+                                <input v-model="docForm.no_finca" :disabled="existingDocFound && !isEditable" type="text" :required="isFieldRequired('no_finca')" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Folio</label>
-                                <input v-model="docForm.folio" :disabled="existingDocFound && !isEditable" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                            <div v-show="isFieldVisible('folio')">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Folio <span v-if="isFieldRequired('folio')" class="text-red-500">*</span>
+                                </label>
+                                <input v-model="docForm.folio" :disabled="existingDocFound && !isEditable" type="text" :required="isFieldRequired('folio')" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Libro</label>
-                                <input v-model="docForm.libro" :disabled="existingDocFound && !isEditable" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                            <div v-show="isFieldVisible('libro')">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Libro <span v-if="isFieldRequired('libro')" class="text-red-500">*</span>
+                                </label>
+                                <input v-model="docForm.libro" :disabled="existingDocFound && !isEditable" type="text" :required="isFieldRequired('libro')" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
-                            </div>
+                        </div>
 
-                            <!-- Columna 3 -->
-                            <div class="space-y-4">
-                                <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Propietario / Titular</label>
-                                <input v-model="docForm.propietario" :disabled="existingDocFound && !isEditable" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                        <!-- Columna 3 -->
+                        <div class="space-y-4">
+                            <div v-show="isFieldVisible('propietario')">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Propietario / Titular <span v-if="isFieldRequired('propietario')" class="text-red-500">*</span>
+                                </label>
+                                <input v-model="docForm.propietario" :disabled="existingDocFound && !isEditable" type="text" :required="isFieldRequired('propietario')" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
-                                <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Autorizador / Notario</label>
-                                <input v-model="docForm.autorizador" :disabled="existingDocFound && !isEditable" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                            <div v-show="isFieldVisible('autorizador')">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Autorizador / Notario <span v-if="isFieldRequired('autorizador')" class="text-red-500">*</span>
+                                </label>
+                                <input v-model="docForm.autorizador" :disabled="existingDocFound && !isEditable" type="text" :required="isFieldRequired('autorizador')" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No. Dominio</label>
-                                <input v-model="docForm.no_dominio" :disabled="existingDocFound && !isEditable" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                            <div v-show="isFieldVisible('no_dominio')">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    No. Dominio <span v-if="isFieldRequired('no_dominio')" class="text-red-500">*</span>
+                                </label>
+                                <input v-model="docForm.no_dominio" :disabled="existingDocFound && !isEditable" type="text" :required="isFieldRequired('no_dominio')" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Referencia</label>
-                                <input v-model="docForm.referencia" :disabled="existingDocFound && !isEditable" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                            <div v-show="isFieldVisible('referencia')">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Referencia <span v-if="isFieldRequired('referencia')" class="text-red-500">*</span>
+                                </label>
+                                <input v-model="docForm.referencia" :disabled="existingDocFound && !isEditable" type="text" :required="isFieldRequired('referencia')" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>
-                            </div>
+                        </div>
                     </div>
 
                     <!-- Observaciones (Full Width) -->
-                    <div class="mt-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Observaciones</label>
-                            <textarea v-model="docForm.observacion" :disabled="existingDocFound && !isEditable" rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800"></textarea>
+                    <div class="mt-4" v-show="isFieldVisible('observacion')">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Observaciones <span v-if="isFieldRequired('observacion')" class="text-red-500">*</span>
+                        </label>
+                        <textarea v-model="docForm.observacion" :disabled="existingDocFound && !isEditable" :required="isFieldRequired('observacion')" rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800"></textarea>
                     </div>
                 </div>
 
@@ -335,6 +355,37 @@ const isEditable = computed(() => {
     // Allow if Retornado (2) OR No Tracking/Initial (0)
     return (state === 2 || state === 0 || !props.expediente?.seguimientos?.length) && isUnique
 })
+
+const currentTipoConfig = computed(() => {
+    const tipo = tiposDocumentoList.value.find(t => t.id === docForm.tipo_documento_id)
+    return tipo?.config_campos || null
+})
+
+const isFieldVisible = (fieldName: string) => {
+    // Si estamos en modo lectura (documento ya existente y no editable), 
+    // mostramos los campos que TENGAN VALOR, incluso si están ocultos en la config actual,
+    // para que la secretaria vea qué se registró originalmente.
+    if (existingDocFound.value && !isEditable.value) {
+        return !!docForm[fieldName as keyof typeof docForm]
+    }
+
+    // Si no se ha seleccionado un tipo de documento, ocultamos los campos opcionales
+    // para obligar al usuario a elegir un tipo primero y ver qué se requiere.
+    if (!docForm.tipo_documento_id) return false
+
+    // Si no hay config definida para el tipo (ej. tipo antiguo), mostramos todo por defecto
+    if (!currentTipoConfig.value) return true 
+    
+    const config = currentTipoConfig.value[fieldName]
+    // Visible si no está marcado como '0' (oculto)
+    return config !== '0' && config !== 0 && config !== false && config !== 'hidden'
+}
+
+const isFieldRequired = (fieldName: string) => {
+    if (!currentTipoConfig.value) return false
+    const config = currentTipoConfig.value[fieldName]
+    return config === '1' || config === 1 || config === true || config === 'required'
+}
 
 // Initialize logic
 async function initModal() {
