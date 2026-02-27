@@ -628,13 +628,13 @@ const menuItems = computed(() => {
         {
             isDivider: true,
             label: 'Reportes y Analítica',
-            permission: 'REPSeguimiento_Principal || REPConsolidado_Agencias || REPRendimiento_Personal || REPEstado_Garantías_Reales || REPArchivos_Administrativos || REPRetiro_Garantías || REPConfirmación_Física',
+            permission: 'rep_seguimiento_principal || rep_consolidado_agencias || rep_rendimiento_personal || rep_estado_garantías_reales || rep_archivos_administrativos || rep_retiro_garantías_fisica || rep_confirmación_fisica',
         },
         {
             id: 'reportes-gerencia',
             label: 'Reportes CSV',
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />',
-            permission: 'REPSeguimiento_Principal || REPConsolidado_Agencias || REPRendimiento_Personal || REPEstado_Garantías_Reales || REPArchivos_Administrativos || REPRetiro_Garantías || REPConfirmación_Física',
+            permission: 'rep_seguimiento_principal || rep_consolidado_agencias || rep_rendimiento_personal || rep_estado_garantías_reales || rep_archivos_administrativos || rep_retiro_garantías_fisica || rep_confirmación_fisica',
             route: '/admin/reportes'
         },
 
