@@ -330,7 +330,7 @@ const openChangeType = (g: any) => {
 const openCorrectDocumento = (doc: any) => {
     const canOverride = useAuthStore().hasPermission('editar_documentos_restringidos')
 
-    if (doc.nuevos_expedientes_count > 1 && !canOverride) {
+    if (doc.expedientes_asociados_count > 0 && !canOverride) {
         Swal.fire({
             icon: 'warning',
             title: 'Corrección Restringida',

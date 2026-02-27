@@ -290,7 +290,7 @@ const openCorrectDocumento = (doc: any) => {
     // Las correcciones suelen requerir el mismo permiso de anulación si es compartido
     const canOverride = useAuthStore().hasPermission('editar_documentos_restringidos')
 
-    if (doc.nuevos_expedientes_count > 1 && !canOverride) {
+    if (doc.expedientes_asociados_count > 0 && !canOverride) {
         Swal.fire({
             icon: 'warning',
             title: 'Corrección Restringida',
