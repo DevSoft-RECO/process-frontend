@@ -42,10 +42,10 @@
       <ExpedientesTable 
           :expedientes="expedientes"
           :loading="loading"
-          :next-page-url="nextPageUrl"
+          :pagination="pagination"
           :hide-actions="true"
           :finalized-mode="true"
-          @load-more="loadMore"
+          @change-page="(page) => fetchExpedientes(`/nuevos-expedientes/finalizados?page=${page}`)"
           @open-detalles="openDetallesModal"
       />
       <!-- Actions are hidden unless strictly needed, we pass open-detalles just in case user wants to see info -->
@@ -72,7 +72,7 @@
   // State
   const expedientes = ref<any[]>([])
   const loading = ref(false)
-  const nextPageUrl = ref<string | null>(null)
+  const pagination = ref<any | null>(null)
   const search = ref('')
   
   const showDetallesModal = ref(false)
@@ -93,31 +93,28 @@
       let endpoint = url || '/nuevos-expedientes/finalizados'
       
       const separator = endpoint.includes('?') ? '&' : '?'
-      if(search.value) {
+      if(search.value && !endpoint.includes('search=')) {
           endpoint = `${endpoint}${separator}search=${search.value}`
       }
   
       try {
           const response = await api.get(endpoint)
           if (response.data.success) {
-              const pagination = response.data.data
-              
-              if (!url) {
-                  expedientes.value = pagination.data
-              } else {
-                  expedientes.value = [...expedientes.value, ...pagination.data]
-              }
-              nextPageUrl.value = pagination.next_page_url
+              const resData = response.data.data
+              expedientes.value = resData.data
+              pagination.value = {
+                current_page: resData.current_page,
+                last_page: resData.last_page,
+                from: resData.from,
+                to: resData.to,
+                total: resData.total
+            }
           }
       } catch (error) {
           console.error(error)
       } finally {
           loading.value = false
       }
-  }
-  
-  const loadMore = () => {
-      if (nextPageUrl.value) fetchExpedientes(nextPageUrl.value)
   }
   
   const resetFetch = () => {

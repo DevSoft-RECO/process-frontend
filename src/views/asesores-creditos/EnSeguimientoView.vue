@@ -23,11 +23,11 @@
     <ExpedientesTable 
         :expedientes="expedientes"
         :loading="loading"
-        :next-page-url="nextPageUrl"
+        :pagination="pagination"
         @open-adjuntar="openAdjuntarModal"
         @open-detalles="openDetallesModal"
         @open-tracking="openTrackingModal"
-        @load-more="loadMore"
+        @change-page="(page) => fetchExpedientes(`/nuevos-expedientes?page=${page}`)"
     />
 
     <AdjuntarModal 
@@ -65,7 +65,7 @@ import Encabezado from '../../components/common/encabezado.vue'
 
 const expedientes = ref<any[]>([])
 const loading = ref(false)
-const nextPageUrl = ref<string | null>(null)
+const pagination = ref<any | null>(null)
 
 const showAdjuntarModal = ref(false)
 const showDetallesModal = ref(false)
@@ -78,29 +78,28 @@ const fetchExpedientes = async (url: string | null = null) => {
     
     // Filter by 'seguimiento'
     const separator = endpoint.includes('?') ? '&' : '?'
-    endpoint = `${endpoint}${separator}tab=seguimiento`
+    if (!endpoint.includes('tab=')) {
+        endpoint = `${endpoint}${separator}tab=seguimiento`
+    }
 
     try {
         const response = await api.get(endpoint)
         if (response.data.success) {
-            const pagination = response.data.data
-            
-            if (!url) {
-                expedientes.value = pagination.data
-            } else {
-                expedientes.value = [...expedientes.value, ...pagination.data]
+            const resData = response.data.data
+            expedientes.value = resData.data
+            pagination.value = {
+                current_page: resData.current_page,
+                last_page: resData.last_page,
+                from: resData.from,
+                to: resData.to,
+                total: resData.total
             }
-            nextPageUrl.value = pagination.next_page_url
         }
     } catch (error) {
         console.error(error)
     } finally {
         loading.value = false
     }
-}
-
-const loadMore = () => {
-    if (nextPageUrl.value) fetchExpedientes(nextPageUrl.value)
 }
 
 const resetFetch = () => fetchExpedientes(null)

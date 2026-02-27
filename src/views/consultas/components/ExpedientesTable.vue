@@ -13,6 +13,9 @@
                         <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
                             Nombre Asociado
                         </th>
+                        <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
+                            Agencia / Asesor
+                        </th>
                         <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
                             Fecha Desembolso / No. Producto
                         </th>
@@ -27,7 +30,7 @@
 
                 <tbody class="divide-y divide-gray-100 dark:divide-slate-700/50">
                     <tr v-if="loading && expedientes.length === 0">
-                        <td colspan="6" class="px-6 py-12 text-center">
+                        <td colspan="7" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center gap-2">
                                 <div class="w-8 h-8 border-4 border-verde-cope border-t-transparent rounded-full animate-spin"></div>
                                 <span class="text-gray-400 font-medium">Cargando expedientes...</span>
@@ -52,6 +55,17 @@
                         <td class="px-6 py-4 font-medium">
                             <div class="text-slate-900 dark:text-white font-bold">{{ exp.nombre_asociado }}</div>
                             <div class="text-[10px] text-slate-400 uppercase tracking-tighter">Asociado Activo</div>
+                        </td>
+
+                        <td class="px-6 py-4 text-center">
+                            <div class="inline-flex flex-col">
+                                <span class="px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold text-[10px] uppercase mb-1">
+                                    Agencia: {{ exp.id_agencia || '-' }}
+                                </span>
+                                <span class="text-slate-500 dark:text-slate-400 font-medium text-[11px]">
+                                    {{ exp.usuario_asesor || '-' }}
+                                </span>
+                            </div>
                         </td>
                         
                         <td class="px-6 py-4">
@@ -108,25 +122,98 @@
             </table>
         </div>
 
-        <div v-if="nextPageUrl" class="bg-slate-50/50 dark:bg-slate-800/30 px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex justify-center">
-            <button @click="$emit('load-more')" :disabled="loading" 
-                class="text-xs text-azul-cope font-bold hover:text-blue-700 transition-colors uppercase tracking-widest">
-                {{ loading ? 'Sincronizando...' : 'Cargar más registros' }}
-            </button>
+        <!-- Pagination -->
+        <div v-if="pagination && pagination.total > 0" 
+             class="bg-slate-50/50 dark:bg-slate-800/30 px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-4">
+            
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                Mostrando <span class="text-slate-900 dark:text-white font-bold">{{ pagination.from }}</span> 
+                a <span class="text-slate-900 dark:text-white font-bold">{{ pagination.to }}</span> 
+                de <span class="text-slate-900 dark:text-white font-bold">{{ pagination.total }}</span> registros
+            </div>
+
+            <div class="flex items-center gap-1">
+                <!-- Previous -->
+                <button 
+                    @click="$emit('change-page', pagination.current_page - 1)"
+                    :disabled="pagination.current_page === 1 || loading"
+                    class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-azul-cope hover:border-azul-cope disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+
+                <!-- Page Numbers -->
+                <div class="hidden sm:flex items-center gap-1">
+                    <template v-for="page in visiblePages" :key="page">
+                        <button 
+                            v-if="typeof page === 'number'"
+                            @click="$emit('change-page', page)"
+                            :class="[
+                                'min-w-[32px] h-8 px-2 rounded-lg text-xs font-bold transition-all border',
+                                pagination.current_page === page 
+                                    ? 'bg-azul-cope text-white border-azul-cope shadow-sm' 
+                                    : 'bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-azul-cope hover:text-azul-cope'
+                            ]"
+                        >
+                            {{ page }}
+                        </button>
+                        <span v-else class="px-1 text-slate-400">...</span>
+                    </template>
+                </div>
+
+                <!-- Next -->
+                <button 
+                    @click="$emit('change-page', pagination.current_page + 1)"
+                    :disabled="pagination.current_page === pagination.last_page || loading"
+                    class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-azul-cope hover:border-azul-cope disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                </button>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { computed } from 'vue'
+
+const props = defineProps<{
     expedientes: any[]
     loading: boolean
-    nextPageUrl: string | null
+    pagination: any | null // Now accepting the full Laravel pagination object
     hideActions?: boolean
     finalizedMode?: boolean
 }>()
 
-defineEmits(['open-adjuntar', 'open-detalles', 'open-tracking', 'load-more'])
+const emit = defineEmits(['open-adjuntar', 'open-detalles', 'open-tracking', 'change-page'])
+
+// Logic for showing page numbers with ellipses
+const visiblePages = computed(() => {
+    if (!props.pagination) return []
+    
+    const current = props.pagination.current_page
+    const last = props.pagination.last_page
+    const pages: (number | string)[] = []
+    
+    // Always show first
+    pages.push(1)
+    
+    if (current > 3) pages.push('...')
+    
+    // Add pages around current
+    for (let i = Math.max(2, current - 1); i <= Math.min(last - 1, current + 1); i++) {
+        pages.push(i)
+    }
+    
+    if (current < last - 2) pages.push('...')
+    
+    // Always show last if not the only page
+    if (last > 1) {
+        pages.push(last)
+    }
+    
+    return pages
+})
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
