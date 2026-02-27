@@ -418,7 +418,7 @@ const menuItems = computed(() => {
             label: 'Solicitudes Confirmación',
             // Search Circle Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />',
-            permission: 'confirmar_documentos ',
+            permission: 'confirmar_documentos',
             children: [
                 {
                     label: 'Nueva Solicitud',
