@@ -434,7 +434,7 @@ const menuItems = computed(() => {
         // Role: Validator (Validador)
         {
             id: 'validacion-documentos',
-            label: 'Validación Documentos',
+            label: 'Gestion Cof Garantias',
             // Badge Check Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />',
             permission: 'archivo',
@@ -455,27 +455,9 @@ const menuItems = computed(() => {
             label: 'Retiro de Garantías Fisicas',
             permission: 'retiro_garantias || archivo'
         },
-        {
-            id: 'validacion-garantias',
-            label: 'Validación Garantías',
-            // Shield Check Icon
-            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />',
-            permission: 'archivo',
-            children: [
                 {
-                    label: 'Buzón Archivo',
-                    route: '/admin/retiro-garantias/buzon'
-                },
-                {
-                    label: 'Histórico General',
-                    route: '/admin/retiro-garantias/historico-general'
-                }
-            ]
-        },
-        
-        {
             id: 'retiro-garantias',
-            label: 'Retiro de Garantías Fisicas',
+            label: 'Sol Retiro de Garantías',
             // External Link / Logout Icon (symbolizing removal)
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />',
             permission: 'retiro_garantias',
@@ -498,6 +480,23 @@ const menuItems = computed(() => {
                 }
             ]
         },
+        {
+            id: 'validacion-garantias',
+            label: 'Gestion Retiro Garantias',
+            // Shield Check Icon
+            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />',
+            permission: 'archivo',
+            children: [
+                {
+                    label: 'Buzón Archivo',
+                    route: '/admin/retiro-garantias/buzon'
+                },
+                {
+                    label: 'Histórico General',
+                    route: '/admin/retiro-garantias/historico-general'
+                }
+            ]
+        },
 
         {
             isDivider: true,
@@ -506,7 +505,7 @@ const menuItems = computed(() => {
         },
         {
             id: 'retiro-administrativo-agencia',
-            label: 'Retiro doc Administrativo',
+            label: 'Sol Retiro doc Admin',
             // Document Arrow Up Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-3-3v6m-9 1V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2H6a2 2 0 01-2-2z" />',
             permission: 'retiro_doc_administrativo',
@@ -519,7 +518,7 @@ const menuItems = computed(() => {
         },
         {
             id: 'gestion-central-archivo',
-            label: 'Archivo Despacho',
+            label: 'Gestion Doc Admin',
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />',
             permission: 'secretaria_agencia',
             children: [
