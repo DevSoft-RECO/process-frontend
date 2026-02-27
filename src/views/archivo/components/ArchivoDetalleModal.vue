@@ -47,11 +47,12 @@
                     </p>
                   </div>
                   <div v-if="detalle.path_contrato">
-                    <a :href="`${apiUrl}/${detalle.path_contrato}`" target="_blank" 
-                       class="flex items-center justify-center gap-2 w-full p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition shadow-lg">
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                      VER PDF ESCANEADO
-                    </a>
+                    <button @click="verContrato" :disabled="loadingContrato"
+                       class="flex items-center justify-center gap-2 w-full p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                      <svg v-if="!loadingContrato" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                      <svg v-else class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                      {{ loadingContrato ? 'GENERANDO ENLACE...' : 'VER PDF ESCANEADO' }}
+                    </button>
                   </div>
                 </div>
               </section>
@@ -183,7 +184,7 @@
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                 </svg>
                 Confirmar Recepción de Garantía
-            </button>
+             </button>
         </div>
         <div v-else></div> <!-- Spacer -->
 
@@ -198,8 +199,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import api from '@/api/axios'
-
-const apiUrl = import.meta.env.VITE_API_URL
+import Swal from 'sweetalert2'
 
 const props = defineProps<{
   show: boolean
@@ -209,6 +209,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['close', 'confirm-receive'])
 const loading = ref(false)
+const loadingContrato = ref(false)
 const detalle = ref<any>(null)
 
 const fetchDetalle = async () => {
@@ -241,6 +242,29 @@ const close = () => {
 
 const confirmReceive = () => {
     emit('confirm-receive')
+}
+
+const verContrato = async () => {
+  if (!detalle.value?.id_expediente) return
+  
+  loadingContrato.value = true
+  try {
+    const res = await api.get(`/secretaria-credito/ver-contrato/${detalle.value.id_expediente}`)
+    if (res.data.success && res.data.url) {
+      window.open(res.data.url, '_blank')
+    } else {
+        throw new Error(res.data.message || 'Error al obtener URL del contrato.')
+    }
+  } catch (err: any) {
+    console.error("Error obteniendo contrato:", err)
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: err.message || 'No se pudo obtener el acceso al contrato escaneado.'
+    })
+  } finally {
+    loadingContrato.value = false
+  }
 }
 
 const formatCurrency = (amount: any) => {
