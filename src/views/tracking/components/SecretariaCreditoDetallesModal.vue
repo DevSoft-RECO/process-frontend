@@ -172,7 +172,7 @@
                     </div>
                     
                     <!-- Observación Legal -->
-                    <div v-if="isAccepted">
+                    <div v-if="isAccepted || isArchived">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 border-b pb-2 dark:border-gray-700">
                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
@@ -180,25 +180,31 @@
                             Observación Legal
                         </h3>
                          <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Agregar / Editar Observación Legal</label>
-                            <div class="flex gap-2">
-                                <textarea 
-                                    v-model="observacionLegal" 
-                                    rows="2" 
-                                    class="flex-1 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50"
-                                    placeholder="Ingrese observación legal aquí..."
-                                ></textarea>
-                                <button 
-                                    @click="guardarObservacionLegal" 
-                                    :disabled="savingLegal"
-                                    class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2 disabled:opacity-50 h-fit self-end"
-                                >
-                                    <svg v-if="savingLegal" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span v-else>Guardar</span>
-                                </button>
+                            <div v-if="!isArchived">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Agregar / Editar Observación Legal</label>
+                                <div class="flex gap-2">
+                                    <textarea 
+                                        v-model="observacionLegal" 
+                                        rows="2" 
+                                        class="flex-1 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50"
+                                        placeholder="Ingrese observación legal aquí..."
+                                    ></textarea>
+                                    <button 
+                                        @click="guardarObservacionLegal" 
+                                        :disabled="savingLegal"
+                                        class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2 disabled:opacity-50 h-fit self-end"
+                                    >
+                                        <svg v-if="savingLegal" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span v-else>Guardar</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Observación Legal (Lectura)</label>
+                                <p class="text-gray-900 dark:text-gray-100 text-sm italic">{{ observacionLegal || 'Sin observación registrada' }}</p>
                             </div>
                         </div>
                     </div>
@@ -215,7 +221,7 @@
                 <div class="w-full md:w-auto border-l border-gray-300 dark:border-gray-600 mx-2 hidden md:block"></div>
 
                  <!-- Acción: Aceptar / Validar (Visual) -->
-                <button v-if="expediente?.seguimientos?.[0]?.id_estado === 5" @click="handleAction('aceptar')" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
+                <button v-if="expediente?.seguimientos?.[0]?.id_estado === 5 && !isArchived" @click="handleAction('aceptar')" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
@@ -223,7 +229,7 @@
                 </button>
 
                 <!-- Acción: Enviar a Abogado (Visible solo en estado 7) -->
-                <button v-if="expediente?.seguimientos?.[0]?.id_estado === 7" @click="handleAction('enviarAbogado')" class="px-5 py-2.5 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-md transition flex items-center gap-2">
+                <button v-if="expediente?.seguimientos?.[0]?.id_estado === 7 && !isArchived" @click="handleAction('enviarAbogado')" class="px-5 py-2.5 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
                     </svg>
@@ -247,7 +253,7 @@
 
                 <!-- Acción: Finalizar Proceso (Si hay contrato y NO está finalizado) -->
                     <button 
-                        v-if="hasContrato && !isFinalized" 
+                        v-if="hasContrato && !isFinalized && !isArchived" 
                         @click="finalizarProceso" 
                         :class="[
                             'px-5 py-2.5 text-white rounded-lg shadow-md transition flex items-center gap-2',
@@ -262,7 +268,7 @@
                     </button>
 
                 <!-- Acción: Adjuntar (Si es estado 10 y NO tiene contrato y NO está cargando) -->
-                <button v-if="isDevuelto && !hasContrato && !loadingDetalles" @click="adjuntarExpediente" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
+                <button v-if="isDevuelto && !hasContrato && !loadingDetalles && !isArchived" @click="adjuntarExpediente" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
@@ -450,6 +456,10 @@ const esEnviadoAArchivos = computed(() => {
     const latest = detallesData.value.expediente.seguimientos[0];
     // Ajustar según el caso exacto de tu DB ('Si', 'si', etc)
     return latest.enviado_a_archivos === 'Si' || latest.enviado_a_archivos === 'si';
+})
+
+const isArchived = computed(() => {
+    return !!props.expediente?.fechas?.f_enviado_archivos;
 })
 
 // Check if expediente is in "Accepted" state (Assuming state >= 3, or specifically checked for in the acceptance flow)
