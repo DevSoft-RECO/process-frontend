@@ -410,7 +410,7 @@ const menuItems = computed(() => {
         // Role: Requester (Solicitante)
         {
             isDivider: true,
-            label: 'Confirmacion Documentos',
+            label: 'Confirmacion Garantias Fisicas',
             permission: 'confirmar_documentos || archivo'
         },
         {
@@ -452,7 +452,7 @@ const menuItems = computed(() => {
         
         {
             isDivider: true,
-            label: 'Retiro de Garantías',
+            label: 'Retiro de Garantías Fisicas',
             permission: 'retiro_garantias || archivo'
         },
         {
@@ -475,7 +475,7 @@ const menuItems = computed(() => {
         
         {
             id: 'retiro-garantias',
-            label: 'Retiro de Garantías',
+            label: 'Retiro de Garantías Fisicas',
             // External Link / Logout Icon (symbolizing removal)
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />',
             permission: 'retiro_garantias',
@@ -506,7 +506,7 @@ const menuItems = computed(() => {
         },
         {
             id: 'retiro-administrativo-agencia',
-            label: 'Agencia (Solicita)',
+            label: 'Retiro doc Administrativo',
             // Document Arrow Up Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-3-3v6m-9 1V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2H6a2 2 0 01-2-2z" />',
             permission: 'retiro_doc_administrativo',
@@ -519,7 +519,7 @@ const menuItems = computed(() => {
         },
         {
             id: 'gestion-central-archivo',
-            label: 'Central (Despacha)',
+            label: 'Archivo Despacho',
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />',
             permission: 'secretaria_agencia',
             children: [
