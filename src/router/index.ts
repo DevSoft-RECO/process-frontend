@@ -220,37 +220,37 @@ const routes: RouteRecordRaw[] = [
                 path: 'retiro-garantias/buzon',
                 name: 'retiro-garantias-buzon',
                 component: () => import('@/views/retiro-garantias/validacion/BuzonSolicitudesView.vue'),
-                meta: { title: 'Buzón Solicitudes Archivo', permission: 'retiro_garantias' }
+                meta: { title: 'Buzón Solicitudes Archivo', permission: 'archivo' }
             },
             {
                 path: 'retiro-garantias/historico-general',
                 name: 'retiro-garantias-historico-general',
                 component: () => import('@/views/retiro-garantias/validacion/BuzonHistoricoGeneralView.vue'),
-                meta: { title: 'Histórico General Garantías', permission: 'retiro_garantias' }
+                meta: { title: 'Histórico General Garantías', permission: 'archivo' }
             },
             {
                 path: 'retiro-garantias/solicitar',
                 name: 'retiro-garantias-solicitar',
                 component: () => import('@/views/retiro-garantias/solicitud/SolicitudRetiroView.vue'),
-                meta: { title: 'Solicitar Retiro', permission: 'archivo' }
+                meta: { title: 'Solicitar Retiro', permission: 'retiro_garantias' }
             },
             {
                 path: 'retiro-garantias/entrega',
                 name: 'retiro-garantias-entrega',
                 component: () => import('@/views/retiro-garantias/validacion/EntregaGarantiasView.vue'),
-                meta: { title: 'Entrega de Garantías', permission: 'archivo' }
+                meta: { title: 'Entrega de Garantías', permission: 'retiro_garantias' }
             },
             {
                 path: 'retiro-garantias/entregadas',
                 name: 'retiro-garantias-entregadas',
                 component: () => import('@/views/retiro-garantias/validacion/BuzonEntregasView.vue'),
-                meta: { title: 'Buzón Entregas', permission: 'archivo' }
+                meta: { title: 'Buzón Entregas', permission: 'retiro_garantias' }
             },
             {
                 path: 'retiro-garantias/historico-cliente',
                 name: 'retiro-garantias-historico-cliente',
                 component: () => import('@/views/retiro-garantias/solicitud/SolicitudRetiroHistoricoClienteView.vue'),
-                meta: { title: 'Histórico Realizadas', permission: 'archivo' }
+                meta: { title: 'Histórico Realizadas', permission: 'retiro_garantias' }
             },
 
             // ==========================================
