@@ -166,9 +166,11 @@
                                              </button>
                                          </div>
                                      </div>
-                                     <button @click="openEditDocumento(d)" :disabled="d.estado !== 'activo'" class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md text-sm font-medium hover:bg-blue-200 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                                         Editar
-                                     </button>
+                                     <div class="flex gap-2">
+                                         <button @click="openCorrectDocumento(d)" :disabled="d.estado !== 'activo'" class="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-md text-sm font-medium hover:bg-orange-200 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                             Corregir Documento
+                                         </button>
+                                     </div>
                                  </div>
                                  <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 dark:text-gray-300">
                                      <div>
@@ -225,11 +227,11 @@
             @refresh="search"
         />
 
-        <EditDocumentModal
-            v-if="showEditDocumento"
-            :show="showEditDocumento"
+        <CorrectDocumentModal
+            v-if="showCorrectDocumento"
+            :show="showCorrectDocumento"
             :documento="selectedDocumento"
-            @close="showEditDocumento = false"
+            @close="showCorrectDocumento = false"
             @refresh="search"
         />
 
@@ -243,7 +245,7 @@ import { useAuthStore } from '@/stores/auth'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 import EditGarantiaModal from '../tracking/components/EditGarantiaModal.vue'
-import EditDocumentModal from '../tracking/components/EditDocumentModal.vue'
+import CorrectDocumentModal from '../tracking/components/CorrectDocumentModal.vue'
 import ChangeGarantiaTypeModal from '../tracking/components/ChangeGarantiaTypeModal.vue'
 
 const searchQuery = ref('')
@@ -254,7 +256,7 @@ const detallesData = ref<any>(null)
 // Modals State
 const showEditGarantia = ref(false)
 const showChangeType = ref(false)
-const showEditDocumento = ref(false)
+const showCorrectDocumento = ref(false)
 const selectedGarantia = ref<any>(null)
 const selectedDocumento = ref<any>(null)
 const currentExpedienteId = ref<string | null>(null)
@@ -332,11 +334,21 @@ const openChangeType = (g: any) => {
     showChangeType.value = true
 }
 
-const openEditDocumento = (doc: any) => {
-    // La restricción de agencia ya se maneja en el backend.
-    // Se elimina la restricción de documentos compartidos para esta vista.
+const openCorrectDocumento = (doc: any) => {
+    // Las correcciones suelen requerir el mismo permiso de anulación si es compartido
+    const canOverride = useAuthStore().hasPermission('editar_documentos_restringidos')
+
+    if (doc.nuevos_expedientes_count > 1 && !canOverride) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Corrección Restringida',
+            text: 'Este documento compartido requiere autorización de Informática para ser corregido masivamente.',
+            confirmButtonText: 'Entendido'
+        })
+        return
+    }
     selectedDocumento.value = doc
-    showEditDocumento.value = true
+    showCorrectDocumento.value = true
 }
 
 const showSharedExpedientes = async (docId: number) => {
