@@ -17,7 +17,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12 w-full items-start animate-fade-in">
       
       <!-- Export Seguimiento General (Emerald) -->
-      <div v-if="hasRequiredPermission('REPSeguimiento_Principal')"
+      <div v-if="hasRequiredPermission('rep_seguimiento_principal')"
            class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(16,185,129,0.5)]"
          :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
          @click="reportStore.requestSegaCSV()"
@@ -56,7 +56,7 @@
       </div>
       
       <!-- Export General Agencias (Blue) -->
-      <div v-if="hasRequiredPermission('REPConsolidado_Agencias')"
+      <div v-if="hasRequiredPermission('rep_consolidado_agencias')"
            class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.5)]"
          :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
          @click="isModalOpen = true"
@@ -95,7 +95,7 @@
       </div>
 
       <!-- Export General (Asesor Logueado) (Purple) -->
-      <div v-if="hasRequiredPermission('REPRendimiento_Personal')"
+      <div v-if="hasRequiredPermission('rep_rendimiento_personal')"
            class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(139,92,246,0.5)]"
          :class="{'pointer-events-none opacity-80': reportStore.isRequesting || (!authStore.user?.username && !authStore.user?.name)}"
          @click="dispararReporteAsesor"
@@ -134,7 +134,7 @@
       </div>
 
       <!-- Export Documentos Generales (Garantías) (Orange) -->
-      <div v-if="hasRequiredPermission('REPEstado_Garantías_Reales')"
+      <div v-if="hasRequiredPermission('rep_estado_garantías_reales')"
            class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(249,115,22,0.5)]"
          :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
          @click="dispararReporteDocumentos"
@@ -173,7 +173,7 @@
       </div>
 
       <!-- Export Préstamos de Expedientes (Solicitudes Admin) (Sky) -->
-      <div v-if="hasRequiredPermission('REPArchivos_Administrativos')"
+      <div v-if="hasRequiredPermission('rep_archivos_administrativos')"
            class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(14,165,233,0.5)]"
          :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
          @click="dispararReporteSolicitudesAdmin"
@@ -212,7 +212,7 @@
       </div>
 
     <!-- Export Retiro de Garantías (Solicitudes de Retiro) (Red) -->
-      <div v-if="hasRequiredPermission('REPRetiro_Garantías')"
+      <div v-if="hasRequiredPermission('rep_retiro_garantías_fisica')"
            class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(244,63,94,0.5)]"
          :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
          @click="dispararReporteSolicitudesRetiro"
@@ -251,7 +251,7 @@
       </div>
 
     <!-- Export Confirmacion de Documentos (Teal) -->
-      <div v-if="hasRequiredPermission('REPConfirmación_Física')"
+      <div v-if="hasRequiredPermission('rep_confirmación_fisica')"
            class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(20,184,166,0.5)]"
          :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
          @click="dispararReporteConfirmaciones"
