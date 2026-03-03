@@ -269,7 +269,11 @@ const formatCurrency = (amount: number) => {
 
 const formatDate = (dateStr: string) => {
     if (!dateStr) return '-'
-    return new Date(dateStr).toLocaleDateString('es-GT')
+    if (dateStr.length === 10) {
+        return new Date(dateStr + 'T00:00:00').toLocaleDateString()
+    }
+    const date = new Date(dateStr)
+    return isNaN(date.getTime()) ? dateStr : date.toLocaleDateString()
 }
 
 onMounted(() => {

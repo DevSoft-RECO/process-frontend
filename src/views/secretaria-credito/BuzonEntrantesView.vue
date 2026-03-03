@@ -131,10 +131,7 @@
 
                              <td class="px-6 py-4 text-center">
                                 <div class="text-slate-600 dark:text-slate-300 font-medium text-xs">
-                                    {{ exp.fechas?.f_enviado_protocolos ? new Date(exp.fechas.f_enviado_protocolos).toLocaleDateString() : 'N/A' }}
-                                </div>
-                                <div v-if="exp.fechas?.f_enviado_protocolos" class="text-[10px] text-slate-400 mt-0.5">
-                                    {{ new Date(exp.fechas.f_enviado_protocolos).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }}
+                                    {{ exp.fechas?.f_enviado_protocolos ? formatDateTime(exp.fechas.f_enviado_protocolos) : 'N/A' }}
                                 </div>
                             </td>
 
@@ -304,12 +301,18 @@ const formatCurrency = (amount: number) => {
 
 const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A'
-    // If it already has time info (has 'T' or seems to be full date), don't append.
-    // Assuming YYYY-MM-DD from backend for dates without time.
-    if (dateString.includes('T')) {
-         return new Date(dateString).toLocaleDateString('es-ES')
+    if (dateString.length === 10) {
+        return new Date(dateString + 'T00:00:00').toLocaleDateString('es-ES')
     }
-    return new Date(dateString + 'T00:00:00').toLocaleDateString('es-ES')
+    const date = new Date(dateString)
+    return isNaN(date.getTime()) ? dateString : date.toLocaleDateString()
+}
+
+const formatDateTime = (dateString: string) => {
+    if (!dateString) return 'N/A'
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return dateString
+    return date.toLocaleDateString('es-ES') + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
 }
 
 const openDetails = (expediente: any) => {

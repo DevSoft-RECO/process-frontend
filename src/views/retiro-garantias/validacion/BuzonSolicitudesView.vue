@@ -61,7 +61,7 @@
             </tr>
             <tr v-for="req in requests" :key="req.id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                  <div class="text-gray-900 font-medium">{{ formatDate(req.fecha_solicitud) }}</div>
+                  <div class="text-gray-900 font-medium">{{ formatDateTime(req.fecha_solicitud) }}</div>
                   <div class="mt-1">
                       <span v-if="req.id_expediente" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                           Sistema
@@ -81,7 +81,7 @@
               <td class="px-6 py-4 text-sm">
                 <div class="font-bold text-gray-900 truncate max-w-[200px]" :title="req.numero_documento">{{ req.numero_documento }}</div>
                 <div class="text-xs text-gray-500 mt-1" v-if="req.fecha_documento">
-                    <i class="far fa-calendar-alt"></i> {{ new Date(req.fecha_documento).toLocaleDateString() }}
+                    <i class="far fa-calendar-alt"></i> {{ formatDate(req.fecha_documento) }}
                 </div>
                 <div class="text-gray-500 text-xs truncate max-w-[200px]" :title="req.titulo_nombre">{{ req.titulo_nombre }}</div>
               </td>
@@ -175,7 +175,7 @@
                   </div>
                   <div>
                     <span class="block text-xs font-bold text-gray-500 uppercase">Fecha del Documento</span>
-                    <span class="text-gray-900">{{ currentRequest?.fecha_documento ? new Date(currentRequest.fecha_documento).toLocaleDateString() : 'N/A' }}</span>
+                    <span class="text-gray-900">{{ formatDate(currentRequest.fecha_documento) }}</span>
                   </div>
                </div>
                
@@ -469,8 +469,7 @@ const dispatchRequest = async (req) => {
 
 const returnToArchive = async (req) => {
     // Intentar obtener la fecha del documento si está disponible, sino usar la de la solicitud, o 'N/A'
-    const docDate = req.documento?.fecha ? new Date(req.documento.fecha).toLocaleDateString() : 
-                    (req.fecha_solicitud ? new Date(req.fecha_solicitud).toLocaleDateString() : 'N/A');
+    const docDate = formatDate(req.documento?.fecha || req.fecha_solicitud);
 
     const result = await Swal.fire({
         title: '¿Reingresar al Archivo?',
@@ -497,8 +496,7 @@ const returnToArchive = async (req) => {
 
 const confirmReturn = async (req) => {
     // Intentar obtener la fecha del documento si está disponible, sino usar la de la solicitud, o 'N/A'
-    const docDate = req.documento?.fecha ? new Date(req.documento.fecha).toLocaleDateString() : 
-                    (req.fecha_solicitud ? new Date(req.fecha_solicitud).toLocaleDateString() : 'N/A');
+    const docDate = formatDate(req.documento?.fecha || req.fecha_solicitud);
 
     const result = await Swal.fire({
         title: '¿Confirmar Reingreso?',
@@ -538,7 +536,17 @@ const getStatusLabel = (status) => {
 
 const formatDate = (dateString) => {
   if (!dateString) return '-';
+  if (dateString.length === 10) {
+      return new Date(dateString + 'T00:00:00').toLocaleDateString();
+  }
   const date = new Date(dateString);
+  return isNaN(date.getTime()) ? dateString : date.toLocaleDateString();
+};
+
+const formatDateTime = (dateString) => {
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return dateString;
   return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 };
 

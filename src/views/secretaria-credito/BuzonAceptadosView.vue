@@ -118,10 +118,7 @@
 
                              <td class="px-6 py-4 text-center">
                                 <div class="text-slate-600 dark:text-slate-300 font-medium text-xs">
-                                    {{ exp.fechas?.f_aceptado_secretaria_credito ? new Date(exp.fechas.f_aceptado_secretaria_credito).toLocaleDateString() : 'N/A' }}
-                                </div>
-                                <div v-if="exp.fechas?.f_aceptado_secretaria_credito" class="text-[12px] text-slate-400 mt-0.5">
-                                    {{ new Date(exp.fechas.f_aceptado_secretaria_credito).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }}
+                                    {{ exp.fechas?.f_aceptado_secretaria_credito ? formatDateTime(exp.fechas.f_aceptado_secretaria_credito) : 'N/A' }}
                                 </div>
                             </td>
 
@@ -291,10 +288,18 @@ const formatCurrency = (amount: number) => {
 
 const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A'
-    if (dateString.includes('T')) {
-         return new Date(dateString).toLocaleDateString('es-ES')
+    if (dateString.length === 10) {
+        return new Date(dateString + 'T00:00:00').toLocaleDateString('es-ES')
     }
-    return new Date(dateString + 'T00:00:00').toLocaleDateString('es-ES')
+    const date = new Date(dateString)
+    return isNaN(date.getTime()) ? dateString : date.toLocaleDateString()
+}
+
+const formatDateTime = (dateString: string) => {
+    if (!dateString) return 'N/A'
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return dateString
+    return date.toLocaleDateString('es-ES') + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
 }
 
 const openDetails = (expediente: any) => {

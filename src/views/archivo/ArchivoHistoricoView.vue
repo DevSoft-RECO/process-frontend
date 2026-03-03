@@ -385,7 +385,12 @@ const formatCurrency = (amount: number) => {
 
 const formatDate = (dateStr: string) => {
     if (!dateStr) return '-'
-    return new Date(dateStr).toLocaleDateString('es-GT')
+    // Si la fecha viene como YYYY-MM-DD (10 caracteres), forzar hora local
+    if (dateStr.length === 10) {
+        return new Date(dateStr + 'T00:00:00').toLocaleDateString()
+    }
+    const date = new Date(dateStr)
+    return isNaN(date.getTime()) ? dateStr : date.toLocaleDateString('es-GT')
 }
 
 onMounted(() => {

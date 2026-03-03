@@ -30,7 +30,7 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.solicitante?.name || 'N/A' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   <div>{{ item.numero_documento }}</div>
-                  <div class="text-xs text-gray-500 font-normal">Fecha doc: {{ item.fecha_documento ? new Date(item.fecha_documento).toLocaleDateString() : 'N/A' }}</div>
+                  <div class="text-xs text-gray-500 font-normal">Fecha doc: {{ formatDate(item.fecha_documento) }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.titulo_nombre }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -143,7 +143,17 @@ const loadItems = async (page = 1) => {
 
 const formatDate = (dateString) => {
   if (!dateString) return '-';
+  if (dateString.length === 10) {
+      return new Date(dateString + 'T00:00:00').toLocaleDateString();
+  }
   const date = new Date(dateString);
+  return isNaN(date.getTime()) ? dateString : date.toLocaleDateString();
+};
+
+const formatDateTime = (dateString) => {
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return dateString;
   return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 };
 

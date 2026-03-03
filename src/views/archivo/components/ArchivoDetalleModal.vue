@@ -129,8 +129,7 @@
                             <p class="font-semibold dark:text-gray-200">{{ doc.numero || '-' }}</p>
                         </div>
                         <div>
-                            <p class="text-xs text-gray-500">Fecha de Documento:</p>
-                            <p class="font-semibold dark:text-gray-200">{{ doc.fecha ? new Date(doc.fecha).toLocaleDateString() : '-' }}</p>
+                            <p class="font-semibold dark:text-gray-200">{{ formatDate(doc.fecha) }}</p>
                         </div>
                         <div>
                             <p class="text-xs text-gray-500">Monto Póliza:</p>
@@ -270,6 +269,15 @@ const verContrato = async () => {
 const formatCurrency = (amount: any) => {
   if (!amount) return '-'
   return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(Number(amount))
+}
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return '-'
+  if (dateString.length === 10) {
+    return new Date(dateString + 'T00:00:00').toLocaleDateString('es-ES')
+  }
+  const date = new Date(dateString)
+  return isNaN(date.getTime()) ? dateString : date.toLocaleDateString()
 }
 </script>
 

@@ -204,11 +204,27 @@ const closeDetails = () => {
 
 const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A'
-    return new Date(dateString).toLocaleDateString()
+    if (dateString.length === 10) {
+        return new Date(dateString + 'T00:00:00').toLocaleDateString('es-ES')
+    }
+    const date = new Date(dateString)
+    return isNaN(date.getTime()) ? dateString : date.toLocaleDateString()
+}
+
+const formatDateTime = (dateString: string) => {
+    if (!dateString) return 'N/A'
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return dateString
+    return date.toLocaleDateString('es-ES') + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
 }
 
 const timeAgo = (dateString: string) => {
     if (!dateString) return ''
-    return formatDistanceToNow(new Date(dateString), { addSuffix: false, locale: es })
+    // Use local parsing for timeAgo as well if it's just a date
+    let date = new Date(dateString)
+    if (dateString.length === 10) {
+        date = new Date(dateString + 'T00:00:00')
+    }
+    return formatDistanceToNow(date, { addSuffix: false, locale: es })
 }
 </script>
