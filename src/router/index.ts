@@ -372,6 +372,13 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/admin/configuracion/EditarConfirmacionGarantiasView.vue'),
                 meta: { title: 'Edición Confirmación Garantías' }
             },
+            {
+                path: 'configuracion/gestion-lotes',
+                name: 'admin-gestion-lotes',
+                component: () => import('@/views/admin/configuracion/GestionLotesView.vue'),
+                meta: { title: 'Gestión de Lotes' }
+            },
+
 
             // ==========================================
             // MÓDULO: REPORTES

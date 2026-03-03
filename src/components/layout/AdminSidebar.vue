@@ -619,9 +619,14 @@ const menuItems = computed(() => {
                 {
                     label: 'Edición Confirmación Garantías',
                     route: '/admin/configuracion/editar-confirmacion-garantias'
+                },
+                {
+                    label: 'Gestión de Lotes (Importación)',
+                    route: '/admin/configuracion/gestion-lotes'
                 }
             ]
         },
+
         
 
         {
