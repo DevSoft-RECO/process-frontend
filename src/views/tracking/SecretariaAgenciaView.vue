@@ -60,6 +60,9 @@
                         <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
                             Desembolso / Producto
                         </th>
+                        <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
+                            Agencia / Asesor
+                        </th>
                         <th scope="col" class="w-32 px-2 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
                             <span v-if="activeTab === 'buzon'">Recibido</span>
                             <span v-else-if="activeTab === 'regresados'">Retorno</span>
@@ -76,7 +79,7 @@
 
                 <tbody class="divide-y divide-gray-100 dark:divide-slate-700/50">
                     <tr v-if="loading && expedientes.length === 0">
-                        <td colspan="8" class="px-6 py-12 text-center text-slate-400">
+                        <td colspan="9" class="px-6 py-12 text-center text-slate-400">
                             <div class="flex flex-col items-center gap-2">
                                 <div class="w-8 h-8 border-4 border-verde-cope border-t-transparent rounded-full animate-spin"></div>
                                 <span class="font-medium text-xs">Cargando datos...</span>
@@ -116,6 +119,11 @@
                             <div class="text-[10px] text-naranja-cope font-bold mt-0.5 uppercase italic">
                                 Prod: #{{ exp.numero_documento || exp.id }}
                             </div>
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <div class="text-slate-700 dark:text-slate-200 font-semibold text-xs">Agencia: {{ exp.id_agencia }}</div>
+                            <div class="text-[13px] font-mono text-slate-400 dark:text-slate-500 mt-0.5 tracking-tighter">{{ exp.usuario_asesor || '---' }}</div>
                         </td>
 
                         <td class="px-2 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase text-center">
@@ -181,6 +189,8 @@ interface Expediente {
     tasa_interes: number;
     fecha_inicio: string;
     numero_documento: string;
+    id_agencia: number;
+    usuario_asesor: string;
     fechas: {
         f_enviado_secretaria: string | null;
         f_retorno_asesores: string | null;
