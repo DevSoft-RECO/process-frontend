@@ -113,7 +113,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-900 dark:text-white">
-                                        {{ formatDate(expediente.fechas?.f_enviado_abogado) }}
+                                        {{ formatDateTime(expediente.fechas?.f_enviado_abogado) }}
                                     </div>
                                     <div class="text-xs text-gray-500">
                                         Hace {{ timeAgo(expediente.fechas?.f_enviado_abogado) }}
@@ -200,15 +200,6 @@ const openDetails = (expediente: any) => {
 const closeDetails = () => {
     showModal.value = false
     selectedExpediente.value = null
-}
-
-const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A'
-    if (dateString.length === 10) {
-        return new Date(dateString + 'T00:00:00').toLocaleDateString('es-ES')
-    }
-    const date = new Date(dateString)
-    return isNaN(date.getTime()) ? dateString : date.toLocaleDateString()
 }
 
 const formatDateTime = (dateString: string) => {
