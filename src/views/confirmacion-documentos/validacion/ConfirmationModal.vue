@@ -176,7 +176,7 @@
           
            <!-- Validation Comments -->
           <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Observación de Confirmación</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Observación de Confirmación (Opcional)</label>
               <textarea v-model="validationObservation" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" rows="2" placeholder="Detalles de la validación física..."></textarea>
           </div>
 
