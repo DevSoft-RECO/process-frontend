@@ -19,8 +19,39 @@
                     </p>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <div class="relative group">
+                <div class="flex flex-col sm:flex-row items-end gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Fecha Inicio</label>
+                        <input 
+                            v-model="startDate" 
+                            type="date" 
+                            class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
+                        >
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Fecha Fin</label>
+                        <input 
+                            v-model="endDate" 
+                            type="date" 
+                            class="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
+                        >
+                    </div>
+                    <button 
+                        @click="fetchExpedientes"
+                        class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center"
+                        title="Filtrar por fechas"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </button>
+                    <button 
+                        @click="downloadCSV"
+                        :disabled="expedientes.length === 0"
+                        class="px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-sm font-bold transition-all shadow-sm hover:shadow-md flex items-center gap-2 disabled:opacity-50"
+                    >
+                        <i class="fas fa-file-csv"></i>
+                        Excel/CSV
+                    </button>
+                    <div class="relative group ml-4">
                          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-4 w-4 text-gray-400 group-hover:text-emerald-500 transition-colors" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
@@ -114,6 +145,8 @@ import { formatDistanceToNow } from 'date-fns'
 const expedientes = ref<any[]>([])
 const loading = ref(true)
 const search = ref('')
+const startDate = ref('')
+const endDate = ref('')
 
 onMounted(() => {
     fetchExpedientes()
@@ -122,11 +155,13 @@ onMounted(() => {
 const fetchExpedientes = async () => {
     loading.value = true
     try {
-        const res = await api.get('/abogado/devueltos')
+        const res = await api.get('/abogado/devueltos', {
+            params: {
+                fecha_inicio: startDate.value,
+                fecha_fin: endDate.value
+            }
+        })
         
-        // Laravel Paginate devuelve los datos en la propiedad 'data'
-        // Si tu controlador devuelve return response()->json($expedientes), 
-        // entonces el array está en res.data.data
         if (res.data && res.data.data) {
             expedientes.value = res.data.data
         } else {
@@ -137,6 +172,28 @@ const fetchExpedientes = async () => {
         expedientes.value = []
     } finally {
         loading.value = false
+    }
+}
+
+const downloadCSV = async () => {
+    try {
+        const response = await api.get('/abogado/exportar-devueltos-csv', {
+            params: {
+                fecha_inicio: startDate.value,
+                fecha_fin: endDate.value
+            },
+            responseType: 'blob'
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `expedientes_devueltos_${new Date().getTime()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error("Error descargando CSV:", error);
     }
 }
 
