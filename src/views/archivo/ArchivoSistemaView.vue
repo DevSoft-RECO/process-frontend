@@ -130,10 +130,54 @@
             </div>
 
             <!-- Pagination -->
-            <div v-if="nextPageUrl" class="bg-slate-50/50 dark:bg-slate-800/30 px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex justify-center">
-                 <button @click="loadMore" :disabled="loading" class="text-sm text-azul-cope font-bold hover:text-blue-800 transition-colors">
-                    {{ loading ? 'Cargando...' : 'Cargar más registros' }}
-                </button>
+            <div v-if="pagination.last_page > 1" class="bg-slate-50/50 dark:bg-slate-800/30 px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-xs text-gray-500 dark:text-gray-400">
+                    Mostrando <span class="font-bold text-slate-700 dark:text-slate-200">{{ pagination.from }}</span> a <span class="font-bold text-slate-700 dark:text-slate-200">{{ pagination.to }}</span> de <span class="font-bold text-slate-700 dark:text-slate-200">{{ pagination.total }}</span> registros
+                </div>
+                
+                <nav class="inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                    <button 
+                        @click="goToPage(pagination.current_page - 1)"
+                        :disabled="pagination.current_page === 1 || loading"
+                        class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed dark:ring-gray-600 dark:hover:bg-gray-800"
+                    >
+                        <span class="sr-only">Anterior</span>
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    
+                    <template v-for="page in displayedPages" :key="page">
+                        <button 
+                            v-if="page !== '...'"
+                            @click="goToPage(page as number)"
+                            :class="[
+                                pagination.current_page === page 
+                                    ? 'relative z-10 inline-flex items-center bg-azul-cope px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul-cope' 
+                                    : 'relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 dark:text-gray-200 dark:ring-gray-600 dark:hover:bg-gray-800'
+                            ]"
+                        >
+                            {{ page }}
+                        </button>
+                        <span 
+                            v-else
+                            class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0 dark:text-gray-400 dark:ring-gray-600"
+                        >
+                            ...
+                        </span>
+                    </template>
+
+                    <button 
+                        @click="goToPage(pagination.current_page + 1)"
+                        :disabled="pagination.current_page === pagination.last_page || loading"
+                        class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed dark:ring-gray-600 dark:hover:bg-gray-800"
+                    >
+                        <span class="sr-only">Siguiente</span>
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </nav>
             </div>
         </div>
 
@@ -174,23 +218,33 @@ interface Expediente {
 
 const expedientes = ref<Expediente[]>([])
 const loading = ref(false)
-const nextPageUrl = ref<string | null>(null)
+const pagination = ref({
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+    from: 0,
+    to: 0
+})
 const showModal = ref(false)
 const selectedId = ref<number | null>(null)
 
-const fetchExpedientes = async (url: string | null = null) => {
+const fetchExpedientes = async (page: number = 1) => {
     loading.value = true
     try {
-        const endpoint = url || '/archivo/sistema'
-        const res = await api.get(endpoint)
+        const response = await api.get('/archivo/sistema', {
+            params: { page }
+        })
 
-        if (res.data.success) {
-            if (!url) {
-                expedientes.value = res.data.data.data
-            } else {
-                expedientes.value = [...expedientes.value, ...res.data.data.data]
+        if (response.data.success) {
+            const resData = response.data.data
+            expedientes.value = resData.data
+            pagination.value = {
+                current_page: resData.current_page,
+                last_page: resData.last_page,
+                total: resData.total,
+                from: resData.from,
+                to: resData.to
             }
-            nextPageUrl.value = res.data.data.next_page_url
         }
     } catch (error) {
         console.error(error)
@@ -200,9 +254,42 @@ const fetchExpedientes = async (url: string | null = null) => {
     }
 }
 
-const loadMore = () => {
-    if (nextPageUrl.value) fetchExpedientes(nextPageUrl.value)
+const goToPage = (page: number) => {
+    if (page >= 1 && page <= pagination.value.last_page && !loading.value) {
+        fetchExpedientes(page)
+    }
 }
+
+// Compute displayed pages for pagination
+import { computed } from 'vue'
+const displayedPages = computed(() => {
+    const current = pagination.value.current_page
+    const last = pagination.value.last_page
+    const delta = 2
+    const range = []
+    const rangeWithDots = []
+    let l
+
+    for (let i = 1; i <= last; i++) {
+        if (i === 1 || i === last || (i >= current - delta && i <= current + delta)) {
+            range.push(i)
+        }
+    }
+
+    for (const i of range) {
+        if (l) {
+            if (i - l === 2) {
+                rangeWithDots.push(l + 1)
+            } else if (i - l !== 1) {
+                rangeWithDots.push('...')
+            }
+        }
+        rangeWithDots.push(i)
+        l = i
+    }
+
+    return rangeWithDots
+})
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
