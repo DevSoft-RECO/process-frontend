@@ -120,13 +120,18 @@ const loadHistory = async () => {
 
 const formatDate = (dateString) => {
     if (!dateString) return '-';
+    // Si la fecha viene como YYYY-MM-DD (10 caracteres), forzar hora local
+    if (dateString.length === 10) {
+        return new Date(dateString + 'T00:00:00').toLocaleDateString();
+    }
     const date = new Date(dateString);
-    return date.toLocaleDateString();
+    return isNaN(date) ? dateString : date.toLocaleDateString();
 };
 
 const formatDateTime = (dateString) => {
     if (!dateString) return '-';
     const date = new Date(dateString);
+    if (isNaN(date)) return dateString;
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 };
 

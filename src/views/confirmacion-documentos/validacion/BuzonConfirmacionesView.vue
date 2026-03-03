@@ -113,7 +113,10 @@ const loadRequests = async () => {
 
 const formatDate = (dateString) => {
     if (!dateString) return '-';
-    // Handle both YYYY-MM-DD and ISO string
+    // Si la fecha viene como YYYY-MM-DD (10 caracteres), forzar hora local
+    if (dateString.length === 10) {
+        return new Date(dateString + 'T00:00:00').toLocaleDateString();
+    }
     const date = new Date(dateString);
     if (isNaN(date)) return dateString;
     return date.toLocaleDateString(); 
@@ -122,6 +125,7 @@ const formatDate = (dateString) => {
 const formatDateTime = (dateString) => {
     if (!dateString) return '-';
     const date = new Date(dateString);
+    if (isNaN(date)) return dateString;
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 };
 
