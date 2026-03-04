@@ -55,6 +55,9 @@
                             <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
                                 Nombre Asociado
                             </th>
+                            <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
+                                Agencia / Asesor
+                            </th>
                             <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
                                 Monto / Tasa
                             </th>
@@ -101,6 +104,16 @@
 
                             <td class="px-6 py-4 font-medium text-slate-900 dark:text-white">
                                 {{ exp.nombre_asociado }}
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                            <div class="inline-flex flex-col">
+                                <span class="px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold text-[10px] uppercase mb-1">
+                                    Agencia: {{ exp.id_agencia || '-' }}
+                                </span>
+                                <span class="text-slate-500 dark:text-slate-400 font-medium text-[11px]">
+                                    {{ exp.usuario_asesor || '-' }}
+                                </span>
+                            </div>
                             </td>
 
                             <td class="px-6 py-4">
@@ -221,6 +234,8 @@ interface Expediente {
     id: number;
     codigo_cliente: string;
     nombre_asociado: string;
+    id_agencia: string;
+    usuario_asesor: string;
     monto_documento: number;
     cui: string;
     tasa_interes: number;
