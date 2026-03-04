@@ -378,6 +378,12 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/admin/configuracion/GestionLotesView.vue'),
                 meta: { title: 'Gestión de Lotes' }
             },
+            {
+                path: 'configuracion/desvincular-garantias',
+                name: 'admin-desvincular-garantias',
+                component: () => import('@/views/admin/configuracion/DesvincularGarantiasView.vue'),
+                meta: { title: 'Desvincular Garantías', permission: 'ajustes' }
+            },
 
 
             // ==========================================

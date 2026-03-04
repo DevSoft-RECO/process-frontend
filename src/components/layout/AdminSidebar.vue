@@ -623,11 +623,14 @@ const menuItems = computed(() => {
                 {
                     label: 'Gestión de Lotes (Importación)',
                     route: '/admin/configuracion/gestion-lotes'
+                },
+                {
+                    label: 'Desvincular Garantías',
+                    route: '/admin/configuracion/desvincular-garantias',
+                    permission: 'ajustes'
                 }
             ]
         },
-
-        
 
         {
             isDivider: true,
