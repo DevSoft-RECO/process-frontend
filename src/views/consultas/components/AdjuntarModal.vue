@@ -45,16 +45,16 @@
             <div class="overflow-y-auto flex-1 p-1">
                 <div v-if="activeTab === 'garantia'">
                     <GarantiaPanel 
-                        :expediente="expediente"
+                        :expediente="localExpediente"
                         @close="close"
-                        @saved="$emit('saved')"
+                        @saved="handleSaved"
                     />
                 </div>
                 <div v-if="activeTab === 'documento'">
                     <DocumentoPanel 
-                        :expediente="expediente"
+                        :expediente="localExpediente"
                         @close="close"
-                        @saved="$emit('saved')"
+                        @saved="handleSaved"
                     />
                 </div>
             </div>
@@ -66,6 +66,7 @@
 import { ref, watch } from 'vue'
 import GarantiaPanel from './GarantiaPanel.vue'
 import DocumentoPanel from './DocumentoPanel.vue'
+import api from '@/api/axios'
 
 const props = defineProps<{
     show: boolean
@@ -76,6 +77,11 @@ const props = defineProps<{
 const emit = defineEmits(['close', 'saved'])
 
 const activeTab = ref<'garantia' | 'documento'>('garantia')
+const localExpediente = ref<any>(null)
+
+watch(() => props.expediente, (newVal) => {
+    localExpediente.value = newVal
+}, { immediate: true })
 
 watch(() => props.show, (newVal) => {
     if (newVal) {
@@ -87,6 +93,23 @@ watch(() => props.show, (newVal) => {
         }
     }
 })
+
+const refreshExpedienteData = async () => {
+    if (!localExpediente.value?.id) return
+    try {
+        const res = await api.get(`/nuevos-expedientes/${localExpediente.value.id}/detalles`)
+        if (res.data.success && res.data.data) {
+            localExpediente.value = res.data.data
+        }
+    } catch (e) {
+        console.error("Error updating local expediente in modal", e)
+    }
+}
+
+const handleSaved = async () => {
+    await refreshExpedienteData()
+    emit('saved')
+}
 
 const close = () => {
     emit('close')
