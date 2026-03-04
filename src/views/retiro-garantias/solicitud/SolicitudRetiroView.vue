@@ -68,6 +68,9 @@
                               <span v-if="doc.tiene_otros_activos" class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded font-bold cursor-help" title="Amarrado a otros expedientes activos">
                                   <i class="fas fa-link"></i> Vinculado a otros
                               </span>
+                              <span v-if="doc.estado_fisico !== 'activo'" class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded font-bold">
+                                  <i class="fas fa-box"></i> Estado Físico: {{ (doc.estado_fisico || 'N/A').toUpperCase() }}
+                              </span>
                           </div>
                           <div class="text-sm text-gray-600 mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1">
                               <p><span class="font-semibold text-gray-700">Tipo:</span> {{ doc.tipo_documento?.nombre || 'N/A' }}</p>
@@ -85,11 +88,16 @@
                       <div class="flex flex-col space-y-2">
                            <button 
                               @click="selectDocument(doc)"
-                              class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
-                              :class="{'bg-green-600 hover:bg-green-700': formData.numero_documento === doc.numero}"
+                              class="text-white px-3 py-1 rounded text-sm transition-colors"
+                              :class="{
+                                  'bg-green-600 hover:bg-green-700': formData.numero_documento === doc.numero,
+                                  'bg-blue-600 hover:bg-blue-700': formData.numero_documento !== doc.numero && doc.estado_fisico === 'activo',
+                                  'bg-gray-400 cursor-not-allowed': doc.estado_fisico !== 'activo'
+                              }"
+                              :disabled="doc.estado_fisico !== 'activo'"
                            >
-                              <i class="fas" :class="formData.numero_documento === doc.numero ? 'fa-check' : 'fa-hand-pointer'"></i>
-                              {{ formData.numero_documento === doc.numero ? 'Seleccionado' : 'Seleccionar' }}
+                              <i class="fas" :class="formData.numero_documento === doc.numero ? 'fa-check' : (doc.estado_fisico === 'activo' ? 'fa-hand-pointer' : 'fa-lock')"></i>
+                              {{ formData.numero_documento === doc.numero ? 'Seleccionado' : (doc.estado_fisico === 'activo' ? 'Seleccionar' : 'No Disponible') }}
                            </button>
 
                            <button 
@@ -159,13 +167,17 @@
           <label class="block text-sm font-medium text-gray-700">Tipo de Retiro</label>
           <select 
             v-model="formData.tipo_retiro" 
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-white"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-white disabled:bg-gray-100 disabled:text-gray-500"
+            :disabled="!formData.numero_documento"
           >
-            <option value="Temporal">Temporal</option>
+            <option value="Temporal" :disabled="isTemporalDisabled">Temporal</option>
             <option value="Definitivo" :disabled="isSelectionLinked">Definitivo</option>
           </select>
-          <p v-if="isSelectionLinked" class="text-xs text-red-600 mt-1">
-             * Retiro definitivo no permitido por vinculación activa.
+          <p v-if="isSelectionLinked && !isManual" class="text-xs text-red-600 mt-1">
+             * Retiro definitivo no permitido por vinculaciones activas.
+          </p>
+          <p v-if="isTemporalDisabled && !isManual" class="text-xs text-blue-600 mt-1">
+             * Retiro temporal bloqueado. No posee vinculaciones activas.
           </p>
         </div>
       </div>
@@ -527,8 +539,7 @@ const searchDocument = async () => {
        Swal.fire({
          icon: 'error',
          title: 'Operación Bloqueada',
-         text: response.data.message,
-         footer: 'El expediente no tiene garantías asociadas o no existe seguimiento.'
+         text: response.data.message
        });
        return;
     }
@@ -581,26 +592,45 @@ const searchDocument = async () => {
   }
 };
 
+const selectedDoc = computed(() => {
+    return documentsList.value.find(d => d.numero === formData.numero_documento);
+});
+
 const isSelectionLinked = computed(() => {
-    if (!formData.numero_documento) return false;
-    const doc = documentsList.value.find(d => d.numero === formData.numero_documento);
-    return doc ? doc.tiene_otros_activos : false;
+    if (!formData.numero_documento || isManual.value) return false;
+    return selectedDoc.value ? !selectedDoc.value.permite_definitivo : false;
+});
+
+const isTemporalDisabled = computed(() => {
+    if (!formData.numero_documento || isManual.value) return false;
+    return selectedDoc.value ? !selectedDoc.value.permite_temporal : false;
 });
 
 const selectDocument = (doc) => {
+    if (doc.estado_fisico !== 'activo') {
+        Swal.fire('No Disponible', `El documento actualmente se encuentra prestando estado '${doc.estado_fisico}' y no puede ser solicitado.`, 'warning');
+        return;
+    }
+
     formData.numero_documento = doc.numero;
     formData.fecha_documento = doc.fecha ? new Date(doc.fecha).toISOString().split('T')[0] : null;
-    if (doc.tiene_otros_activos) {
+    
+    // Auto-select valid type based on pivot permissions
+    if (doc.permite_temporal && !doc.permite_definitivo) {
         formData.tipo_retiro = 'Temporal';
         Swal.fire({
             icon: 'warning',
             title: 'Advertencia',
-            text: 'Esta garantía está vinculada a otros expedientes activos. Solo se permite retiro TEMPORAL.',
+            text: 'Esta garantía está vinculada a uno o más expedientes activos. Solo se permite retiro TEMPORAL.',
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
             timer: 5000
         });
+    } else if (doc.permite_definitivo && !doc.permite_temporal) {
+        formData.tipo_retiro = 'Definitivo';
+    } else {
+        formData.tipo_retiro = 'Temporal'; // Si por alguna razón permite ambos, asume Temporal de forma predeterminada
     }
 };
 
