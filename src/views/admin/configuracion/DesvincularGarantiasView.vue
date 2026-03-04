@@ -4,32 +4,29 @@
     <!-- HEADER -->
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 p-2">
       <div class="flex items-center gap-5">
-        <div class="w-16 h-16 bg-red-600 dark:bg-red-700 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/20 rotate-3 hover:rotate-0 transition-transform duration-300 shrink-0">
+        <div class="w-16 h-16 bg-verde-cope dark:bg-red-700 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/20 rotate-3 hover:rotate-0 transition-transform duration-300 shrink-0">
           <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
           </svg>
         </div>
         <div class="flex flex-col">
           <h1 class="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic leading-none">
-            Desvinculación <span class="text-red-600 dark:text-red-500 font-light">Garantías</span>
+            Desvinculación <span class="text-verde-cope dark:text-red-500 font-light">Garantías</span>
           </h1>
           <p class="text-slate-600 dark:text-slate-400 font-bold text-xs uppercase tracking-[0.2em] flex items-center gap-2 mt-2">
             <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-sm shadow-emerald-500/50"></span>
-            Módulo de Auditoría y Control de Archivos
+            Desvinculacion de Garantias a los productos
           </p>
         </div>
       </div>
     </header>
 
     <!-- SEARCH SECTION -->
-    <section class="bg-gray-50 dark:bg-gray-800 p-8 md:p-12 relative overflow-hidden">
-
-      
+    <section class="p-8 md:p-12 relative overflow-hidden">
 
         <!-- Decorative bg circle -->
-        
-        <div class="dark:bg-gray-800 max-w-3xl mx-auto relative z-10 text-center space-y-6">
-          <h2 class="text-slate-800 dark:text-black text-xl font-black uppercase tracking-[0.3em]">Buscador Global de Expedientes</h2>
+        <div class="max-w-3xl mx-auto relative z-10 text-center space-y-6">
+          <h2 class="text-slate-800 dark:text-white text-xl font-black uppercase tracking-[0.3em]">Buscador Global de Expedientes</h2>
           
           <div class="relative group">
             <input 
@@ -43,7 +40,7 @@
               <button 
                 @click="searchExpediente"
                 :disabled="searching || !searchQuery"
-                class="px-6 md:px-8 py-3 bg-red-600 hover:bg-red-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white rounded-xl font-black uppercase tracking-tighter transition-all flex items-center gap-3 shadow-sm active:scale-95 disabled:active:scale-100"
+                class="px-6 md:px-8 py-3 bg-azul-cope hover:bg-verde-cope disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white rounded-xl font-black uppercase tracking-tighter transition-all flex items-center gap-3 shadow-sm active:scale-95 disabled:active:scale-100"
               >
                 <span v-if="searching" class="animate-spin border-2 border-white/30 border-t-white rounded-full w-5 h-5"></span>
                 <span class="text-sm">{{ searching ? 'Buscando' : 'Consultar' }}</span>
@@ -66,7 +63,7 @@
           <div class="absolute top-0 right-0 p-5 hidden sm:block">
              <span class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg text-[10px] font-black uppercase tracking-widest border border-gray-200 dark:border-gray-600 shadow-sm">ID: {{ expediente.id }}</span>
           </div>
-          <p class="text-red-600 dark:text-red-500 font-black text-xs uppercase tracking-[0.4em] mb-3">Asociado Titular</p>
+          <p class="text-verde-cope dark:text-red-500 font-black text-xs uppercase tracking-[0.4em] mb-3">Asociado Titular</p>
           <h2 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tighter uppercase leading-none break-words">{{ expediente.nombre_asociado }}</h2>
           <div class="mt-8 flex items-center gap-4">
             <div class="w-12 h-12 bg-gray-50 dark:bg-gray-700 rounded-xl flex items-center justify-center border border-gray-100 dark:border-gray-600 shrink-0">
@@ -166,16 +163,7 @@
       </div>
     </div>
     
-    <!-- EMPTY STATE -->
-    <div v-else-if="!searching" class="py-24 text-center animate-fade-in relative max-w-lg mx-auto">
-        <div class="w-24 h-24 mx-auto bg-white dark:bg-gray-800 rounded-3xl flex items-center justify-center mb-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <svg class="w-10 h-10 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-        </div>
-        <div class="space-y-3">
-          <h3 class="text-2xl font-black text-gray-800 dark:text-white uppercase tracking-tight">Listo para Auditar</h3>
-          <p class="text-gray-500 dark:text-gray-400 font-medium text-sm leading-relaxed">Ingrese los datos en el buscador superior para localizar el expediente electrónico y visualizar sus documentos físicos vinculados.</p>
-        </div>
-    </div>
+
 
   </div>
 </template>
