@@ -164,7 +164,7 @@
               <input v-model="editForm.referencia" type="text" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monto Póliza</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monto</label>
               <input v-model="editForm.monto_poliza" type="number" step="0.01" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" />
             </div>
              <div>

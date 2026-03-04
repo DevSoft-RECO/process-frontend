@@ -73,7 +73,7 @@
                               <p><span class="font-semibold text-gray-700">Tipo:</span> {{ doc.tipo_documento?.nombre || 'N/A' }}</p>
                               <p><span class="font-semibold text-gray-700">Fecha:</span> {{ doc.fecha ? new Date(doc.fecha).toLocaleDateString() : 'N/A' }}</p>
                               <p><span class="font-semibold text-gray-700">Propietario:</span> {{ doc.propietario || 'N/A' }}</p>
-                              <p><span class="font-semibold text-gray-700">Monto Poliza:</span> {{ doc.monto_poliza || 'N/A' }}</p>
+                              <p><span class="font-semibold text-gray-700">Monto:</span> {{ doc.monto_poliza || 'N/A' }}</p>
                               <p><span class="font-semibold text-gray-700">Autorizador:</span> {{ doc.autorizador || 'N/A' }}</p>
                               <p><span class="font-semibold text-gray-700">Finca:</span> {{ doc.no_finca || 'N/A' }}</p>
                               <p><span class="font-semibold text-gray-700">Folio:</span> {{ doc.folio || 'N/A' }}</p>
@@ -110,7 +110,7 @@
            <div><span class="font-bold text-gray-700">Tipo:</span> {{ documentInfo?.tipo_documento?.nombre || 'N/A' }}</div>
            <div><span class="font-bold text-gray-700">Fecha:</span> {{ documentInfo?.fecha ? new Date(documentInfo.fecha).toLocaleDateString() : 'N/A' }}</div>
            <div><span class="font-bold text-gray-700">Propietario:</span> {{ documentInfo?.propietario || 'N/A' }}</div>
-           <div><span class="font-bold text-gray-700">Monto Poliza:</span> {{ documentInfo?.monto_poliza || 'N/A' }}</div>
+           <div><span class="font-bold text-gray-700">Monto:</span> {{ documentInfo?.monto_poliza || 'N/A' }}</div>
            <div><span class="font-bold text-gray-700">Autorizador:</span> {{ documentInfo?.autorizador || 'N/A' }}</div>
            <div><span class="font-bold text-gray-700">Finca:</span> {{ documentInfo?.no_finca || 'N/A' }}</div>
            <div><span class="font-bold text-gray-700">Folio:</span> {{ documentInfo?.folio || 'N/A' }}</div>

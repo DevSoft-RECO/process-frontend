@@ -156,7 +156,7 @@
                                             <span class="font-medium text-gray-900 dark:text-white">{{ d.registro_propiedad?.nombre || 'N/A' }}</span>
                                         </div>
                                         <div>
-                                            <span class="block text-xs text-gray-500 dark:text-gray-400 uppercase">Monto Póliza</span>
+                                            <span class="block text-xs text-gray-500 dark:text-gray-400 uppercase">Monto</span>
                                             <span class="font-medium text-gray-900 dark:text-white font-mono">{{ d.monto_poliza ? formatCurrency(d.monto_poliza) : 'N/A' }}</span>
                                         </div>
                                     </div>

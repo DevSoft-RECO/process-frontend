@@ -196,7 +196,7 @@
                             </div>
                             <div v-show="isFieldVisible('monto_poliza')">
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Monto Póliza <span v-if="isFieldRequired('monto_poliza')" class="text-red-500">*</span>
+                                    Monto <span v-if="isFieldRequired('monto_poliza')" class="text-red-500">*</span>
                                 </label>
                                 <input v-model="docForm.monto_poliza" :disabled="existingDocFound && !isEditable" type="number" step="0.01" :required="isFieldRequired('monto_poliza')" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" />
                             </div>

@@ -105,7 +105,7 @@
                             <input v-model="form.fecha" type="date" disabled class="block w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:border-blue-500 focus:bg-white focus:ring-0 text-gray-700 font-bold shadow-sm transition-all text-center">
                         </div>
                         <div class="group">
-                             <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Monto Póliza</label>
+                             <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Monto</label>
                              <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 font-bold">Q</span>
                                 <input v-model="form.monto_poliza" type="number" :disabled="found" 

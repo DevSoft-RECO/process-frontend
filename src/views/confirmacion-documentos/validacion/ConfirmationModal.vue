@@ -67,7 +67,7 @@
 
               <!-- Optional Fields -->
                <div>
-                  <label class="block font-medium text-gray-700">Monto Póliza</label>
+                  <label class="block font-medium text-gray-700">Monto</label>
                   <input type="text" v-model="form.monto_poliza" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
               </div>
                <div>
@@ -138,7 +138,7 @@
                   <div><strong>Tipo Documento:</strong> <br>{{ request.documento?.tipo_documento?.nombre || request.tipo_documento }}</div>
                   <div><strong>Registro Propiedad:</strong> <br>{{ request.documento?.registro_propiedad?.nombre || request.registro_propiedad || '-' }}</div>
                   
-                  <div><strong>Monto Póliza:</strong> <br>{{ request.documento?.monto_poliza || request.monto_poliza || '-' }}</div>
+                  <div><strong>Monto:</strong> <br>{{ request.documento?.monto_poliza || request.monto_poliza || '-' }}</div>
                   <div><strong>Referencia:</strong> <br>{{ request.documento?.referencia || request.referencia || '-' }}</div>
 
                   <div><strong>Propietario:</strong> <br>{{ request.documento?.propietario || request.propietario || '-' }}</div>

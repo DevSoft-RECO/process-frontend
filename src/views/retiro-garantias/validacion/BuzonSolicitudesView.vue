@@ -213,7 +213,7 @@
                  <span class="text-gray-900">{{ selectedDocument.autorizador }}</span>
               </div>
                <div class="bg-gray-50 p-3 rounded">
-                 <span class="block font-bold text-gray-600">Monto Póliza</span>
+                 <span class="block font-bold text-gray-600">Monto</span>
                  <span class="text-gray-900">{{ selectedDocument.monto_poliza }}</span>
               </div>
               <div class="bg-gray-50 p-3 rounded">

@@ -77,7 +77,7 @@
               </div>
 
               <div>
-                  <label class="block font-medium text-gray-700 mb-1">Monto Póliza</label>
+                  <label class="block font-medium text-gray-700 mb-1">Monto</label>
                   <input type="number" step="0.01" v-model="form.monto_poliza" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="0.00">
               </div>
               

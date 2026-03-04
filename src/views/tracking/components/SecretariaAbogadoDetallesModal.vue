@@ -170,7 +170,7 @@
                                         </div>
                                     </div>
                                     <div class="text-right" v-if="d.monto_poliza">
-                                        <p class="text-xs text-gray-500 uppercase">Monto Póliza</p>
+                                        <p class="text-xs text-gray-500 uppercase">Monto</p>
                                         <p class="font-bold text-gray-900 dark:text-white font-mono">{{ formatCurrency(d.monto_poliza) }}</p>
                                     </div>
                                 </div>

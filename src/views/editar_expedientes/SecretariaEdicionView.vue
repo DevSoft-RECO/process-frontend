@@ -182,7 +182,7 @@
                                          {{ d.fecha }}
                                      </div>
                                      <div>
-                                         <span class="block text-xs uppercase text-gray-400">Monto Poliza</span>
+                                         <span class="block text-xs uppercase text-gray-400">Monto</span>
                                          {{ formatCurrency(d.monto_poliza) }}
                                      </div>
                                      <div class="md:col-span-3">

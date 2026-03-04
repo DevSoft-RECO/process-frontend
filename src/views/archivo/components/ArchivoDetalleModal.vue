@@ -132,7 +132,7 @@
                             <p class="font-semibold dark:text-gray-200">{{ formatDate(doc.fecha) }}</p>
                         </div>
                         <div>
-                            <p class="text-xs text-gray-500">Monto Póliza:</p>
+                            <p class="text-xs text-gray-500">Monto:</p>
                             <p class="font-semibold dark:text-gray-200">{{ doc.monto_poliza ? formatCurrency(doc.monto_poliza) : '-' }}</p>
                         </div>
                         <div>

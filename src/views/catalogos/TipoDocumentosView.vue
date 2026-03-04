@@ -148,7 +148,7 @@ const availableFields = [
     { key: 'libro', label: 'Libro' },
     { key: 'no_dominio', label: 'No. Dominio' },
     { key: 'referencia', label: 'Referencia' },
-    { key: 'monto_poliza', label: 'Monto Póliza' },
+    { key: 'monto_poliza', label: 'Monto' },
     { key: 'observacion', label: 'Observación' },
     { key: 'registro_propiedad_id', label: 'Registro Propiedad' },
 ]
