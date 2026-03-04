@@ -5,7 +5,7 @@
         <svg class="w-8 h-8 text-verde-cope" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-3-3v6m-9 1V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2H6a2 2 0 01-2-2z" />
         </svg>
-        Solicitud de Retiro de Documento Administrativo
+        Solicitud de Expediente Administrativo
       </h1>
       <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 ml-11">
         Busque un expediente por su ID o Número de Documento para solicitar su retiro.

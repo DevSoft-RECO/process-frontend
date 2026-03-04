@@ -260,7 +260,7 @@ const routes: RouteRecordRaw[] = [
                 path: 'retiro-administrativo/usuario/solicitar',
                 name: 'retiro-administrativo-solicitar',
                 component: () => import('@/views/retiro-administrativo/usuario/SolicitarRetiroAdminView.vue'),
-                meta: { title: 'Solicitar Retiro Administrativo', permission: 'retiro_doc_administrativo' }
+                meta: { title: 'Solicitar Expediente Administrativo', permission: 'retiro_doc_administrativo' }
             },
             {
                 path: 'retiro-administrativo/admin/despacho',
