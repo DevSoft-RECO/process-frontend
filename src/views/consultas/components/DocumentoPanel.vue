@@ -16,13 +16,13 @@
             <form @submit.prevent="submitDocumento">
                 <!-- Step 1: Search Inputs -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
-                        <div>
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Número de Documento *</label>
-                        <input v-model="docForm.numero" type="text" :readonly="!docSearchStep && existingDocFound" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white readonly:bg-gray-100 dark:readonly:bg-gray-800" required />
+                        <input v-model="docForm.numero" type="text" :readonly="existingDocFound && !isEditable" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white readonly:bg-gray-100 dark:readonly:bg-gray-800" required />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fecha de Documento *</label>
-                        <input v-model="docForm.fecha" type="date" :readonly="!docSearchStep && existingDocFound" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white readonly:bg-gray-100 dark:readonly:bg-gray-800" required />
+                        <input v-model="docForm.fecha" type="date" :readonly="existingDocFound && !isEditable" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white readonly:bg-gray-100 dark:readonly:bg-gray-800" required />
                     </div>
                     
                     <!-- Search Button -->
@@ -412,9 +412,10 @@ async function fetchRegistros() {
 }
 
 async function fetchUpdatedDocuments() {
-    if (!props.expediente?.id) return
+    const targetId = props.expediente?.id || props.expediente?.nuevo_expediente_id;
+    if (!targetId) return;
     try {
-        const res = await api.get(`/nuevos-expedientes/${props.expediente.id}/detalles`)
+        const res = await api.get(`/nuevos-expedientes/${targetId}/detalles`)
         if (res.data.success && res.data.data) {
            linkedDocs.value = res.data.data.documentos || []
         }
@@ -454,10 +455,11 @@ async function checkDocumento() {
     foundDocs.value = []
     
     try {
+        const targetId = props.expediente?.id || props.expediente?.nuevo_expediente_id;
         const res = await api.post('/documentos/check', {
             numero: docForm.numero,
             fecha: docForm.fecha,
-            nuevo_expediente_id: props.expediente?.id
+            nuevo_expediente_id: targetId
         })
         
         if (res.data.found && Array.isArray(res.data.data) && res.data.data.length > 0) {
@@ -501,16 +503,17 @@ function selectExistingDoc(doc: any) {
 async function loadLinkedDoc(doc: any) {
     // Populate form basics
     docForm.numero = doc.numero
-    docForm.fecha = doc.fecha
+    docForm.fecha = doc.fecha ? doc.fecha.split(' ')[0] : ''
     
     // We trigger a check to get fresh metadata (like global usage count)
     // This allows robust "isEditable" logic even for already linked docs
     checkingDoc.value = true
     try {
+        const targetId = props.expediente?.id || props.expediente?.nuevo_expediente_id;
         const res = await api.post('/documentos/check', {
             numero: doc.numero,
             fecha: doc.fecha,
-            nuevo_expediente_id: props.expediente?.id
+            nuevo_expediente_id: targetId
         })
         
         if (res.data.found && Array.isArray(res.data.data)) {
@@ -555,7 +558,8 @@ const detachDocumento = async (docId: number) => {
 
     if (result.isConfirmed) {
         try {
-            const res = await api.delete(`/nuevos-expedientes/${props.expediente.id}/documentos/${docId}`)
+            const targetId = props.expediente?.id || props.expediente?.nuevo_expediente_id;
+            const res = await api.delete(`/nuevos-expedientes/${targetId}/documentos/${docId}`)
             if (res.data.success) {
                 linkedDocs.value = linkedDocs.value.filter(d => d.id !== docId)
                 emit('saved') // Trigger refresh on parent
@@ -579,7 +583,11 @@ const submitDocumento = async () => {
     }
 
     try {
-        await api.post(`/nuevos-expedientes/${props.expediente.id}/documentos`, payload)
+        const targetId = props.expediente.id || props.expediente.nuevo_expediente_id;
+        if (!targetId) {
+             throw new Error("ID de expediente no encontrado para asociar el documento.");
+        }
+        await api.post(`/nuevos-expedientes/${targetId}/documentos`, payload)
         
         Swal.fire({
             icon: 'success',

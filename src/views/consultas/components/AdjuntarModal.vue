@@ -99,7 +99,11 @@ const refreshExpedienteData = async () => {
     try {
         const res = await api.get(`/nuevos-expedientes/${localExpediente.value.id}/detalles`)
         if (res.data.success && res.data.data) {
-            localExpediente.value = res.data.data
+            const data = res.data.data
+            const updatedExpediente = data.expediente
+            updatedExpediente.garantias = data.garantias
+            updatedExpediente.documentos = data.documentos
+            localExpediente.value = updatedExpediente
         }
     } catch (e) {
         console.error("Error updating local expediente in modal", e)
