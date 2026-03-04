@@ -104,10 +104,10 @@
                                         </ul>
                                     </div>
 
-                                    <!-- Mobiliarias (Paired with index 4) -->
+                                    <!-- Otras Garantías (Paired with index 4) -->
                                     <div v-if="g.pivot.codeudor4 || g.pivot.observacion4" class="col-span-1 md:col-span-2 pt-6 border-t border-gray-100 dark:border-gray-700 mt-2">
                                         <p class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] mb-4 bg-blue-50 dark:bg-blue-900/20 w-fit px-3 py-1 rounded-full border border-blue-100 dark:border-blue-800/50">
-                                            Garantias Mobiliarias (Solo cuando aplica )
+                                            Otras Garantías
                                         </p>
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div class="bg-blue-50/30 dark:bg-blue-900/5 p-4 rounded-xl border border-blue-100/50 dark:border-blue-900/20">

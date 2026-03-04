@@ -30,29 +30,49 @@
                 <div v-for="i in 3" :key="i" class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Codeudor Input -->
                     <div>
-                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Codeudor {{ i }}</label>
-                        <input v-model="form[`codeudor${i}` as keyof typeof form]" type="text" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" :placeholder="`Nombre del Codeudor ${i}`" />
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Codeudor {{ i }}</label>
+                            <span class="text-[10px] tabular-nums" :class="form[`codeudor${i}` as keyof typeof form]?.length >= 200 ? 'text-red-500 font-bold' : 'text-gray-400'">
+                                {{ form[`codeudor${i}` as keyof typeof form]?.length || 0 }}/200
+                            </span>
+                        </div>
+                        <input v-model="form[`codeudor${i}` as keyof typeof form]" type="text" maxlength="200" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" :placeholder="`Nombre del Codeudor ${i}`" />
                     </div>
                     <!-- Observacion Input -->
                     <div>
-                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Observación {{ i }}</label>
-                        <input v-model="form[`observacion${i}` as keyof typeof form]" type="text" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" :placeholder="`Observación para Codeudor ${i}`" />
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Observación {{ i }}</label>
+                            <span class="text-[10px] tabular-nums" :class="form[`observacion${i}` as keyof typeof form]?.length >= 200 ? 'text-red-500 font-bold' : 'text-gray-400'">
+                                {{ form[`observacion${i}` as keyof typeof form]?.length || 0 }}/200
+                            </span>
+                        </div>
+                        <input v-model="form[`observacion${i}` as keyof typeof form]" type="text" maxlength="200" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" :placeholder="`Observación para Codeudor ${i}`" />
                     </div>
                 </div>
 
-                <!-- Nueva Sección: Garantías Mobiliarias (Paired with index 4) -->
+                <!-- Nueva Sección: Otras Garantias (Paired with index 4) -->
                 <div class="pt-4 border-t border-gray-100 dark:border-gray-700 space-y-4">
                     <h3 class="text-xs font-bold text-azul-cope dark:text-blue-400 uppercase tracking-wider px-1">
-                        Garantias Mobiliarias (Solo cuando aplica )
+                        Otras Garantias
                     </h3>
                     <div class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Título Garantía</label>
-                            <input v-model="form.codeudor4" type="text" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" placeholder="Título de la garantía mobiliaria" />
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Título Garantía</label>
+                                <span class="text-[10px] tabular-nums" :class="form.codeudor4?.length >= 200 ? 'text-red-500 font-bold' : 'text-gray-400'">
+                                    {{ form.codeudor4?.length || 0 }}/200
+                                </span>
+                            </div>
+                            <input v-model="form.codeudor4" type="text" maxlength="200" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" placeholder="Título de la garantía" />
                         </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Observación Garantía</label>
-                            <input v-model="form.observacion4" type="text" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" placeholder="Observaciones adicionales" />
+                        <div class="md:col-span-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Observación Garantía</label>
+                                <span class="text-[10px] tabular-nums" :class="form.observacion4?.length >= 400 ? 'text-red-500 font-bold' : 'text-gray-400'">
+                                    {{ form.observacion4?.length || 0 }}/400
+                                </span>
+                            </div>
+                            <textarea v-model="form.observacion4" rows="4" maxlength="400" class="w-full text-sm rounded-md border-gray-300 focus:border-verde-cope focus:ring-verde-cope dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800" placeholder="Escriba aquí las observaciones detalladas de la garantía..."></textarea>
                         </div>
                     </div>
                 </div>

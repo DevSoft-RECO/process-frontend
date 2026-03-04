@@ -84,10 +84,10 @@
                         <p v-if="g.observacion3" class="text-xs italic text-gray-500 mt-1 bg-gray-100/50 dark:bg-gray-800/50 p-1.5 rounded">"{{ g.observacion3 }}"</p>
                       </div>
 
-                      <!-- Mobiliarias -->
+                      <!-- Otras Garantías -->
                       <div v-if="g.codeudor4 || g.observacion4" class="mt-2 pt-3 border-t border-gray-100 dark:border-gray-600">
                         <p class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.15em] mb-2">
-                          Garantias Mobiliarias (Solo cuando aplica )
+                          Otras Garantías
                         </p>
                         <div class="grid grid-cols-1 gap-3">
                           <div class="bg-blue-50/50 dark:bg-blue-900/10 p-2 rounded border border-blue-100 dark:border-blue-900/20">
