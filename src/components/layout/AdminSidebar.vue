@@ -546,6 +546,14 @@ const menuItems = computed(() => {
            
         },
         {
+            id: 'cancelacion-creditos',
+            label: 'Cancelación Crédito',
+            // Simple X-Circle Icon for canceling
+            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />',
+            route: '/admin/cancelacion-credito',
+            permission: 'cancelar_creditos'
+        },
+        {
             id: 'carga-datos',
             label: 'Carga de Datos',
             // Cloud Upload Icon

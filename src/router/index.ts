@@ -273,8 +273,14 @@ const routes: RouteRecordRaw[] = [
             },
 
             // ==========================================
-            // MÓDULO: AJUSTES (Carga de Datos)
+            // MÓDULO: AJUSTES (Carga de Datos y Cancelación)
             // ==========================================
+            {
+                path: 'cancelacion-credito',
+                name: 'admin-cancelar-credito',
+                component: () => import('@/views/cancelacion-creditos/CancelacionCreditoView.vue'),
+                meta: { title: 'Cancelación Crédito', permission: 'cancelar_creditos' }
+            },
             {
                 path: 'carga-datos/clientes',
                 name: 'admin-carga-clientes',
