@@ -29,7 +29,7 @@
      <!-- Formulario -->
      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
         <div>
-          <label class="block text-sm font-medium text-gray-700">Cambie el #Prdocuto por el #Doc </label>
+          <label class="block text-sm font-medium text-gray-700"># de Documento</label>
           <input 
             v-model="formData.numero_documento" 
             type="text" 
@@ -38,7 +38,7 @@
           >
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Fecha del Documento (Opcional)</label>
+          <label class="block text-sm font-medium text-gray-700">Fecha del Documento</label>
           <input 
             v-model="formData.fecha_documento" 
             type="date" 
@@ -127,8 +127,8 @@ const formData = reactive({
 });
 
 onMounted(() => {
-    formData.numero_documento = props.documentData.numero_documento;
-    formData.fecha_documento = props.documentData.fecha_documento || props.documentData.fecha_solicitud || null;
+    formData.numero_documento = '';
+    formData.fecha_documento = null;
     formData.titulo_nombre = props.documentData.titulo_nombre;
     formData.id_expediente_historico = props.documentData.id_expediente_historico || null;
     // Pre-fill justificacion with observations if useful, or leave empty
@@ -136,6 +136,14 @@ onMounted(() => {
 });
 
 const submitRequest = async () => {
+  if (!formData.numero_documento) {
+    Swal.fire('Atención', 'Debe ingresar el # de Documento', 'warning');
+    return;
+  }
+  if (!formData.fecha_documento) {
+    Swal.fire('Atención', 'Debe ingresar la Fecha del Documento', 'warning');
+    return;
+  }
   if (!formData.justificacion) {
     Swal.fire('Atención', 'Debe ingresar una justificación', 'warning');
     return;
