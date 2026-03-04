@@ -59,7 +59,7 @@
           <div class="grid grid-cols-1 gap-4">
               <div v-for="doc in documentsList" :key="doc.id" 
                    class="border rounded-lg p-4 bg-gray-50 hover:bg-white transition-colors relative"
-                   :class="{'border-blue-500 ring-2 ring-blue-200': formData.numero_documento === doc.numero, 'border-gray-200': formData.numero_documento !== doc.numero}"
+                   :class="{'border-blue-500 ring-2 ring-blue-200': formData.id_documento === doc.id, 'border-gray-200': formData.id_documento !== doc.id}"
               >
                   <div class="flex justify-between items-start">
                       <div class="flex-1">
@@ -90,14 +90,14 @@
                               @click="selectDocument(doc)"
                               class="text-white px-3 py-1 rounded text-sm transition-colors"
                               :class="{
-                                  'bg-green-600 hover:bg-green-700': formData.numero_documento === doc.numero,
-                                  'bg-blue-600 hover:bg-blue-700': formData.numero_documento !== doc.numero && doc.estado_fisico === 'activo',
+                                  'bg-green-600 hover:bg-green-700': formData.id_documento === doc.id,
+                                  'bg-blue-600 hover:bg-blue-700': formData.id_documento !== doc.id && doc.estado_fisico === 'activo',
                                   'bg-gray-400 cursor-not-allowed': doc.estado_fisico !== 'activo'
                               }"
                               :disabled="doc.estado_fisico !== 'activo'"
                            >
-                              <i class="fas" :class="formData.numero_documento === doc.numero ? 'fa-check' : (doc.estado_fisico === 'activo' ? 'fa-hand-pointer' : 'fa-lock')"></i>
-                              {{ formData.numero_documento === doc.numero ? 'Seleccionado' : (doc.estado_fisico === 'activo' ? 'Seleccionar' : 'No Disponible') }}
+                              <i class="fas" :class="formData.id_documento === doc.id ? 'fa-check' : (doc.estado_fisico === 'activo' ? 'fa-hand-pointer' : 'fa-lock')"></i>
+                              {{ formData.id_documento === doc.id ? 'Seleccionado' : (doc.estado_fisico === 'activo' ? 'Seleccionar' : 'No Disponible') }}
                            </button>
 
                            <button 
@@ -503,6 +503,7 @@ const formData = reactive({
   id_expediente: null,
   id_expediente_historico: null,
   numero_documento: '',
+  id_documento: null,
   fecha_documento: null,
   titulo_nombre: '',
   tipo_retiro: 'Temporal',
@@ -593,16 +594,16 @@ const searchDocument = async () => {
 };
 
 const selectedDoc = computed(() => {
-    return documentsList.value.find(d => d.numero === formData.numero_documento);
+    return documentsList.value.find(d => d.id === formData.id_documento);
 });
 
 const isSelectionLinked = computed(() => {
-    if (!formData.numero_documento || isManual.value) return false;
+    if (!formData.id_documento || isManual.value) return false;
     return selectedDoc.value ? !selectedDoc.value.permite_definitivo : false;
 });
 
 const isTemporalDisabled = computed(() => {
-    if (!formData.numero_documento || isManual.value) return false;
+    if (!formData.id_documento || isManual.value) return false;
     return selectedDoc.value ? !selectedDoc.value.permite_temporal : false;
 });
 
@@ -612,6 +613,7 @@ const selectDocument = (doc) => {
         return;
     }
 
+    formData.id_documento = doc.id;
     formData.numero_documento = doc.numero;
     formData.fecha_documento = doc.fecha ? new Date(doc.fecha).toISOString().split('T')[0] : null;
     
@@ -753,6 +755,7 @@ const resetFormData = () => {
   formData.id_expediente = null;
   formData.id_expediente_historico = null;
   formData.numero_documento = '';
+  formData.id_documento = null;
   formData.titulo_nombre = '';
   formData.tipo_retiro = 'Temporal';
   formData.justificacion = '';
