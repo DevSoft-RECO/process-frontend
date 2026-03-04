@@ -72,11 +72,14 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/asesores-creditos/FinalizadosView.vue'),
                 meta: { title: 'Finalizados (Histórico)', permission: 'asesores_credito' }
             },
+            // ==========================================
+            // MÓDULO: JEFE DE AGENCIA
+            // ==========================================
             {
                 path: 'consultas/expedientes',
                 name: 'admin-consultas-expedientes',
                 component: () => import('@/views/consultas/ExpedientesHistoricosView.vue'),
-                meta: { title: 'Listado Histórico', permission: 'asesores_credito' }
+                meta: { title: 'Listado Histórico', permission: 'jefe_agencia' }
             },
 
             // ==========================================
