@@ -43,6 +43,7 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50 sticky top-0">
             <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha / Origen</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Origen / Destino</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código Cliente / Producto</th>
@@ -61,6 +62,9 @@
               <td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay solicitudes en este estado.</td>
             </tr>
             <tr v-for="req in requests" :key="req.id" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <div class="text-gray-900 font-medium">{{ req.id }}</div>
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
                   <div class="text-gray-900 font-medium">{{ formatDateTime(req.fecha_solicitud) }}</div>
                   <div class="mt-1">
@@ -409,10 +413,19 @@ const dispatchRequest = async (req) => {
   const requestingAgencyName = req.agencia?.nombre || 'la agencia solicitante';
   const requestingAgencyId = req.id_agencia;
 
+  let observacionInput = '';
+
   // 1. Mostrar confirmación inicial (Camino rápido vs manual)
   const result = await Swal.fire({
     title: 'Despachar Documento',
-    html: `¿Generar envío para <strong>${requestingAgencyName}</strong>?<br><br><small class="text-gray-500">Documento: ${req.numero_documento} (${req.tipo_retiro})</small>`,
+    html: `
+      <div class="mb-2">¿Generar envío para <strong>${requestingAgencyName}</strong>?</div>
+      <div class="text-sm text-gray-500 mb-4">Documento: ${req.numero_documento} (${req.tipo_retiro})</div>
+      <div class="text-left">
+        <label for="swal-obs-1" class="block text-sm font-medium text-gray-700">Observación de Despacho (Opcional):</label>
+        <textarea id="swal-obs-1" class="border border-gray-300 rounded-md shadow-sm p-2 w-full mt-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" style="resize: none;" rows="2" placeholder="Agregue un detalle..."></textarea>
+      </div>
+    `,
     icon: 'question',
     showCancelButton: true,
     showDenyButton: true,
@@ -422,6 +435,14 @@ const dispatchRequest = async (req) => {
     confirmButtonColor: '#059669', // Green-600
     denyButtonColor: '#3B82F6',    // Blue-500
     cancelButtonColor: '#6B7280',
+    didOpen: () => {
+        const input = document.getElementById('swal-obs-1');
+        if (input) {
+            input.addEventListener('input', (e) => {
+                observacionInput = e.target.value;
+            });
+        }
+    }
   });
 
   let selectedAgencyId = null;
@@ -431,25 +452,38 @@ const dispatchRequest = async (req) => {
     selectedAgencyId = requestingAgencyId;
   } else if (result.isDenied) {
     // Caso manual: Selector de agencias
-    const agencyOptions = {};
-    agencies.value.forEach(a => {
-        agencyOptions[a.id] = a.nombre;
-    });
+    const agencyOptions = agencies.value.map(a => `<option value="${a.id}">${a.nombre}</option>`).join('');
 
-    const { value: manualAgencyId } = await Swal.fire({
+    const manualResult = await Swal.fire({
       title: 'Seleccionar Agencia de Destino',
-      input: 'select',
-      inputOptions: agencyOptions,
-      inputPlaceholder: 'Seleccione una agencia',
+      html: `
+        <select id="swal-agency-select" class="swal2-select w-full" style="display:flex; margin: 1rem 0;">
+            <option value="" disabled selected>Seleccione una agencia...</option>
+            ${agencyOptions}
+        </select>
+        <div class="text-left mt-4">
+            <label for="swal-obs-2" class="block text-sm font-medium text-gray-700">Observación de Despacho (Opcional):</label>
+            <textarea id="swal-obs-2" class="border border-gray-300 rounded-md shadow-sm p-2 w-full mt-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" style="resize: none;" rows="2" placeholder="Agregue un detalle...">${observacionInput}</textarea>
+        </div>
+      `,
       showCancelButton: true,
       confirmButtonText: 'Confirmar Envío',
       cancelButtonText: 'Volver',
-      inputValidator: (value) => {
-        if (!value) return 'Debe seleccionar una agencia de destino';
+      preConfirm: () => {
+          const agency = document.getElementById('swal-agency-select').value;
+          const obs = document.getElementById('swal-obs-2').value;
+          if (!agency) {
+              Swal.showValidationMessage('Debe seleccionar una agencia de destino');
+              return false;
+          }
+          return { agency, obs };
       }
     });
     
-    selectedAgencyId = manualAgencyId;
+    if (manualResult.isConfirmed) {
+        selectedAgencyId = manualResult.value.agency;
+        observacionInput = manualResult.value.obs;
+    }
   }
 
   // 2. Ejecutar despacho si hay una agencia seleccionada o confirmada
@@ -460,7 +494,8 @@ const dispatchRequest = async (req) => {
 
       await api.post(`/solicitudes-retiro/${req.id}/despachar`, {
         estado: targetState,
-        id_agencia_entrega: selectedAgencyId
+        id_agencia_entrega: selectedAgencyId,
+        observacion_despacho: observacionInput
       });
 
       Swal.fire('Éxito', 'Documento despachado correctamente', 'success');
