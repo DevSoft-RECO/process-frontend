@@ -1,6 +1,7 @@
 <template>
     <div class="p-6 space-y-6">
-        <!-- Header -->
+        <template v-if="hasAnyDashboardPermission">
+            <!-- Header -->
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Dashboard Analítico</h1>
@@ -148,7 +149,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white">Rendimiento por Asesor</h3>
                     
-                     <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <div class="flex items-center gap-2 w-full sm:w-auto" v-if="hasGeneralOrSuper">
                         <select 
                             v-model="selectedAgency" 
                             @change="filterAdvisors"
@@ -236,7 +237,7 @@
             </div>
 
             <!-- Agency Performance -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 overflow-hidden" v-if="hasGeneralOrSuper">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white">Rendimiento por Agencia</h3>
                     <div class="flex items-center gap-2" v-if="agencies.last_page > 1">
@@ -323,14 +324,41 @@
         <!-- The NEW `agencies` response has: agency.active, agency.rejected_cases, agency.total, agency.rejection_rate, agency.success_rate. -->
         <!-- It DOES NOT have `finalized` anymore. So the bottom cards WILL BREAK if I don't remove or update them. -->
         <!-- Given the comprehensive table, the bottom cards are less useful. I will remove them to avoid errors and redundancy. -->
+        </template>
 
+        <template v-else>
+            <!-- Welcome Screen for Unauthorized Users -->
+            <div class="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6">
+                <div class="p-6 bg-blue-50 dark:bg-blue-900/30 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+                <h1 class="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                    Bienvenido al Sistema de Administración de Expedientes de Créditos
+                </h1>
+                <p class="text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl">
+                    Utiliza el menú lateral para navegar a través de los buzones y herramientas según los permisos asignados a tu cuenta.
+                </p>
+            </div>
+        </template>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import DashboardService from '@/services/DashboardService'
 import ProcessingTimesWidget from './dashboard/ProcessingTimesWidget.vue'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
+const hasGeneralOrSuper = computed(() => {
+    return authStore.hasRole('Super Admin') || authStore.hasPermission('dashboard_general')
+})
+
+const hasAnyDashboardPermission = computed(() => {
+    return hasGeneralOrSuper.value || authStore.hasPermission('dashboard_agencia')
+})
 
 const loading = ref(false)
 const kpi = ref({ total_active: 0, total_finalized: 0, total_amount: 0, avg_days_open: 0 })
@@ -345,6 +373,8 @@ const selectedAgency = ref<number | null>(null)
 const selectedMonth = ref(new Date().toISOString().slice(0, 7))
 
 const loadAll = async () => {
+    if (!hasAnyDashboardPermission.value) return;
+
     loading.value = true
     try {
         const [kpiRes, pipeRes, advRes, rejRes, agRes, trRes, timeRes, agListRes] = await Promise.all([
