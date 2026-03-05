@@ -57,30 +57,39 @@ interface TrendData {
 }
 
 export default {
-    async getKpi(month?: string): Promise<KpiData> {
+    async getKpi(month?: string, agencyIds?: number[] | null): Promise<KpiData> {
         let url = '/dashboard/kpi'
-        if (month) {
-            url += `?month=${month}`
+        let params = new URLSearchParams()
+        if (month) params.append('month', month)
+        if (agencyIds && agencyIds.length > 0) {
+            agencyIds.forEach(id => params.append('agency_id[]', id.toString()))
         }
+        if (params.toString()) url += `?${params.toString()}`
+
         const res = await api.get(url)
         return res.data
     },
-    async getPipeline(month?: string): Promise<PipelineData[]> {
+    async getPipeline(month?: string, agencyIds?: number[] | null): Promise<PipelineData[]> {
         let url = '/dashboard/pipeline'
-        if (month) {
-            url += `?month=${month}`
+        let params = new URLSearchParams()
+        if (month) params.append('month', month)
+        if (agencyIds && agencyIds.length > 0) {
+            agencyIds.forEach(id => params.append('agency_id[]', id.toString()))
         }
+        if (params.toString()) url += `?${params.toString()}`
+
         const res = await api.get(url)
         return res.data
     },
-    async getAdvisors(page = 1, agencyId?: number | null, month?: string): Promise<AdvisorData> {
+    async getAdvisors(page = 1, agencyIds?: number[] | null, month?: string): Promise<AdvisorData> {
         let url = `/dashboard/advisors?page=${page}`
-        if (agencyId) {
-            url += `&agency_id=${agencyId}`
+        let params = new URLSearchParams()
+        if (month) params.append('month', month)
+        if (agencyIds && agencyIds.length > 0) {
+            agencyIds.forEach(id => params.append('agency_id[]', id.toString()))
         }
-        if (month) {
-            url += `&month=${month}`
-        }
+        if (params.toString()) url += `&${params.toString()}`
+
         const res = await api.get(url)
         return res.data
     },
@@ -88,11 +97,15 @@ export default {
         const res = await api.get('/dashboard/rejections')
         return res.data
     },
-    async getAgencies(page = 1, month?: string): Promise<AgencyData> {
+    async getAgencies(page = 1, month?: string, agencyIds?: number[] | null): Promise<AgencyData> {
         let url = `/dashboard/agencies?page=${page}`
-        if (month) {
-            url += `&month=${month}`
+        let params = new URLSearchParams()
+        if (month) params.append('month', month)
+        if (agencyIds && agencyIds.length > 0) {
+            agencyIds.forEach(id => params.append('agency_id[]', id.toString()))
         }
+        if (params.toString()) url += `&${params.toString()}`
+
         const res = await api.get(url)
         return res.data
     },
@@ -100,15 +113,26 @@ export default {
         const res = await api.get('/dashboard/agencies-list')
         return res.data
     },
-    async getTrends(): Promise<TrendData[]> {
-        const res = await api.get('/dashboard/trends')
+    async getTrends(agencyIds?: number[] | null): Promise<TrendData[]> {
+        let url = '/dashboard/trends'
+        let params = new URLSearchParams()
+        if (agencyIds && agencyIds.length > 0) {
+            agencyIds.forEach(id => params.append('agency_id[]', id.toString()))
+        }
+        if (params.toString()) url += `?${params.toString()}`
+
+        const res = await api.get(url)
         return res.data
     },
-    async getProcessingTimes(month?: string): Promise<any> {
+    async getProcessingTimes(month?: string, agencyIds?: number[] | null): Promise<any> {
         let url = '/dashboard/processing-times'
-        if (month) {
-            url += `?month=${month}`
+        let params = new URLSearchParams()
+        if (month) params.append('month', month)
+        if (agencyIds && agencyIds.length > 0) {
+            agencyIds.forEach(id => params.append('agency_id[]', id.toString()))
         }
+        if (params.toString()) url += `?${params.toString()}`
+
         const res = await api.get(url)
         return res.data
     }

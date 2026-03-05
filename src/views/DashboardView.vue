@@ -14,6 +14,39 @@
                     </svg>
                     <span class="text-sm font-bold text-gray-700 dark:text-gray-300 hidden sm:inline">Período:</span>
                 </div>
+
+                <!-- Agency Multi-Select Filter -->
+                <div class="relative" v-if="hasGeneralOrSuper">
+                    <button 
+                        @click="isAgencyDropdownOpen = !isAgencyDropdownOpen" 
+                        class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                    >
+                        <span class="truncate max-w-[150px] sm:max-w-xs">{{ selectedAgenciesLabel }}</span>
+                        <svg class="w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    
+                    <div v-show="isAgencyDropdownOpen" class="absolute right-0 sm:left-0 z-20 w-64 mt-2 bg-white rounded-md shadow-lg dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
+                        <div class="p-2 space-y-1 max-h-60 overflow-y-auto">
+                            <!-- Toggle All Button -->
+                            <label class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                                <input type="checkbox" :checked="isAllAgenciesSelected" @change="selectAllAgencies" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <span class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Todas las Agencias</span>
+                            </label>
+                            
+                            <div class="border-t border-gray-200 dark:border-gray-600 my-1"></div>
+                            
+                            <!-- Individual Agencies -->
+                            <label v-for="agency in agenciesList" :key="agency.id" class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                                <input type="checkbox" :value="agency.id" v-model="selectedAgencies" @change="loadAll" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <span class="ml-2 text-sm text-gray-900 dark:text-gray-300">{{ agency.nombre }}</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-px h-8 bg-gray-200 dark:bg-gray-700 mx-1 hidden sm:block" v-if="hasGeneralOrSuper"></div>
+
                 <input 
                     type="month" 
                     v-model="selectedMonth" 
@@ -149,17 +182,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white">Rendimiento por Asesor</h3>
                     
-                    <div class="flex items-center gap-2 w-full sm:w-auto" v-if="hasGeneralOrSuper">
-                        <select 
-                            v-model="selectedAgency" 
-                            @change="filterAdvisors"
-                            class="text-sm border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        >
-                            <option :value="null">Todas las Agencias</option>
-                            <option v-for="agency in agenciesList" :key="agency.id" :value="agency.id">
-                                {{ agency.nombre }}
-                            </option>
-                        </select>
+
                          <div class="flex items-center gap-2" v-if="advisors.last_page > 1">
                             <button 
                                 @click="changeAdvisorPage(advisors.current_page - 1)" 
@@ -184,7 +207,6 @@
                             </button>
                         </div>
                     </div>
-                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm text-left">
                         <thead class="bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400">
@@ -364,34 +386,52 @@ const loading = ref(false)
 const kpi = ref({ total_active: 0, total_finalized: 0, total_amount: 0, avg_days_open: 0 })
 const pipeline = ref<any[]>([])
 const advisors = ref<{ data: any[], current_page: number, total: number, last_page: number }>({ data: [], current_page: 1, total: 0, last_page: 1 })
-const rejections = ref<any[]>([])
 const agencies = ref<{ data: any[], current_page: number, total: number, last_page: number }>({ data: [], current_page: 1, total: 0, last_page: 1 })
 const trends = ref<any[]>([])
 const times = ref({ creation_to_secretary: 0, secretary_internal: 0, secretary_to_lawyer: 0, lawyer_return: 0 })
 const agenciesList = ref<{ id: number, nombre: string }[]>([])
-const selectedAgency = ref<number | null>(null)
+const selectedAgencies = ref<number[]>([])
+const isAgencyDropdownOpen = ref(false)
 const selectedMonth = ref(new Date().toISOString().slice(0, 7))
+
+const isAllAgenciesSelected = computed(() => {
+    return selectedAgencies.value.length === 0 || selectedAgencies.value.length === agenciesList.value.length
+})
+
+const selectedAgenciesLabel = computed(() => {
+    if (isAllAgenciesSelected.value || selectedAgencies.value.length === 0) {
+        return 'Todas las Agencias'
+    }
+    if (selectedAgencies.value.length === 1) {
+        const agency = agenciesList.value.find(a => a.id === selectedAgencies.value[0])
+        return agency ? agency.nombre : '1 Agencia'
+    }
+    return `${selectedAgencies.value.length} Agencias`
+})
+
+const selectAllAgencies = () => {
+    selectedAgencies.value = []
+    loadAll()
+}
 
 const loadAll = async () => {
     if (!hasAnyDashboardPermission.value) return;
 
     loading.value = true
     try {
-        const [kpiRes, pipeRes, advRes, rejRes, agRes, trRes, timeRes, agListRes] = await Promise.all([
-            DashboardService.getKpi(selectedMonth.value),
-            DashboardService.getPipeline(selectedMonth.value),
-            DashboardService.getAdvisors(1, null, selectedMonth.value), // Initial load without filter
-            DashboardService.getRejections(),
-            DashboardService.getAgencies(1, selectedMonth.value),
-            DashboardService.getTrends(),
-            DashboardService.getProcessingTimes(selectedMonth.value),
+        const [kpiRes, pipeRes, advRes, agRes, trRes, timeRes, agListRes] = await Promise.all([
+            DashboardService.getKpi(selectedMonth.value, selectedAgencies.value),
+            DashboardService.getPipeline(selectedMonth.value, selectedAgencies.value),
+            DashboardService.getAdvisors(1, selectedAgencies.value, selectedMonth.value), // Initial load with or without filter
+            DashboardService.getAgencies(1, selectedMonth.value, selectedAgencies.value),
+            DashboardService.getTrends(selectedAgencies.value),
+            DashboardService.getProcessingTimes(selectedMonth.value, selectedAgencies.value),
             DashboardService.getAgenciesList()
         ])
 
         kpi.value = kpiRes
         pipeline.value = pipeRes
         advisors.value = advRes
-        rejections.value = rejRes
         agencies.value = agRes
         trends.value = trRes
         times.value = timeRes
@@ -404,23 +444,11 @@ const loadAll = async () => {
     }
 }
 
-const filterAdvisors = async () => {
-    loading.value = true
-    try {
-        const res = await DashboardService.getAdvisors(1, selectedAgency.value, selectedMonth.value)
-        advisors.value = res
-    } catch (e) {
-        console.error("Error filtering advisors", e)
-    } finally {
-        loading.value = false
-    }
-}
-
 const changeAdvisorPage = async (page: number) => {
     if (page < 1 || page > advisors.value.last_page) return
     loading.value = true
     try {
-        const res = await DashboardService.getAdvisors(page, selectedAgency.value, selectedMonth.value)
+        const res = await DashboardService.getAdvisors(page, selectedAgencies.value, selectedMonth.value)
         advisors.value = res
     } catch (e) {
         console.error("Error changing advisor page", e)
