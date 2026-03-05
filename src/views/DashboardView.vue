@@ -16,9 +16,9 @@
                 </div>
 
                 <!-- Agency Multi-Select Filter -->
-                <div class="relative" v-if="hasGeneralOrSuper">
+                <div class="relative" v-if="hasGeneralOrSuper" id="agency-filter-container">
                     <button 
-                        @click="isAgencyDropdownOpen = !isAgencyDropdownOpen" 
+                        @click.stop="isAgencyDropdownOpen = !isAgencyDropdownOpen" 
                         class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                     >
                         <span class="truncate max-w-[150px] sm:max-w-xs">{{ selectedAgenciesLabel }}</span>
@@ -27,23 +27,32 @@
                         </svg>
                     </button>
                     
-                    <div v-show="isAgencyDropdownOpen" class="absolute right-0 sm:left-0 z-20 w-64 mt-2 bg-white rounded-md shadow-lg dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
-                        <div class="p-2 space-y-1 max-h-60 overflow-y-auto">
-                            <!-- Toggle All Button -->
-                            <label class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
-                                <input type="checkbox" :checked="isAllAgenciesSelected" @change="selectAllAgencies" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                <span class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Todas las Agencias</span>
-                            </label>
-                            
-                            <div class="border-t border-gray-200 dark:border-gray-600 my-1"></div>
-                            
-                            <!-- Individual Agencies -->
-                            <label v-for="agency in agenciesList" :key="agency.id" class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
-                                <input type="checkbox" :value="agency.id" v-model="selectedAgencies" @change="loadAll" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                <span class="ml-2 text-sm text-gray-900 dark:text-gray-300">{{ agency.nombre }}</span>
-                            </label>
+                    <Transition
+                        enter-active-class="transition ease-out duration-100"
+                        enter-from-class="transform opacity-0 scale-95"
+                        enter-to-class="transform opacity-100 scale-100"
+                        leave-active-class="transition ease-in duration-75"
+                        leave-from-class="transform opacity-100 scale-100"
+                        leave-to-class="transform opacity-0 scale-95"
+                    >
+                        <div v-show="isAgencyDropdownOpen" class="absolute right-0 sm:left-0 z-20 w-64 mt-2 bg-white rounded-md shadow-lg dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
+                            <div class="p-2 space-y-1 max-h-60 overflow-y-auto">
+                                <!-- Toggle All Button -->
+                                <label class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                                    <input type="checkbox" :checked="isAllAgenciesSelected" @change="selectAllAgencies" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    <span class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Todas las Agencias</span>
+                                </label>
+                                
+                                <div class="border-t border-gray-200 dark:border-gray-600 my-1"></div>
+                                
+                                <!-- Individual Agencies -->
+                                <label v-for="agency in agenciesList" :key="agency.id" class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                                    <input type="checkbox" :value="agency.id" v-model="selectedAgencies" @change="loadAll" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-gray-300">{{ agency.nombre }}</span>
+                                </label>
+                            </div>
                         </div>
-                    </div>
+                    </Transition>
                 </div>
                 <div class="w-px h-8 bg-gray-200 dark:bg-gray-700 mx-1 hidden sm:block" v-if="hasGeneralOrSuper"></div>
 
@@ -69,65 +78,78 @@
 
         <!-- KPIs Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Active Cases -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Expedientes Activos</p>
-                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ kpi.total_active }}</h3>
-                    </div>
-                    <div class="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
+            <template v-if="loading">
+                <div v-for="i in 4" :key="i" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border-l-4 border-gray-200 dark:border-gray-700 animate-pulse">
+                    <div class="flex justify-between items-start">
+                        <div class="space-y-3 flex-1">
+                            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                            <div class="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                        </div>
+                        <div class="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
                     </div>
                 </div>
-            </div>
+            </template>
+            <template v-else>
+                <!-- Active Cases -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border-l-4 border-blue-500 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Expedientes Activos</p>
+                            <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ kpi.total_active }}</h3>
+                        </div>
+                        <div class="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
 
-            <!-- In Amount -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border-l-4 border-verde-cope">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Monto (Este Mes)</p>
-                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ formatCurrency(kpi.total_amount) }}</h3>
-                    </div>
-                    <div class="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg text-verde-cope">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                <!-- In Amount -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border-l-4 border-verde-cope hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Monto (Este Mes)</p>
+                            <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ formatCurrency(kpi.total_amount) }}</h3>
+                        </div>
+                        <div class="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg text-verde-cope">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Finalized -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border-l-4 border-purple-500">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Finalizados</p>
-                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ kpi.total_finalized }}</h3>
-                    </div>
-                    <div class="p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                        </svg>
+                <!-- Finalized -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border-l-4 border-purple-500 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Finalizados</p>
+                            <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ kpi.total_finalized }}</h3>
+                        </div>
+                        <div class="p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Avg Time -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border-l-4 border-orange-500">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tiempo Promedio de apertura a cierre</p>
-                        <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ kpi.avg_days_open }} <span class="text-sm font-normal text-gray-500">días</span></h3>
-                    </div>
-                    <div class="p-2 bg-orange-50 dark:bg-orange-900/30 rounded-lg text-orange-600 dark:text-orange-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                <!-- Avg Time -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border-l-4 border-orange-500 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tiempo Promedio</p>
+                            <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ kpi.avg_days_open }} <span class="text-sm font-normal text-gray-500">días</span></h3>
+                        </div>
+                        <div class="p-2 bg-orange-50 dark:bg-orange-900/30 rounded-lg text-orange-600 dark:text-orange-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </template>
         </div>
 
         <!-- Processing Times -->
@@ -137,7 +159,13 @@
             <!-- Process Distribution (2/3 width) -->
             <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Distribución por Etapas</h3>
-                <div class="space-y-4">
+                <div v-if="loading" class="space-y-4 animate-pulse">
+                    <div v-for="i in 5" :key="i" class="space-y-2">
+                        <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                        <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                    </div>
+                </div>
+                <div v-else class="space-y-4">
                     <div v-for="(item, index) in pipeline" :key="index" class="relative">
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ item.state_name }}</span>
@@ -154,7 +182,10 @@
             <!-- Trends Mini Table (1/3 width) -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Tendencia (6 Meses)</h3>
-                <div class="overflow-x-auto">
+                <div v-if="loading" class="space-y-4 animate-pulse">
+                    <div v-for="i in 6" :key="i" class="h-8 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                </div>
+                <div v-else class="overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead>
                             <tr class="text-left border-b border-gray-100 dark:border-gray-700">
@@ -220,39 +251,56 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                            <tr v-for="(adv, i) in advisors.data" :key="i" class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
-                                <td class="px-4 py-3 font-medium text-gray-900 dark:text-white truncate max-w-[150px]" :title="adv.asesor">
-                                    {{ adv.asesor }}
-                                </td>
-                                <td class="px-4 py-3 text-center">
-                                    <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                        {{ adv.active_cases }}
-                                    </span>
-                                </td>
-                                <td class="px-4 py-3 text-center text-red-600 dark:text-red-400 font-medium">
-                                    {{ adv.rejected_cases }}
-                                </td>
-                                <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">
-                                    {{ formatCurrency(adv.creditos ?? 0) }}
-                                </td>
-                                <td class="px-4 py-3 text-center">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <span class="font-bold" :class="{'text-red-600': adv.success_rate < 70, 'text-yellow-600': adv.success_rate >= 70 && adv.success_rate < 90, 'text-green-600': adv.success_rate >= 90}">
-                                            {{ adv.success_rate }}%
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <span :class="{'text-green-600': adv.rejection_rate < 10, 'text-yellow-600': adv.rejection_rate >= 10 && adv.rejection_rate < 30, 'text-red-600': adv.rejection_rate >= 30}">
-                                            {{ adv.rejection_rate }}%
-                                        </span>
-                                        <div class="w-16 bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                                            <div class="h-1.5 rounded-full" :class="{'bg-green-500': adv.rejection_rate < 10, 'bg-yellow-500': adv.rejection_rate >= 10 && adv.rejection_rate < 30, 'bg-red-500': adv.rejection_rate >= 30}" :style="{ width: Math.min(adv.rejection_rate, 100) + '%' }"></div>
+                            <template v-if="loading">
+                                <tr v-for="i in 5" :key="'skeleton-adv-' + i" class="animate-pulse">
+                                    <td class="px-4 py-3"><div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div></td>
+                                    <td class="px-4 py-3"><div class="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-8 mx-auto"></div></td>
+                                    <td class="px-4 py-3"><div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mx-auto"></div></td>
+                                    <td class="px-4 py-3"><div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 ml-auto"></div></td>
+                                    <td class="px-4 py-3"><div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-12 mx-auto"></div></td>
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-8"></div>
+                                            <div class="w-16 bg-gray-200 rounded-full h-1.5 dark:bg-gray-700"></div>
                                         </div>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else>
+                                <tr v-for="(adv, i) in advisors.data" :key="i" class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
+                                    <td class="px-4 py-3 font-medium text-gray-900 dark:text-white truncate max-w-[150px]" :title="adv.asesor">
+                                        {{ adv.asesor }}
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                            {{ adv.active_cases }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3 text-center text-red-600 dark:text-red-400 font-medium">
+                                        {{ adv.rejected_cases }}
+                                    </td>
+                                    <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">
+                                        {{ formatCurrency(adv.creditos ?? 0) }}
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <span class="font-bold" :class="{'text-red-600': adv.success_rate < 70, 'text-yellow-600': adv.success_rate >= 70 && adv.success_rate < 90, 'text-green-600': adv.success_rate >= 90}">
+                                                {{ adv.success_rate }}%
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 text-right">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <span :class="{'text-green-600': adv.rejection_rate < 10, 'text-yellow-600': adv.rejection_rate >= 10 && adv.rejection_rate < 30, 'text-red-600': adv.rejection_rate >= 30}">
+                                                {{ adv.rejection_rate }}%
+                                            </span>
+                                            <div class="w-16 bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
+                                                <div class="h-1.5 rounded-full" :class="{'bg-green-500': adv.rejection_rate < 10, 'bg-yellow-500': adv.rejection_rate >= 10 && adv.rejection_rate < 30, 'bg-red-500': adv.rejection_rate >= 30}" :style="{ width: Math.min(adv.rejection_rate, 100) + '%' }"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
                         </tbody>
                     </table>
                 </div>
@@ -299,39 +347,56 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                            <tr v-for="(agency, i) in agencies.data" :key="i" class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
-                                <td class="px-4 py-3 font-medium text-gray-900 dark:text-white truncate max-w-[150px]">
-                                    {{ agency.agency }}
-                                </td>
-                                <td class="px-4 py-3 text-center">
-                                    <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                        {{ agency.active }}
-                                    </span>
-                                </td>
-                                <td class="px-4 py-3 text-center text-red-600 dark:text-red-400 font-medium">
-                                    {{ agency.rejected_cases }}
-                                </td>
-                                <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">
-                                    {{ formatCurrency(agency.creditos ?? 0) }}
-                                </td>
-                                <td class="px-4 py-3 text-center">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <span class="font-bold" :class="{'text-red-600': agency.success_rate < 70, 'text-yellow-600': agency.success_rate >= 70 && agency.success_rate < 90, 'text-green-600': agency.success_rate >= 90}">
-                                            {{ agency.success_rate }}%
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <span :class="{'text-green-600': agency.rejection_rate < 10, 'text-yellow-600': agency.rejection_rate >= 10 && agency.rejection_rate < 30, 'text-red-600': agency.rejection_rate >= 30}">
-                                            {{ agency.rejection_rate }}%
-                                        </span>
-                                        <div class="w-16 bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                                            <div class="h-1.5 rounded-full" :class="{'bg-green-500': agency.rejection_rate < 10, 'bg-yellow-500': agency.rejection_rate >= 10 && agency.rejection_rate < 30, 'bg-red-500': agency.rejection_rate >= 30}" :style="{ width: Math.min(agency.rejection_rate, 100) + '%' }"></div>
+                            <template v-if="loading">
+                                <tr v-for="i in 5" :key="'skeleton-agy-' + i" class="animate-pulse">
+                                    <td class="px-4 py-3"><div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div></td>
+                                    <td class="px-4 py-3"><div class="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-8 mx-auto"></div></td>
+                                    <td class="px-4 py-3"><div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mx-auto"></div></td>
+                                    <td class="px-4 py-3"><div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 ml-auto"></div></td>
+                                    <td class="px-4 py-3"><div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-12 mx-auto"></div></td>
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-8"></div>
+                                            <div class="w-16 bg-gray-200 rounded-full h-1.5 dark:bg-gray-700"></div>
                                         </div>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else>
+                                <tr v-for="(agency, i) in agencies.data" :key="i" class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
+                                    <td class="px-4 py-3 font-medium text-gray-900 dark:text-white truncate max-w-[150px]">
+                                        {{ agency.agency }}
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                            {{ agency.active }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3 text-center text-red-600 dark:text-red-400 font-medium">
+                                        {{ agency.rejected_cases }}
+                                    </td>
+                                    <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">
+                                        {{ formatCurrency(agency.creditos ?? 0) }}
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <span class="font-bold" :class="{'text-red-600': agency.success_rate < 70, 'text-yellow-600': agency.success_rate >= 70 && agency.success_rate < 90, 'text-green-600': agency.success_rate >= 90}">
+                                                {{ agency.success_rate }}%
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 text-right">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <span :class="{'text-green-600': agency.rejection_rate < 10, 'text-yellow-600': agency.rejection_rate >= 10 && agency.rejection_rate < 30, 'text-red-600': agency.rejection_rate >= 30}">
+                                                {{ agency.rejection_rate }}%
+                                            </span>
+                                            <div class="w-16 bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
+                                                <div class="h-1.5 rounded-full" :class="{'bg-green-500': agency.rejection_rate < 10, 'bg-yellow-500': agency.rejection_rate >= 10 && agency.rejection_rate < 30, 'bg-red-500': agency.rejection_rate >= 30}" :style="{ width: Math.min(agency.rejection_rate, 100) + '%' }"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
                         </tbody>
                     </table>
                 </div>
@@ -368,7 +433,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import DashboardService from '@/services/DashboardService'
 import ProcessingTimesWidget from './dashboard/ProcessingTimesWidget.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -414,6 +479,13 @@ const selectAllAgencies = () => {
     loadAll()
 }
 
+const handleClickOutside = (event: MouseEvent) => {
+    const container = document.getElementById('agency-filter-container')
+    if (container && !container.contains(event.target as Node)) {
+        isAgencyDropdownOpen.value = false
+    }
+}
+
 const loadAll = async () => {
     if (!hasAnyDashboardPermission.value) return;
 
@@ -440,7 +512,9 @@ const loadAll = async () => {
     } catch (e) {
         console.error("Error loading dashboard data", e)
     } finally {
-        loading.value = false
+        setTimeout(() => {
+            loading.value = false
+        }, 300) // Subtle delay for smoother skeleton feel
     }
 }
 
@@ -481,5 +555,10 @@ const calculatePercent = (val: number, total: number) => {
 
 onMounted(() => {
     loadAll()
+    window.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('click', handleClickOutside)
 })
 </script>
