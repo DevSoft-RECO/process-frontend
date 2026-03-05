@@ -30,7 +30,7 @@
                     @keyup.enter="loadHistory(1)"
                     type="text" 
                     class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-4 sm:text-sm border-gray-300 rounded-md py-2" 
-                    placeholder="Buscar por Expediente / Documento"
+                    placeholder="Buscar por Expediente, Documento, Cód. Cliente o Producto"
                 >
                 <button 
                   @click="loadHistory(1)"
@@ -181,7 +181,8 @@ const loadHistory = async (page = 1) => {
   try {
     const params = { 
         page,
-        estado: filterState.value 
+        estado: filterState.value,
+        search: searchTerm.value || null
     };
     
     // NOTA: Usamos el endpoint /solicitudes-retiro/archivo que ahora soporta estados 5 y 6
