@@ -1,8 +1,8 @@
 <template>
   <div class="h-full flex flex-col space-y-4">
-    <h1 class="text-2xl font-bold text-gray-800">Buzón de Solicitudes de Garantías</h1>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Buzón de Solicitudes de Garantías</h1>
 
-    <div class="bg-white p-4 rounded-lg shadow flex-1 overflow-hidden flex flex-col">
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow flex-1 overflow-hidden flex flex-col">
       <div class="flex justify-between items-center mb-4">
         <div class="flex space-x-2">
            <button 
@@ -33,15 +33,28 @@
            >
              Por Reingresar
            </button>
+          <!-- Filtro de agencias -->
+          <div class="ml-4">
+             <select 
+               v-model="selectedAgencyFilter" 
+               @change="filterState = 1; loadRequests(1)" 
+               class="border border-gray-300 rounded px-2 py-1 text-sm bg-white dark:bg-gray-700 dark:text-gray-200"
+             >
+               <option value="">Todas las Agencias</option>
+               <option v-for="ag in agencies" :key="ag.id" :value="ag.id">
+                 {{ ag.nombre }}
+               </option>
+             </select>
+          </div>
         </div>
-        <button @click="loadRequests" class="text-blue-600 hover:text-blue-800 text-sm">
+        <button @click="loadRequests(currentPage)" class="text-blue-600 hover:text-blue-800 text-sm">
           <i class="fas fa-sync"></i> Actualizar
         </button>
       </div>
 
-      <div class="flex-1 overflow-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50 sticky top-0">
+      <div class="flex-1 overflow-auto mb-4">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-900">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha / Origen</th>
@@ -54,62 +67,62 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             <tr v-if="loading">
-              <td colspan="7" class="px-6 py-4 text-center text-gray-500">Cargando solicitudes...</td>
+              <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">Cargando solicitudes...</td>
             </tr>
             <tr v-else-if="requests.length === 0">
-              <td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay solicitudes en este estado.</td>
+              <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No hay solicitudes en este estado.</td>
             </tr>
-            <tr v-for="req in requests" :key="req.id" class="hover:bg-gray-50">
+            <tr v-for="req in requests" :key="req.id" class="hover:bg-gray-50 dark:hover:bg-gray-700">
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <div class="text-gray-900 font-medium">{{ req.id }}</div>
+                <div class="text-gray-900 dark:text-gray-100 font-medium">{{ req.id }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                  <div class="text-gray-900 font-medium">{{ formatDateTime(req.fecha_solicitud) }}</div>
+                  <div class="text-gray-900 dark:text-gray-100 font-medium">{{ formatDateTime(req.fecha_solicitud) }}</div>
                   <div class="mt-1">
-                      <span v-if="req.id_expediente" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      <span v-if="req.id_expediente" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
                           Sistema
                       </span>
-                      <span v-else-if="req.es_manual" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                      <span v-else-if="req.es_manual" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
                           Manual
                       </span>
-                      <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                      <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
                           Histórico
                       </span>
                   </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                  <div class="text-gray-900 font-bold" title="Agencia Solicitante"><i class="fas fa-building text-gray-400 mr-1"></i> {{ req.agencia?.nombre || 'N/A' }}</div>
-                  <div class="text-gray-500" title="Usuario Solicitante"><i class="fas fa-user-circle text-gray-400 mr-1"></i> {{ req.solicitante?.name || 'N/A' }}</div>
+                  <div class="text-gray-900 dark:text-gray-100 font-bold" title="Agencia Solicitante"><i class="fas fa-building text-gray-400 dark:text-gray-500 mr-1"></i> {{ req.agencia?.nombre || 'N/A' }}</div>
+                  <div class="text-gray-500 dark:text-gray-400" title="Usuario Solicitante"><i class="fas fa-user-circle text-gray-400 dark:text-gray-500 mr-1"></i> {{ req.solicitante?.name || 'N/A' }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                  <div class="text-gray-900 font-bold" title="Código Cliente"><i class="text-gray-400 mr-1"></i> {{ req.codigo_cliente || 'N/A' }}</div>
-                  <div class="text-gray-500" title="Usuario Solicitante"><i class="text-gray-400 mr-1"></i> {{ req.numero_producto || 'N/A' }}</div>
+                  <div class="text-gray-900 dark:text-gray-100 font-bold" title="Código Cliente"><i class="text-gray-400 dark:text-gray-500 mr-1"></i> {{ req.codigo_cliente || 'N/A' }}</div>
+                  <div class="text-gray-500 dark:text-gray-400" title="Usuario Solicitante"><i class="text-gray-400 dark:text-gray-500 mr-1"></i> {{ req.numero_producto || 'N/A' }}</div>
               </td>
               <td class="px-6 py-4 text-sm">
-                <div class="font-bold text-gray-900 truncate max-w-[200px]" :title="req.numero_documento">{{ req.numero_documento }}</div>
-                <div class="text-xs text-gray-500 mt-1" v-if="req.fecha_documento">
+                <div class="font-bold text-gray-900 dark:text-gray-100 truncate max-w-[200px]" :title="req.numero_documento">{{ req.numero_documento }}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1" v-if="req.fecha_documento">
                     <i class="far fa-calendar-alt"></i> {{ formatDate(req.fecha_documento) }}
                 </div>
-                <div class="text-gray-500 text-xs truncate max-w-[200px]" :title="req.titulo_nombre">{{ req.titulo_nombre }}</div>
+                <div class="text-gray-500 dark:text-gray-400 text-xs truncate max-w-[200px]" :title="req.titulo_nombre">{{ req.titulo_nombre }}</div>
               </td>
               <td class="px-6 py-4 text-sm max-w-xs">
-                 <div class="font-bold mb-1" :class="req.tipo_retiro === 'Definitivo' ? 'text-red-600' : 'text-blue-600'">
+                 <div class="font-bold mb-1" :class="req.tipo_retiro === 'Definitivo' ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'">
                     {{ req.tipo_retiro }}
                  </div>
-                 <div class="text-gray-500 text-xs truncate" :title="req.justificacion">
+                 <div class="text-gray-500 dark:text-gray-400 text-xs truncate" :title="req.justificacion">
                     {{ req.justificacion }}
                  </div>
               </td>
-              <td v-if="filterState === 4" class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" :title="req.observacion_retorno">
+              <td v-if="filterState === 4" class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate" :title="req.observacion_retorno">
                 {{ req.observacion_retorno || '-' }}
               </td>
 
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button 
                   @click="openDetailModal(req)"
-                  class="mr-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                  class="mr-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
                 >
                   <i class="fas fa-eye"></i> Ver
                 </button>
@@ -117,14 +130,14 @@
                     <button 
                       v-if="!isHistoricoSinDocumento(req)"
                       @click="dispatchRequest(req)" 
-                      class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                      class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
                     >
                       Despachar
                     </button>
                     <button 
                       v-else
                       @click="openRegistrationModal(req)" 
-                      class="bg-blue-600 text-white px-3 py-1 mb-1 rounded hover:bg-blue-700 shadow-sm block text-xs"
+                      class="bg-blue-600 text-white px-3 py-1 mb-1 rounded hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 shadow-sm block text-xs"
                       title="Debe registrar el documento físico antes de despachar"
                     >
                       <i class="fas fa-file-signature"></i> Registrar Doc.
@@ -133,13 +146,13 @@
                 <button 
                   v-if="req.estado_actual === 1 && authStore.hasRole('Super Admin')"
                   @click="deleteRequest(req)" 
-                  class="ml-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                  class="ml-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600"
                   title="Eliminar Solicitud"
                 >
                   <i class="fas fa-trash"></i>
                 </button>
                 <div v-else class="flex flex-col space-y-1">
-                     <span class="text-xs font-bold text-gray-500">
+                     <span class="text-xs font-bold text-gray-500 dark:text-gray-400">
                          {{ getStatusLabel(req.estado_actual) }}
                      </span>
                     
@@ -157,24 +170,53 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Paginación -->
+      <div v-if="lastPage > 1 && !loading" class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 sm:px-6 mt-auto">
+          <div class="flex flex-1 justify-between sm:hidden">
+            <button @click="loadRequests(currentPage - 1)" :disabled="currentPage === 1" class="relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50">Anterior</button>
+            <button @click="loadRequests(currentPage + 1)" :disabled="currentPage === lastPage" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50">Siguiente</button>
+          </div>
+          <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm text-gray-700 dark:text-gray-300">
+                Mostrando página <span class="font-medium dark:text-white">{{ currentPage }}</span> de <span class="font-medium dark:text-white">{{ lastPage }}</span> 
+                (<span class="font-medium dark:text-white">{{ totalRecords }}</span> registros totales)
+              </p>
+            </div>
+            <div>
+              <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                <button @click="loadRequests(currentPage - 1)" :disabled="currentPage === 1" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 dark:text-gray-300 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 focus:z-20 focus:outline-offset-0 disabled:opacity-50 bg-white dark:bg-gray-700">
+                  <span class="sr-only">Anterior</span>
+                  <i class="fas fa-chevron-left h-5 w-5 text-center leading-5"></i>
+                </button>
+                <div class="px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 bg-white dark:bg-gray-800">{{ currentPage }}</div>
+                <button @click="loadRequests(currentPage + 1)" :disabled="currentPage === lastPage" class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 dark:text-gray-300 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 focus:z-20 focus:outline-offset-0 disabled:opacity-50 bg-white dark:bg-gray-700">
+                  <span class="sr-only">Siguiente</span>
+                  <i class="fas fa-chevron-right h-5 w-5 text-center leading-5"></i>
+                </button>
+              </nav>
+            </div>
+          </div>
+      </div>
     </div>
 
     <!-- Detail Modal -->
     <div v-if="showDetailModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity">
-      <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl transform transition-all relative">
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-2xl transform transition-all relative">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="text-xl font-bold text-gray-800">Detalles de la Garantía</h3>
-          <button @click="closeDetailModal" class="text-gray-500 hover:text-gray-700">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white">Detalles de la Garantía</h3>
+          <button @click="closeDetailModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
             <i class="fas fa-times"></i>
           </button>
         </div>
 
         <div v-if="selectedDocument" class="space-y-4">
            <!-- CASO HISTÓRICO -->
-           <div v-if="selectedDocument._isHistoric" class="bg-purple-50 p-4 rounded border border-purple-200">
+           <div v-if="selectedDocument._isHistoric" class="bg-purple-50 dark:bg-purple-900/30 p-4 rounded border border-purple-200 dark:border-purple-800/50">
                <div class="flex items-center space-x-2 mb-2">
-                   <span class="px-2 py-0.5 rounded bg-purple-200 text-purple-800 text-xs font-bold">Histórico</span>
-                   <h4 class="font-bold text-gray-800">Detalles Recuperados</h4>
+                   <span class="px-2 py-0.5 rounded bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200 text-xs font-bold">Histórico</span>
+                   <h4 class="font-bold text-gray-800 dark:text-gray-100">Detalles Recuperados</h4>
                </div>
                
                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
@@ -189,63 +231,63 @@
                </div>
                
                <div class="mb-3">
-                   <p class="text-xs font-bold text-gray-500 uppercase">Datos de Garantía</p>
-                   <p class="text-sm text-gray-800 whitespace-pre-line">{{ selectedDocument.datos_garantia || 'Sin datos registrados.' }}</p>
+                   <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Datos de Garantía</p>
+                   <p class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-line">{{ selectedDocument.datos_garantia || 'Sin datos registrados.' }}</p>
                </div>
 
                <div>
-                   <p class="text-xs font-bold text-gray-500 uppercase">Observaciones Originales</p>
-                   <p class="text-sm text-gray-800">{{ selectedDocument.observacion || 'Sin observaciones.' }}</p>
+                   <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Observaciones Originales</p>
+                   <p class="text-sm text-gray-800 dark:text-gray-200">{{ selectedDocument.observacion || 'Sin observaciones.' }}</p>
                </div>
            </div>
 
            <!-- CASO SISTEMA (Nuevo Expediente) -->
            <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div class="bg-gray-50 p-3 rounded">
-                <span class="block font-bold text-gray-600">Número de Documento</span>
-                <span class="text-gray-900">{{ selectedDocument.numero }}</span>
+              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                <span class="block font-bold text-gray-600 dark:text-gray-400">Número de Documento</span>
+                <span class="text-gray-900 dark:text-gray-100">{{ selectedDocument.numero }}</span>
               </div>
-              <div class="bg-gray-50 p-3 rounded">
-                 <span class="block font-bold text-gray-600">Nombre asociado Producto</span>
-                 <span class="text-gray-900">{{ currentRequest?.titulo_nombre }}</span>
+              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                 <span class="block font-bold text-gray-600 dark:text-gray-400">Nombre asociado Producto</span>
+                 <span class="text-gray-900 dark:text-gray-100">{{ currentRequest?.titulo_nombre }}</span>
               </div>
-               <div class="bg-gray-50 p-3 rounded">
-                 <span class="block font-bold text-gray-600">Fecha del Documento</span>
-                 <span class="text-gray-900">{{ currentRequest?.fecha_documento ? new Date(currentRequest.fecha_documento).toLocaleDateString() : 'N/A' }}</span>
+               <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                 <span class="block font-bold text-gray-600 dark:text-gray-400">Fecha del Documento</span>
+                 <span class="text-gray-900 dark:text-gray-100">{{ currentRequest?.fecha_documento ? new Date(currentRequest.fecha_documento).toLocaleDateString() : 'N/A' }}</span>
               </div>
-              <div class="bg-gray-50 p-3 rounded">
-                 <span class="block font-bold text-gray-600">Propietario</span>
-                 <span class="text-gray-900">{{ selectedDocument.propietario }}</span>
+              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                 <span class="block font-bold text-gray-600 dark:text-gray-400">Propietario</span>
+                 <span class="text-gray-900 dark:text-gray-100">{{ selectedDocument.propietario }}</span>
               </div>
-              <div class="bg-gray-50 p-3 rounded">
-                 <span class="block font-bold text-gray-600">Autorizador</span>
-                 <span class="text-gray-900">{{ selectedDocument.autorizador }}</span>
+              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                 <span class="block font-bold text-gray-600 dark:text-gray-400">Autorizador</span>
+                 <span class="text-gray-900 dark:text-gray-100">{{ selectedDocument.autorizador }}</span>
               </div>
-               <div class="bg-gray-50 p-3 rounded">
-                 <span class="block font-bold text-gray-600">Monto</span>
-                 <span class="text-gray-900">{{ selectedDocument.monto_poliza }}</span>
+               <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                 <span class="block font-bold text-gray-600 dark:text-gray-400">Monto</span>
+                 <span class="text-gray-900 dark:text-gray-100">{{ selectedDocument.monto_poliza }}</span>
               </div>
-              <div class="bg-gray-50 p-3 rounded">
-                 <span class="block font-bold text-gray-600">Tipo Documento</span>
-                 <span class="text-gray-900">{{ selectedDocument.tipo_documento?.nombre || 'N/A' }}</span>
+              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                 <span class="block font-bold text-gray-600 dark:text-gray-400">Tipo Documento</span>
+                 <span class="text-gray-900 dark:text-gray-100">{{ selectedDocument.tipo_documento?.nombre || 'N/A' }}</span>
               </div>
-               <div class="col-span-2 bg-gray-50 p-3 rounded flex flex-wrap gap-4">
-                 <div class="flex-1 min-w-[120px]"><span class="block font-bold text-gray-600 text-xs uppercase mb-1">Finca</span> {{ selectedDocument.no_finca || '-' }}</div>
-                 <div class="flex-1 min-w-[120px]"><span class="block font-bold text-gray-600 text-xs uppercase mb-1">Folio</span> {{ selectedDocument.folio || '-' }}</div>
-                 <div class="flex-1 min-w-[120px]"><span class="block font-bold text-gray-600 text-xs uppercase mb-1">Libro</span> {{ selectedDocument.libro || '-' }}</div>
-                 <div class="flex-1 min-w-[120px]"><span class="block font-bold text-gray-600 text-xs uppercase mb-1">No. Dominio</span> {{ selectedDocument.no_dominio || '-' }}</div>
+               <div class="col-span-2 bg-gray-50 dark:bg-gray-700 p-3 rounded flex flex-wrap gap-4">
+                 <div class="flex-1 min-w-[120px]"><span class="block font-bold text-gray-600 dark:text-gray-400 text-xs uppercase mb-1">Finca</span> <span class="dark:text-gray-100">{{ selectedDocument.no_finca || '-' }}</span></div>
+                 <div class="flex-1 min-w-[120px]"><span class="block font-bold text-gray-600 dark:text-gray-400 text-xs uppercase mb-1">Folio</span> <span class="dark:text-gray-100">{{ selectedDocument.folio || '-' }}</span></div>
+                 <div class="flex-1 min-w-[120px]"><span class="block font-bold text-gray-600 dark:text-gray-400 text-xs uppercase mb-1">Libro</span> <span class="dark:text-gray-100">{{ selectedDocument.libro || '-' }}</span></div>
+                 <div class="flex-1 min-w-[120px]"><span class="block font-bold text-gray-600 dark:text-gray-400 text-xs uppercase mb-1">No. Dominio</span> <span class="dark:text-gray-100">{{ selectedDocument.no_dominio || '-' }}</span></div>
               </div>
-              <div class="col-span-2 bg-gray-50 p-3 rounded">
-                 <span class="block font-bold text-gray-600">Registro de Propiedad</span>
-                 <span class="text-gray-900">{{ selectedDocument.registro_propiedad?.nombre || 'N/A' }}</span>
+              <div class="col-span-2 bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                 <span class="block font-bold text-gray-600 dark:text-gray-400">Registro de Propiedad</span>
+                 <span class="text-gray-900 dark:text-gray-100">{{ selectedDocument.registro_propiedad?.nombre || 'N/A' }}</span>
               </div>
-              <div class="bg-gray-50 p-3 rounded">
-                  <span class="block font-bold text-gray-600">Referencia</span>
-                  <span class="text-gray-900">{{ selectedDocument.referencia || '-' }}</span>
+              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                  <span class="block font-bold text-gray-600 dark:text-gray-400">Referencia</span>
+                  <span class="text-gray-900 dark:text-gray-100">{{ selectedDocument.referencia || '-' }}</span>
               </div>
-              <div class="bg-gray-50 p-3 rounded">
-                  <span class="block font-bold text-gray-600">Observación Doc.</span>
-                  <span class="text-gray-900 text-xs">{{ selectedDocument.observacion || '-' }}</span>
+              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                  <span class="block font-bold text-gray-600 dark:text-gray-400">Observación Doc.</span>
+                  <span class="text-gray-900 dark:text-gray-100 text-xs">{{ selectedDocument.observacion || '-' }}</span>
               </div>
            </div>
            
@@ -290,6 +332,11 @@ const authStore = useAuthStore();
 const requests = ref([]);
 const loading = ref(false);
 const filterState = ref(1); // Default: Pendientes
+const selectedAgencyFilter = ref(''); // Default: Todas (Vacío)
+const currentPage = ref(1);
+const lastPage = ref(1);
+const totalRecords = ref(0);
+
 const showDetailModal = ref(false);
 const selectedDocument = ref(null);
 const currentRequest = ref(null);
@@ -314,13 +361,24 @@ const loadAgencies = async () => {
         console.error('Error loading agencies', error);
     }
 };
-const loadRequests = async () => {
+
+const loadRequests = async (page = 1) => {
   loading.value = true;
   try {
     const response = await api.get('/solicitudes-retiro/archivo', {
-      params: { estado: filterState.value }
+      params: { 
+          estado: filterState.value,
+          id_agencia: selectedAgencyFilter.value || null,
+          page: page
+      }
     });
+    
+    // Asignación de Paginación Laravel
     requests.value = response.data.data;
+    currentPage.value = response.data.current_page;
+    lastPage.value = response.data.last_page;
+    totalRecords.value = response.data.total;
+
   } catch (error) {
     console.error(error);
     Swal.fire('Error', 'No se pudieron cargar las solicitudes', 'error');
@@ -345,7 +403,7 @@ const deleteRequest = async (req) => {
     try {
       await api.delete(`/solicitudes-retiro/${req.id}`);
       Swal.fire('Eliminado!', 'La solicitud ha sido eliminada.', 'success');
-      loadRequests();
+      loadRequests(currentPage.value);
     } catch (error) {
       console.error(error);
       Swal.fire('Error', 'No se pudo eliminar la solicitud.', 'error');
@@ -405,7 +463,7 @@ const openRegistrationModal = (req) => {
 const handleDocumentRegistered = () => {
     showRegistrationModal.value = false;
     selectedRequestForRegistration.value = null;
-    loadRequests(); // Recargar para obtener el documento asociado
+    loadRequests(currentPage.value); // Recargar para obtener el documento asociado
 };
 // -------------------------
 
@@ -499,7 +557,7 @@ const dispatchRequest = async (req) => {
       });
 
       Swal.fire('Éxito', 'Documento despachado correctamente', 'success');
-      loadRequests();
+      loadRequests(currentPage.value);
     } catch (error) {
        console.error(error);
        Swal.fire('Error', 'No se pudo completar el despacho del documento', 'error');
@@ -526,7 +584,7 @@ const returnToArchive = async (req) => {
         try {
             await api.post(`/solicitudes-retiro/${req.id}/return-archive`);
             Swal.fire('Éxito', 'Documento reingresado al archivo.', 'success');
-            loadRequests();
+            loadRequests(currentPage.value);
         } catch (error) {
             console.error(error);
             Swal.fire('Error', error.response?.data?.message || 'Error al reingresar.', 'error');
@@ -553,7 +611,7 @@ const confirmReturn = async (req) => {
         try {
             await api.post(`/solicitudes-retiro/${req.id}/confirm-return`);
             Swal.fire('Éxito', 'Garantía reingresada al archivo correctamente.', 'success');
-            loadRequests();
+            loadRequests(currentPage.value);
         } catch (error) {
             console.error(error);
             Swal.fire('Error', error.response?.data?.message || 'No se pudo confirmar el reingreso.', 'error');
@@ -591,7 +649,7 @@ const formatDateTime = (dateString) => {
 };
 
 onMounted(() => {
-  loadRequests();
+  loadRequests(1);
   loadAgencies();
 });
 </script>
