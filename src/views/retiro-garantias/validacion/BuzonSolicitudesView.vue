@@ -45,6 +45,7 @@
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha / Origen</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Origen / Destino</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código Cliente / Producto</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detalles Retiro</th>
               <th v-if="filterState === 4" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Obs. Retorno</th>
@@ -77,6 +78,10 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm">
                   <div class="text-gray-900 font-bold" title="Agencia Solicitante"><i class="fas fa-building text-gray-400 mr-1"></i> {{ req.agencia?.nombre || 'N/A' }}</div>
                   <div class="text-gray-500" title="Usuario Solicitante"><i class="fas fa-user-circle text-gray-400 mr-1"></i> {{ req.solicitante?.name || 'N/A' }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <div class="text-gray-900 font-bold" title="Código Cliente"><i class="text-gray-400 mr-1"></i> {{ req.codigo_cliente || 'N/A' }}</div>
+                  <div class="text-gray-500" title="Usuario Solicitante"><i class="text-gray-400 mr-1"></i> {{ req.numero_producto || 'N/A' }}</div>
               </td>
               <td class="px-6 py-4 text-sm">
                 <div class="font-bold text-gray-900 truncate max-w-[200px]" :title="req.numero_documento">{{ req.numero_documento }}</div>
