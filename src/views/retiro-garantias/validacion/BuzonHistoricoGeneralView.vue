@@ -49,11 +49,14 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50 sticky top-0">
             <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Salida</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Retiro</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Agencia Solicitante</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Agencia Solicitante/Usuario</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código Cliente/Producto</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Evidencia de entrega</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado Final</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Estado Final</th>
             </tr>
@@ -66,6 +69,9 @@
               <td colspan="7" class="px-6 py-4 text-center text-gray-500">No se encontraron registros históricos.</td>
             </tr>
             <tr v-for="item in items" :key="item.id" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <div class="text-gray-900 font-medium">{{ item.id }}</div>
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {{ formatDate(item.fecha_solicitud) }}
               </td>
@@ -80,8 +86,24 @@
                   :class="item.tipo_retiro === 'Definitivo' ? 'text-red-600' : 'text-blue-600'">
                 {{ item.tipo_retiro }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.agencia?.nombre || 'N/A' }}</td>
-              
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <div class="text-gray-900 font-bold" title="Agencia Solicitante"><i class="fas fa-building text-gray-400 mr-1"></i> {{ item.agencia?.nombre || 'N/A' }}</div>
+                  <div class="text-gray-500" title="Usuario Solicitante"><i class="fas fa-user-circle text-gray-400 mr-1"></i> {{ item.solicitante?.name || 'N/A' }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <div class="text-gray-900 font-bold" title="Código Cliente"><i class="text-gray-400 mr-1"></i> {{ item.codigo_cliente || 'N/A' }}</div>
+                  <div class="text-gray-500" title="Usuario Solicitante"><i class="text-gray-400 mr-1"></i> {{ item.numero_producto || 'N/A' }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <button 
+                  v-if="item.evidencia_entrega_path"
+                  @click="verEvidencia(item.id)"
+                  class="text-blue-600 hover:text-blue-900 font-bold flex items-center"
+                >
+                  <i class="fas fa-file-pdf mr-1"></i> Ver Evidencia
+                </button>
+                <span v-else class="text-gray-400 italic">Sin evidencia</span>
+              </td>
               <!-- ESTADO FINAL -->
               <td class="px-6 py-4 whitespace-nowrap text-sm">
                  <span v-if="item.estado_actual === 0" class="px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-gray-200 text-gray-800 border border-gray-300">
@@ -172,6 +194,18 @@ const loadHistory = async (page = 1) => {
   } finally {
     loading.value = false;
   }
+};
+
+const verEvidencia = async (id) => {
+    try {
+        const response = await api.get(`/solicitudes-retiro/${id}/ver-evidencia`);
+        if (response.data.success && response.data.url) {
+            window.open(response.data.url, '_blank');
+        }
+    } catch (error) {
+        console.error(error);
+        Swal.fire('Error', 'No se pudo generar la URL de la evidencia.', 'error');
+    }
 };
 
 const formatDate = (dateString) => {
