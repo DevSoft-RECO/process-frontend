@@ -503,6 +503,8 @@ const formData = reactive({
   id_expediente: null,
   id_expediente_historico: null,
   numero_documento: '',
+  codigo_cliente: null,
+  numero_producto: null,
   id_documento: null,
   fecha_documento: null,
   titulo_nombre: '',
@@ -562,6 +564,8 @@ const searchDocument = async () => {
       // Pre-fill expediente data
       formData.id_expediente = response.data.data.id_expediente;
       formData.id_expediente_historico = response.data.data.id_expediente_historico || null;
+      formData.codigo_cliente = response.data.data.codigo_cliente || null;
+      formData.numero_producto = response.data.data.numero_producto || null;
       formData.titulo_nombre = response.data.data.titulo_nombre; // Keep existing title if any
       formData.es_manual = false;
       
@@ -755,6 +759,8 @@ const resetFormData = () => {
   formData.id_expediente = null;
   formData.id_expediente_historico = null;
   formData.numero_documento = '';
+  formData.codigo_cliente = null;
+  formData.numero_producto = null;
   formData.id_documento = null;
   formData.titulo_nombre = '';
   formData.tipo_retiro = 'Temporal';

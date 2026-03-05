@@ -118,6 +118,8 @@ const loadingSubmit = ref(false);
 const formData = reactive({
   id_expediente: null,
   id_expediente_historico: null,
+  codigo_cliente: null,
+  numero_producto: null,
   numero_documento: '',
   fecha_documento: null,
   titulo_nombre: '',
@@ -131,6 +133,8 @@ onMounted(() => {
     formData.fecha_documento = null;
     formData.titulo_nombre = props.documentData.titulo_nombre;
     formData.id_expediente_historico = props.documentData.id_expediente_historico || null;
+    formData.codigo_cliente = props.documentData.codigo_cliente || null;
+    formData.numero_producto = props.documentData.numero_producto || null;
     // Pre-fill justificacion with observations if useful, or leave empty
     // formData.justificacion = props.documentData.observaciones || ''; 
 });
