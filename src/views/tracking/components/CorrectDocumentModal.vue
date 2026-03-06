@@ -96,6 +96,12 @@
                         </div>
                     </div>
 
+                    <!-- Referencia -->
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Referencia</label>
+                        <input v-model="form.referencia" type="text" class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm">
+                    </div>
+
                     <!-- Observaciones -->
                      <div class="col-span-2">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Observaciones</label>

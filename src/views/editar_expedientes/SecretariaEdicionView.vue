@@ -185,6 +185,10 @@
                                          <span class="block text-xs uppercase text-gray-400">Monto</span>
                                          {{ formatCurrency(d.monto_poliza) }}
                                      </div>
+                                     <div>
+                                         <span class="block text-xs uppercase text-gray-400">Referencia</span>
+                                         {{ d.referencia || '---' }}
+                                     </div>
                                      <div class="md:col-span-3">
                                          <span class="block text-xs uppercase text-gray-400">Finca / Folio / Libro / No Dominio</span>
                                          {{ d.no_finca }} / {{ d.folio }} / {{ d.libro }} / {{ d.no_dominio }}
