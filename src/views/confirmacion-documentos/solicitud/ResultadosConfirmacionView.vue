@@ -17,7 +17,7 @@
     </div>
 
     <!-- Data Table -->
-    <div class="bg-white rounded-lg shadow overflow-hidden flex-1">
+    <div class="bg-white rounded-lg shadow overflow-auto flex-1 h-[0px]">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
@@ -84,7 +84,10 @@
                 </div>
                 <!-- Mostrar nuevos expedientes asociados si existen y ya hay confirmación -->
                 <div v-if="res.confirmacion && res.documento && res.documento.nuevos_expedientes && res.documento.nuevos_expedientes.length > 0">
-                    <span class="text-xs font-semibold text-blue-500 uppercase">Expedientes Asociados ({{ res.documento.nuevos_expedientes.length }}):</span>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-semibold text-blue-500 uppercase">Expedientes Asociados ({{ res.documento.nuevos_expedientes.length }}):</span>
+                        <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded border border-green-200" title="Información en Tiempo Real">Tiempo Real</span>
+                    </div>
                     <ul class="mt-1 space-y-1">
                       <li v-for="exp in res.documento.nuevos_expedientes" :key="exp.id" class="text-xs bg-blue-50 p-1.5 rounded border border-blue-100">
                         <div class="font-medium text-blue-700">Exp: {{ exp.numero_documento }}</div>
