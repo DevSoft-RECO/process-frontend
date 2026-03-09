@@ -129,7 +129,7 @@
                     class="flex w-full items-center gap-2 px-4 py-3 text-sm text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    Volver a App Madre
+                    Volver al Portal YK
                 </button>
             </div>
         </transition>
