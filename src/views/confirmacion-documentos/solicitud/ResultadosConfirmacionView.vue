@@ -70,17 +70,31 @@
               </div>
             </td>
 
-            <!-- Col 4: Observaciones -->
+            <!-- Col 4: Observaciones & Asociaciones -->
             <td class="px-6 py-4 text-sm text-gray-500 align-top">
                 <div class="mb-2">
                     <span class="text-xs font-semibold text-gray-400 uppercase">Observacion Documento:</span>
                     <p class="text-xs text-gray-600 italic whitespace-normal max-w-xs">{{ res.observacion || '(Sin obs)' }}</p>
                 </div>
-                <div>
+                <div class="mb-2">
                     <span class="text-xs font-semibold text-gray-400 uppercase">Respuesta de Confirmacion:</span>
                     <p class="text-xs text-gray-800 font-medium whitespace-normal max-w-xs">
                         {{ res.observacion_confirmacion || (res.confirmacion ? '-' : 'En proceso...') }}
                     </p>
+                </div>
+                <!-- Mostrar nuevos expedientes asociados si existen y ya hay confirmación -->
+                <div v-if="res.confirmacion && res.documento && res.documento.nuevos_expedientes && res.documento.nuevos_expedientes.length > 0">
+                    <span class="text-xs font-semibold text-blue-500 uppercase">Expedientes Asociados ({{ res.documento.nuevos_expedientes.length }}):</span>
+                    <ul class="mt-1 space-y-1">
+                      <li v-for="exp in res.documento.nuevos_expedientes" :key="exp.id" class="text-xs bg-blue-50 p-1.5 rounded border border-blue-100">
+                        <div class="font-medium text-blue-700">Exp: {{ exp.numero_documento }}</div>
+                        <div class="text-blue-600">{{ exp.nombre_asociado }}</div>
+                      </li>
+                    </ul>
+                </div>
+                <div v-else-if="res.confirmacion && res.documento">
+                    <span class="text-xs font-semibold text-gray-400 uppercase">Expedientes Asociados:</span>
+                    <p class="text-xs text-gray-500 italic">No hay expedientes asociados.</p>
                 </div>
             </td>
 
