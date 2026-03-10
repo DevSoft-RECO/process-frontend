@@ -68,19 +68,9 @@
                             <label class="block text-xs font-medium text-gray-400 uppercase">Tipo Garantía</label>
                             <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ form.tipo_garantia }}</p>
                         </div>
-                         <div class="col-span-1">
-                            <label class="block text-xs font-medium text-gray-400 uppercase">Contrato</label>
-                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ form.contrato }}</p>
-                        </div>
                         <div class="col-span-1">
                             <label class="block text-xs font-medium text-gray-400 uppercase">Fecha Ingreso</label>
                             <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ formatDate(form.ingreso) }}</p>
-                        </div>
-                        <div class="col-span-full">
-                            <label class="block text-xs font-medium text-gray-400 uppercase">Datos Garantía</label>
-                            <p class="mt-1 text-xs text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-2 rounded max-h-32 overflow-y-auto">
-                                {{ form.datos_garantia || 'N/A' }}
-                            </p>
                         </div>
 
                         <!-- Editable Fields Separator -->
@@ -95,17 +85,24 @@
                              class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-azul-cope focus:ring-azul-cope sm:text-sm">
                          </div>
 
+                         <!-- Contrato -->
+                         <div class="col-span-1">
+                             <label for="contrato" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contrato</label>
+                             <input type="text" id="contrato" v-model="form.contrato" 
+                             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-azul-cope focus:ring-azul-cope sm:text-sm">
+                         </div>
+
                          <!-- Estado (Dropdown) -->
                          <div class="col-span-1">
                              <label for="estado" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Estado</label>
                              <select id="estado" v-model="form.estado"
                                 class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-azul-cope focus:ring-azul-cope sm:text-sm"
                              >
-                                 <option value="archivado">Archivado</option>
-                                 <option value="garantia retirada">Garantía Retirada</option>
-                                 <option value="garantia solicitada">Garantía Solicitada</option>
+                                 <option value="COMPLETO">COMPLETO</option>
+                                 <option value="INCOMPLETO">INCOMPLETO</option>
+                                 <option value="FALTANTE">FALTANTE</option>
                                  <!-- Fallback option if current state is not in list -->
-                                 <option v-if="!['archivado', 'garantia retirada', 'garantia solicitada'].includes(form.estado?.toLowerCase())" :value="form.estado">
+                                 <option v-if="form.estado && !['COMPLETO', 'INCOMPLETO', 'FALTANTE'].includes(form.estado)" :value="form.estado">
                                     {{ form.estado }}
                                  </option>
                              </select>
@@ -127,10 +124,34 @@
                              >
                          </div>
 
+                         <!-- Localizacion -->
+                         <div class="col-span-1">
+                             <label for="localizacion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Localización</label>
+                             <select id="localizacion" v-model="form.localizacion"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-azul-cope focus:ring-azul-cope sm:text-sm"
+                             >
+                                 <option value="ARCHIVO">ARCHIVO</option>
+                                 <option value="RETIRADO">RETIRADO</option>
+                                 <option value="FALTANTE">FALTANTE</option>
+                                 <!-- Fallback option if current value is not in list -->
+                                 <option v-if="form.localizacion && !['ARCHIVO', 'RETIRADO', 'FALTANTE'].includes(form.localizacion)" :value="form.localizacion">
+                                    {{ form.localizacion }}
+                                 </option>
+                             </select>
+                         </div>
+
+                         <!-- Datos Garantía -->
+                         <div class="col-span-full">
+                             <label for="datos_garantia" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Datos Garantía</label>
+                             <textarea id="datos_garantia" v-model="form.datos_garantia" rows="3"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-azul-cope focus:ring-azul-cope sm:text-sm"
+                             ></textarea>
+                         </div>
+
                          <!-- Observacion -->
                          <div class="col-span-full">
                              <label for="observacion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observación</label>
-                             <textarea id="observacion" v-model="form.observacion" rows="3"
+                             <textarea id="observacion" v-model="form.observacion" rows="2"
                                 class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-azul-cope focus:ring-azul-cope sm:text-sm"
                              ></textarea>
                          </div>
@@ -193,10 +214,13 @@ const saveChanges = async () => {
     try {
         const payload = {
             inscripcion_otros_contratos: form.value.inscripcion_otros_contratos,
+            contrato: form.value.contrato,
             estado: form.value.estado,
             ingreso: form.value.ingreso,
             salida: form.value.salida,
             inventario: form.value.inventario,
+            localizacion: form.value.localizacion,
+            datos_garantia: form.value.datos_garantia,
             observacion: form.value.observacion
         }
 
