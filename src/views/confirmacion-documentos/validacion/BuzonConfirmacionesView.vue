@@ -24,6 +24,8 @@
             <tr>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo / Registro</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitante</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expediente</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detalles</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Solicitud</th>
               <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
@@ -31,10 +33,10 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-if="loading" class="animate-pulse">
-                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Cargando solicitudes...</td>
+                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">Cargando solicitudes...</td>
             </tr>
             <tr v-else-if="requests.length === 0">
-                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">No hay solicitudes pendientes.</td>
+                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">No hay solicitudes pendientes.</td>
             </tr>
             <tr v-for="req in requests" :key="req.id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap">
@@ -47,22 +49,41 @@
                     <i class="fas fa-edit"></i> Manual
                 </div>
               </td>
-              <td class="px-6 py-4">
+              <td class="px-6 py-4 align-top">
                 <div class="text-sm text-gray-900">{{ req.tipo_documento || 'No especificado' }}</div>
                 <div class="text-sm text-gray-500">{{ req.registro_propiedad || 'No especificado' }}</div>
               </td>
-               <td class="px-6 py-4 text-sm text-gray-500">
+              <!-- Solicitante -->
+              <td class="px-6 py-4 align-top">
+                <div class="text-sm font-medium text-gray-900">{{ req.nombre_solicitante || req.user?.name || '-' }}</div>
+                <div class="text-xs text-gray-400 mt-0.5">
+                  <i class="fas fa-building mr-1"></i>Agencia: {{ req.id_agencia || '-' }}
+                </div>
+              </td>
+              <!-- Expediente -->
+              <td class="px-6 py-4 align-top">
+                <div class="text-xs text-gray-700">
+                  <span class="font-semibold text-gray-500">Cód. Cliente:</span>
+                  <span class="ml-1 font-mono">{{ req.codigo_cliente || '-' }}</span>
+                </div>
+                <div class="text-xs text-gray-700 mt-0.5">
+                  <span class="font-semibold text-gray-500">No. Producto:</span>
+                  <span class="ml-1 font-mono">{{ req.numero_producto || '-' }}</span>
+                </div>
+              </td>
+              <!-- Detalles -->
+              <td class="px-6 py-4 text-sm text-gray-500 align-top">
                 <div class="max-w-xs truncate" :title="req.observacion">
                     {{ req.observacion || '-' }}
                 </div>
-                 <div class="mt-1 text-xs">
+                <div class="mt-1 text-xs">
                     Finca: {{ req.no_finca || '-' }} | Folio: {{ req.folio || '-' }} | Libro: {{ req.libro || '-' }}
                 </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
                 {{ formatDateTime(req.created_at) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium align-top">
                 <button 
                   @click="openValidationModal(req)" 
                   class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-md transition-colors"

@@ -23,6 +23,8 @@
           <tr>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Identificación</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitante</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expediente</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datos Registrales</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observaciones</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resultado</th>
@@ -30,10 +32,10 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr v-if="loading" class="animate-pulse">
-              <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Cargando histórico...</td>
+              <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">Cargando histórico...</td>
           </tr>
           <tr v-else-if="history.length === 0">
-              <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">No hay documentos en el histórico.</td>
+              <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">No hay documentos en el histórico.</td>
           </tr>
           <tr v-for="item in history" :key="item.id" class="hover:bg-gray-50">
             <!-- Col 1: Documento -->
@@ -50,6 +52,26 @@
               <div class="text-xs text-gray-900"><span class="font-semibold">Aut:</span> {{ item.autorizador || '-' }}</div>
               <div class="text-xs text-gray-500 mt-1">Ref: {{ item.referencia || '-' }}</div>
               <div class="text-xs text-gray-500">Monto: {{ item.monto_poliza ? 'Q ' + item.monto_poliza : '-' }}</div>
+            </td>
+
+            <!-- Col 3: Solicitante -->
+            <td class="px-6 py-4 whitespace-nowrap align-top">
+              <div class="text-sm font-medium text-gray-900">{{ item.nombre_solicitante || item.user?.name || '-' }}</div>
+              <div class="text-xs text-gray-400 mt-0.5">
+                <i class="fas fa-building mr-1"></i>Agencia: {{ item.id_agencia || '-' }}
+              </div>
+            </td>
+
+            <!-- Col 4: Expediente -->
+            <td class="px-6 py-4 whitespace-nowrap align-top">
+              <div class="text-xs text-gray-700">
+                <span class="font-semibold text-gray-500">Cód. Cliente:</span>
+                <span class="ml-1 font-mono">{{ item.codigo_cliente || '-' }}</span>
+              </div>
+              <div class="text-xs text-gray-700 mt-0.5">
+                <span class="font-semibold text-gray-500">No. Producto:</span>
+                <span class="ml-1 font-mono">{{ item.numero_producto || '-' }}</span>
+              </div>
             </td>
 
             <!-- Col 3: Datos Registrales -->
