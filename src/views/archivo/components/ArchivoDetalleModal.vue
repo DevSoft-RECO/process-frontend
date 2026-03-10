@@ -123,20 +123,29 @@
                     </div>
 
                     <!-- Fila 2: Información del Documento -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                         <div>
-                            <p class="text-xs text-gray-500">Número de Documento:</p>
+                            <p class="text-[10px] text-gray-500 uppercase font-bold">Tipo de Documento:</p>
+                            <p class="font-semibold dark:text-gray-200">{{ doc.tipo_documento?.nombre || 'N/A' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-gray-500 uppercase font-bold">Registro de Propiedad:</p>
+                            <p class="font-semibold dark:text-gray-200">{{ doc.registro_propiedad?.nombre || 'N/A' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-gray-500 uppercase font-bold">Número de Documento:</p>
                             <p class="font-semibold dark:text-gray-200">{{ doc.numero || '-' }}</p>
                         </div>
                         <div>
+                            <p class="text-[10px] text-gray-500 uppercase font-bold">Fecha:</p>
                             <p class="font-semibold dark:text-gray-200">{{ formatDate(doc.fecha) }}</p>
                         </div>
                         <div>
-                            <p class="text-xs text-gray-500">Monto:</p>
+                            <p class="text-[10px] text-gray-500 uppercase font-bold">Monto:</p>
                             <p class="font-semibold dark:text-gray-200">{{ doc.monto_poliza ? formatCurrency(doc.monto_poliza) : '-' }}</p>
                         </div>
                         <div>
-                            <p class="text-xs text-gray-500">Referencia:</p>
+                            <p class="text-[10px] text-gray-500 uppercase font-bold">Referencia:</p>
                             <p class="font-semibold dark:text-gray-200">{{ doc.referencia || '-' }}</p>
                         </div>
                     </div>
