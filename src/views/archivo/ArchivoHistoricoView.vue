@@ -72,9 +72,25 @@
                             {{ message || 'No hay expedientes en el archivo histórico.' }}
                         </td>
                     </tr>
-                    <tr v-for="exp in expedientes" :key="exp.codigo_cliente" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <tr v-for="exp in expedientes" :key="exp.codigo_cliente" 
+                        class="transition border-b border-gray-100 dark:border-gray-800/50"
+                        :class="[
+                            exp.estado === 'COMPLETO' ? 'bg-green-50/50 dark:bg-green-900/10 hover:bg-green-100/50 dark:hover:bg-green-900/20' : 
+                            exp.estado === 'INCOMPLETO' ? 'bg-yellow-50/50 dark:bg-yellow-900/10 hover:bg-yellow-100/50 dark:hover:bg-yellow-900/20' : 
+                            exp.estado === 'FALTANTE' ? 'bg-red-50/50 dark:bg-red-900/10 hover:bg-red-100/50 dark:hover:bg-red-900/20' : 
+                            'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        ]"
+                    >
                         <!-- Código / Agencia -->
-                        <td class="px-4 py-3 sticky left-0 bg-white dark:bg-gray-800">
+                        <td 
+                            class="px-4 py-3 sticky left-0 z-10 transition-colors duration-200"
+                            :class="[
+                                exp.estado === 'COMPLETO' ? 'bg-green-50 dark:bg-gray-800/95' : 
+                                exp.estado === 'INCOMPLETO' ? 'bg-yellow-50 dark:bg-gray-800/95' : 
+                                exp.estado === 'FALTANTE' ? 'bg-red-50 dark:bg-gray-800/95' : 
+                                'bg-white dark:bg-gray-800'
+                            ]"
+                        >
                             <div class="font-bold text-gray-900 dark:text-white">{{ exp.codigo_cliente }}</div>
                             <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ exp.agencia }}</div>
                         </td>
@@ -120,7 +136,10 @@
                          <td class="px-4 py-3">
                              <div class="text-gray-700 dark:text-gray-300 text-xs mb-1">{{ exp.ingreso }}</div>
                              <span :class="[
-                                'px-2 py-0.5 rounded-full text-[10px] font-medium border',
+                                'px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors',
+                                exp.estado === 'COMPLETO' ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800' : 
+                                exp.estado === 'INCOMPLETO' ? 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800' : 
+                                exp.estado === 'FALTANTE' ? 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800' : 
                                 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'
                              ]">
                                 {{ exp.estado || 'N/A' }}
