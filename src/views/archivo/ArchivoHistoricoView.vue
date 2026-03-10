@@ -72,7 +72,7 @@
                             {{ message || 'No hay expedientes en el archivo histórico.' }}
                         </td>
                     </tr>
-                    <tr v-for="exp in expedientes" :key="exp.codigo_cliente" 
+                    <tr v-for="exp in expedientes" :key="exp.id" 
                         class="transition border-b border-gray-100 dark:border-gray-800/50"
                         :class="[
                             exp.estado === 'COMPLETO' ? 'bg-green-50/50 dark:bg-green-900/10 hover:bg-green-100/50 dark:hover:bg-green-900/20' : 
@@ -235,6 +235,7 @@ import ArchivoHistoricoModal from './components/ArchivoHistoricoModal.vue'
 import Encabezado from '../../components/common/encabezado.vue'
 
 interface Expediente {
+    id: number
     codigo_cliente: number
     agencia: string
     fecha_inicio: string

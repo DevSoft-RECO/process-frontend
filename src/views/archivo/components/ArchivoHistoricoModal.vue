@@ -209,7 +209,7 @@ const closeModal = () => {
 }
 
 const saveChanges = async () => {
-    if (!form.value.codigo_cliente) return
+    if (!form.value.id) return
 
     loading.value = true
     try {
@@ -225,7 +225,7 @@ const saveChanges = async () => {
             observacion: form.value.observacion
         }
 
-        const response = await api.put(`/expedientes/${form.value.codigo_cliente}`, payload)
+        const response = await api.put(`/expedientes/${form.value.id}`, payload)
 
         if (response.data.success) {
             Swal.fire('Éxito', 'Información actualizada correctamente.', 'success')
