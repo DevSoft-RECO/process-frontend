@@ -1,6 +1,8 @@
 import api from '@/api/axios'
 
 interface KpiData {
+    total_mes: number
+    con_seguimiento: number
     total_active: number
     total_finalized: number
     total_amount: number

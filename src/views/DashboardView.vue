@@ -93,11 +93,21 @@
                 <!-- Active Cases -->
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border-l-4 border-blue-500 hover:shadow-md transition-shadow">
                     <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Expedientes Activos</p>
-                            <h3 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ kpi.total_active }}</h3>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Con Seguimiento</p>
+                            <div class="flex items-baseline gap-1.5 mt-2">
+                                <h3 class="text-3xl font-bold text-gray-900 dark:text-white">{{ kpi.con_seguimiento }}</h3>
+                                <span class="text-base font-semibold text-gray-400 dark:text-gray-500">/{{ kpi.total_mes }}</span>
+                            </div>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Total expedientes del mes</p>
+                            <div class="mt-2 w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5">
+                                <div
+                                    class="bg-blue-500 h-1.5 rounded-full transition-all duration-700"
+                                    :style="{ width: calculatePercent(kpi.con_seguimiento, kpi.total_mes) + '%' }"
+                                ></div>
+                            </div>
                         </div>
-                        <div class="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
+                        <div class="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400 ml-3 shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
@@ -448,7 +458,7 @@ const hasAnyDashboardPermission = computed(() => {
 })
 
 const loading = ref(false)
-const kpi = ref({ total_active: 0, total_finalized: 0, total_amount: 0, avg_days_open: 0 })
+const kpi = ref({ total_mes: 0, con_seguimiento: 0, total_finalized: 0, total_amount: 0, avg_days_open: 0, total_active: 0 })
 const pipeline = ref<any[]>([])
 const advisors = ref<{ data: any[], current_page: number, total: number, last_page: number }>({ data: [], current_page: 1, total: 0, last_page: 1 })
 const agencies = ref<{ data: any[], current_page: number, total: number, last_page: number }>({ data: [], current_page: 1, total: 0, last_page: 1 })
