@@ -17,147 +17,218 @@
     </div>
 
     <!-- Data Table -->
-    <div class="bg-white rounded-lg shadow overflow-hidden flex-1">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Identificación</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitante</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expediente</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datos Registrales</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observaciones</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resultado</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-if="loading" class="animate-pulse">
-              <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">Cargando histórico...</td>
-          </tr>
-          <tr v-else-if="history.length === 0">
-              <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">No hay documentos en el histórico.</td>
-          </tr>
-          <tr v-for="item in history" :key="item.id" class="hover:bg-gray-50">
-            <!-- Col 1: Documento -->
-            <td class="px-6 py-4 whitespace-nowrap align-top">
-              <div class="text-sm font-bold text-gray-900">No. {{ item.numero }}</div>
-              <div class="text-xs text-gray-500">Fecha: {{ formatDate(item.fecha) }}</div>
-              <div class="text-xs text-gray-500 mt-1">{{ item.tipo_documento }}</div>
-              <div class="text-xs text-gray-400">{{ item.registro_propiedad }}</div>
-            </td>
+    <div class="bg-white rounded-lg shadow overflow-hidden flex-1 flex flex-col">
+      <div class="overflow-x-auto flex-1">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Identificación</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitante</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expediente</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datos Registrales</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observaciones</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resultado</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-if="loading" class="animate-pulse">
+                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">Cargando histórico...</td>
+            </tr>
+            <tr v-else-if="history.length === 0">
+                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">No hay documentos en el histórico.</td>
+            </tr>
+            <tr v-for="item in history" :key="item.id" class="hover:bg-gray-50">
+              <!-- Col 1: Documento -->
+              <td class="px-6 py-4 whitespace-nowrap align-top">
+                <div class="text-sm font-bold text-gray-900">No. {{ item.numero }}</div>
+                <div class="text-xs text-gray-500">Fecha: {{ formatDate(item.fecha) }}</div>
+                <div class="text-xs text-gray-500 mt-1">{{ item.tipo_documento }}</div>
+                <div class="text-xs text-gray-400">{{ item.registro_propiedad }}</div>
+              </td>
 
-            <!-- Col 2: Identificacion -->
-            <td class="px-6 py-4 whitespace-nowrap align-top">
-              <div class="text-xs text-gray-900"><span class="font-semibold">Prop:</span> {{ item.propietario || '-' }}</div>
-              <div class="text-xs text-gray-900"><span class="font-semibold">Aut:</span> {{ item.autorizador || '-' }}</div>
-              <div class="text-xs text-gray-500 mt-1">Ref: {{ item.referencia || '-' }}</div>
-              <div class="text-xs text-gray-500">Monto: {{ item.monto_poliza ? 'Q ' + item.monto_poliza : '-' }}</div>
-            </td>
+              <!-- Col 2: Identificacion -->
+              <td class="px-6 py-4 whitespace-nowrap align-top">
+                <div class="text-xs text-gray-900"><span class="font-semibold">Prop:</span> {{ item.propietario || '-' }}</div>
+                <div class="text-xs text-gray-900"><span class="font-semibold">Aut:</span> {{ item.autorizador || '-' }}</div>
+                <div class="text-xs text-gray-500 mt-1">Ref: {{ item.referencia || '-' }}</div>
+                <div class="text-xs text-gray-500">Monto: {{ item.monto_poliza ? 'Q ' + item.monto_poliza : '-' }}</div>
+              </td>
 
-            <!-- Col 3: Solicitante -->
-            <td class="px-6 py-4 whitespace-nowrap align-top">
-              <div class="text-sm font-medium text-gray-900">{{ item.nombre_solicitante || item.user?.name || '-' }}</div>
-              <div class="text-xs text-gray-400 mt-0.5">
-                <i class="fas fa-building mr-1"></i>Agencia: {{ item.id_agencia || '-' }}
-              </div>
-            </td>
-
-            <!-- Col 4: Expediente -->
-            <td class="px-6 py-4 whitespace-nowrap align-top">
-              <div class="text-xs text-gray-700">
-                <span class="font-semibold text-gray-500">Cód. Cliente:</span>
-                <span class="ml-1 font-mono">{{ item.codigo_cliente || '-' }}</span>
-              </div>
-              <div class="text-xs text-gray-700 mt-0.5">
-                <span class="font-semibold text-gray-500">No. Producto:</span>
-                <span class="ml-1 font-mono">{{ item.numero_producto || '-' }}</span>
-              </div>
-            </td>
-
-            <!-- Col 3: Datos Registrales -->
-            <td class="px-6 py-4 whitespace-nowrap align-top">
-              <div class="text-xs text-gray-600">
-                <span class="font-semibold">F:</span> {{ item.no_finca || '-' }} &nbsp;|&nbsp; 
-                <span class="font-semibold">F:</span> {{ item.folio || '-' }}
-              </div>
-              <div class="text-xs text-gray-600">
-                <span class="font-semibold">L:</span> {{ item.libro || '-' }} &nbsp;|&nbsp; 
-                <span class="font-semibold">D:</span> {{ item.no_dominio || '-' }}
-              </div>
-            </td>
-
-            <!-- Col 4: Observaciones -->
-            <td class="px-6 py-4 text-sm text-gray-500 align-top">
-                <div class="mb-2">
-                    <span class="text-xs font-semibold text-gray-400 uppercase">Solicitud:</span>
-                    <p class="text-xs text-gray-600 italic whitespace-normal max-w-xs">{{ item.observacion || '(Sin obs)' }}</p>
+              <!-- Col 3: Solicitante -->
+              <td class="px-6 py-4 whitespace-nowrap align-top">
+                <div class="text-sm font-medium text-gray-900">{{ item.nombre_solicitante || item.user?.name || '-' }}</div>
+                <div class="text-xs text-gray-400 mt-0.5">
+                  <i class="fas fa-building mr-1"></i>Agencia: {{ item.id_agencia || '-' }}
                 </div>
-                <div>
-                    <span class="text-xs font-semibold text-gray-400 uppercase">Respuesta:</span>
-                    <p class="text-xs text-gray-800 font-medium whitespace-normal max-w-xs">{{ item.observacion_confirmacion || '-' }}</p>
-                </div>
-            </td>
+              </td>
 
-            <!-- Col 5: Resultado -->
-            <td class="px-6 py-4 whitespace-nowrap align-top">
-              <div class="flex flex-col items-start gap-1">
-                  <span 
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                    :class="item.confirmacion === 'SI' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                  >
-                    {{ item.confirmacion === 'SI' ? 'EXISTE' : 'NO EXISTE' }}
-                  </span>
-                  <span class="text-xs text-gray-400 mt-1">
-                    {{ formatDateTime(item.fecha_confirmacion) }}
-                  </span>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              <!-- Col 4: Expediente -->
+              <td class="px-6 py-4 whitespace-nowrap align-top">
+                <div class="text-xs text-gray-700">
+                  <span class="font-semibold text-gray-500">Cód. Cliente:</span>
+                  <span class="ml-1 font-mono">{{ item.codigo_cliente || '-' }}</span>
+                </div>
+                <div class="text-xs text-gray-700 mt-0.5">
+                  <span class="font-semibold text-gray-500">No. Producto:</span>
+                  <span class="ml-1 font-mono">{{ item.numero_producto || '-' }}</span>
+                </div>
+              </td>
+
+              <!-- Col 5: Datos Registrales -->
+              <td class="px-6 py-4 whitespace-nowrap align-top">
+                <div class="text-xs text-gray-600">
+                  <span class="font-semibold">F:</span> {{ item.no_finca || '-' }} &nbsp;|&nbsp; 
+                  <span class="font-semibold">F:</span> {{ item.folio || '-' }}
+                </div>
+                <div class="text-xs text-gray-600">
+                  <span class="font-semibold">L:</span> {{ item.libro || '-' }} &nbsp;|&nbsp; 
+                  <span class="font-semibold">D:</span> {{ item.no_dominio || '-' }}
+                </div>
+              </td>
+
+              <!-- Col 6: Observaciones -->
+              <td class="px-6 py-4 text-sm text-gray-500 align-top">
+                  <div class="mb-2">
+                      <span class="text-xs font-semibold text-gray-400 uppercase">Solicitud:</span>
+                      <p class="text-xs text-gray-600 italic whitespace-normal max-w-xs">{{ item.observacion || '(Sin obs)' }}</p>
+                  </div>
+                  <div>
+                      <span class="text-xs font-semibold text-gray-400 uppercase">Respuesta:</span>
+                      <p class="text-xs text-gray-800 font-medium whitespace-normal max-w-xs">{{ item.observacion_confirmacion || '-' }}</p>
+                  </div>
+              </td>
+
+              <!-- Col 7: Resultado -->
+              <td class="px-6 py-4 whitespace-nowrap align-top">
+                <div class="flex flex-col items-start gap-1">
+                    <span 
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                      :class="item.confirmacion === 'SI' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                    >
+                      {{ item.confirmacion === 'SI' ? 'EXISTE' : 'NO EXISTE' }}
+                    </span>
+                    <span class="text-xs text-gray-400 mt-1">
+                      {{ formatDateTime(item.fecha_confirmacion) }}
+                    </span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="px-6 py-3 border-t border-gray-200 flex items-center justify-between bg-white">
+        <div class="text-sm text-gray-500">
+          Mostrando <span class="font-medium">{{ pagination.from ?? 0 }}</span> –
+          <span class="font-medium">{{ pagination.to ?? 0 }}</span> de
+          <span class="font-medium">{{ pagination.total ?? 0 }}</span> registros
+        </div>
+        <div class="flex items-center gap-1">
+          <button
+            @click="changePage(pagination.current_page - 1)"
+            :disabled="!pagination.prev_page_url || loading"
+            class="px-3 py-1 rounded border text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition"
+          >
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button
+            v-for="page in visiblePages"
+            :key="page"
+            @click="changePage(page)"
+            :class="[
+              'px-3 py-1 rounded border text-sm transition',
+              page === pagination.current_page
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'hover:bg-gray-100'
+            ]"
+          >
+            {{ page }}
+          </button>
+          <button
+            @click="changePage(pagination.current_page + 1)"
+            :disabled="!pagination.next_page_url || loading"
+            class="px-3 py-1 rounded border text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition"
+          >
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
 
 const history = ref([]);
 const loading = ref(false);
 
-const loadHistory = async () => {
-    loading.value = true;
-    try {
-        const response = await api.get('/confirmacion-documentos/historico');
-        history.value = response.data.data;
-    } catch (error) {
-        console.error(error);
-        Swal.fire('Error', 'Error al cargar histórico', 'error');
-    } finally {
-        loading.value = false;
-    }
+const pagination = ref({
+  current_page: 1,
+  last_page: 1,
+  prev_page_url: null,
+  next_page_url: null,
+  from: 0,
+  to: 0,
+  total: 0,
+});
+
+const visiblePages = computed(() => {
+  const total   = pagination.value.last_page;
+  const current = pagination.value.current_page;
+  const delta   = 2;
+  const range   = [];
+  for (let i = Math.max(1, current - delta); i <= Math.min(total, current + delta); i++) {
+    range.push(i);
+  }
+  return range;
+});
+
+const loadHistory = async (page = 1) => {
+  loading.value = true;
+  try {
+    const response = await api.get('/confirmacion-documentos/historico', { params: { page } });
+    const res = response.data;
+    history.value    = res.data;
+    pagination.value = {
+      current_page:  res.current_page,
+      last_page:     res.last_page,
+      prev_page_url: res.prev_page_url,
+      next_page_url: res.next_page_url,
+      from:          res.from,
+      to:            res.to,
+      total:         res.total,
+    };
+  } catch (error) {
+    console.error(error);
+    Swal.fire('Error', 'Error al cargar histórico', 'error');
+  } finally {
+    loading.value = false;
+  }
+};
+
+const changePage = (page) => {
+  if (page < 1 || page > pagination.value.last_page) return;
+  loadHistory(page);
 };
 
 const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    // Si la fecha viene como YYYY-MM-DD (10 caracteres), forzar hora local
-    if (dateString.length === 10) {
-        return new Date(dateString + 'T00:00:00').toLocaleDateString();
-    }
-    const date = new Date(dateString);
-    return isNaN(date) ? dateString : date.toLocaleDateString();
+  if (!dateString) return '-';
+  if (dateString.length === 10) return new Date(dateString + 'T00:00:00').toLocaleDateString();
+  const date = new Date(dateString);
+  return isNaN(date) ? dateString : date.toLocaleDateString();
 };
 
 const formatDateTime = (dateString) => {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    if (isNaN(date)) return dateString;
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  if (isNaN(date)) return dateString;
+  return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
-onMounted(() => {
-    loadHistory();
-});
+onMounted(() => loadHistory());
 </script>

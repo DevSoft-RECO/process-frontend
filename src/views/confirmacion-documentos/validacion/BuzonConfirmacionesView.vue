@@ -17,8 +17,8 @@
     </div>
 
     <!-- Data Table -->
-    <div class="bg-white rounded-lg shadow overflow-hidden flex-1">
-      <div class="overflow-x-auto">
+    <div class="bg-white rounded-lg shadow overflow-hidden flex-1 flex flex-col">
+      <div class="overflow-x-auto flex-1">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
@@ -39,7 +39,7 @@
                 <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">No hay solicitudes pendientes.</td>
             </tr>
             <tr v-for="req in requests" :key="req.id" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-6 py-4 whitespace-nowrap align-top">
                 <div class="text-sm font-medium text-gray-900">{{ req.numero }}</div>
                 <div class="text-sm text-gray-500">{{ formatDate(req.fecha) }}</div>
                 <div v-if="req.documento_id" class="text-xs text-green-600 font-bold mt-1">
@@ -95,9 +95,47 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Paginación -->
+      <div class="px-6 py-3 border-t border-gray-200 flex items-center justify-between bg-white">
+        <div class="text-sm text-gray-500">
+          Mostrando <span class="font-medium">{{ pagination.from ?? 0 }}</span> –
+          <span class="font-medium">{{ pagination.to ?? 0 }}</span> de
+          <span class="font-medium">{{ pagination.total ?? 0 }}</span> solicitudes
+        </div>
+        <div class="flex items-center gap-1">
+          <button
+            @click="changePage(pagination.current_page - 1)"
+            :disabled="!pagination.prev_page_url || loading"
+            class="px-3 py-1 rounded border text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition"
+          >
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button
+            v-for="page in visiblePages"
+            :key="page"
+            @click="changePage(page)"
+            :class="[
+              'px-3 py-1 rounded border text-sm transition',
+              page === pagination.current_page
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'hover:bg-gray-100'
+            ]"
+          >
+            {{ page }}
+          </button>
+          <button
+            @click="changePage(pagination.current_page + 1)"
+            :disabled="!pagination.next_page_url || loading"
+            class="px-3 py-1 rounded border text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition"
+          >
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Validation Modal replaced by SweetAlert -->
+    <!-- Validation Modal -->
     <ConfirmationModal 
       :show="showModal" 
       :request="selectedRequest"
@@ -109,78 +147,106 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
 import ConfirmationModal from './ConfirmationModal.vue';
 
-const requests = ref([]);
-const loading = ref(false);
+const requests  = ref([]);
+const loading   = ref(false);
 const showModal = ref(false);
 const selectedRequest = ref(null);
 
-const loadRequests = async () => {
-    loading.value = true;
-    try {
-        const response = await api.get('/confirmacion-documentos');
-        requests.value = response.data.data;
-    } catch (error) {
-        console.error(error);
-        Swal.fire('Error', 'Error al cargar solicitudes', 'error');
-    } finally {
-        loading.value = false;
-    }
+const pagination = ref({
+  current_page: 1,
+  last_page: 1,
+  prev_page_url: null,
+  next_page_url: null,
+  from: 0,
+  to: 0,
+  total: 0,
+});
+
+// Páginas visibles: máximo 5 alrededor de la actual
+const visiblePages = computed(() => {
+  const total   = pagination.value.last_page;
+  const current = pagination.value.current_page;
+  const delta   = 2;
+  const range   = [];
+  for (let i = Math.max(1, current - delta); i <= Math.min(total, current + delta); i++) {
+    range.push(i);
+  }
+  return range;
+});
+
+const loadRequests = async (page = 1) => {
+  loading.value = true;
+  try {
+    const response = await api.get('/confirmacion-documentos', { params: { page } });
+    const res = response.data;
+    requests.value  = res.data;
+    pagination.value = {
+      current_page:   res.current_page,
+      last_page:      res.last_page,
+      prev_page_url:  res.prev_page_url,
+      next_page_url:  res.next_page_url,
+      from:           res.from,
+      to:             res.to,
+      total:          res.total,
+    };
+  } catch (error) {
+    console.error(error);
+    Swal.fire('Error', 'Error al cargar solicitudes', 'error');
+  } finally {
+    loading.value = false;
+  }
+};
+
+const changePage = (page) => {
+  if (page < 1 || page > pagination.value.last_page) return;
+  loadRequests(page);
 };
 
 const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    // Si la fecha viene como YYYY-MM-DD (10 caracteres), forzar hora local
-    if (dateString.length === 10) {
-        return new Date(dateString + 'T00:00:00').toLocaleDateString();
-    }
-    const date = new Date(dateString);
-    if (isNaN(date)) return dateString;
-    return date.toLocaleDateString(); 
+  if (!dateString) return '-';
+  if (dateString.length === 10) return new Date(dateString + 'T00:00:00').toLocaleDateString();
+  const date = new Date(dateString);
+  return isNaN(date) ? dateString : date.toLocaleDateString();
 };
 
 const formatDateTime = (dateString) => {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    if (isNaN(date)) return dateString;
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  if (isNaN(date)) return dateString;
+  return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
 const openValidationModal = (req) => {
-    selectedRequest.value = req;
-    showModal.value = true;
+  selectedRequest.value = req;
+  showModal.value = true;
 };
 
 const handleSaved = async ({ id, data }) => {
-    try {
-        await api.put(`/confirmacion-documentos/${id}`, data);
-        Swal.fire('Éxito', 'Documento validado correctamente', 'success');
-        showModal.value = false;
-        loadRequests();
-    } catch (error) {
-        console.error(error);
-        Swal.fire('Error', 'No se pudo guardar la validación', 'error');
-    }
+  try {
+    await api.put(`/confirmacion-documentos/${id}`, data);
+    Swal.fire('Éxito', 'Documento validado correctamente', 'success');
+    showModal.value = false;
+    loadRequests(pagination.value.current_page);
+  } catch (error) {
+    console.error(error);
+    Swal.fire('Error', 'No se pudo guardar la validación', 'error');
+  }
 };
 
 const handleRegistered = () => {
-    // Document registered successfully, now it exists.
-    // Refresh list to update status icons
-    loadRequests();
-    // Modal stays open so user can confirm validation now (as EXISTING)
-    Swal.fire({
-        title: 'Registrado',
-        text: 'El documento ha sido creado. Ahora puede proceder a Validar indicando que SÍ EXISTE.',
-        icon: 'success',
-        timer: 3000
-    });
+  loadRequests(pagination.value.current_page);
+  Swal.fire({
+    title: 'Registrado',
+    text: 'El documento ha sido creado. Ahora puede proceder a Validar indicando que SÍ EXISTE.',
+    icon: 'success',
+    timer: 3000,
+  });
 };
 
-onMounted(() => {
-    loadRequests();
-});
+onMounted(() => loadRequests());
 </script>
