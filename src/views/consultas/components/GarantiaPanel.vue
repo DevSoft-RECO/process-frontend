@@ -1,5 +1,5 @@
 <template>
-    <div class="h-full">
+    <div class="h-full overflow-y-auto">
         <div class="p-6 border-b border-gray-100 dark:border-gray-700">
             <h2 class="text-xl font-bold text-gray-900 dark:text-white">
                 Agregar Garantía
@@ -134,7 +134,7 @@ watch(() => form.garantia_id, (newVal) => {
 
 const fetchGarantias = async () => {
     try {
-        const res = await api.get('/garantias')
+        const res = await api.get('/garantias?all=1')
         if (res.data.success) {
             garantiasList.value = res.data.data.data || res.data.data 
         }
