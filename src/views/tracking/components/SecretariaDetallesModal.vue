@@ -11,7 +11,7 @@
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        Revisión de Secretaría
+                        Revisión de Secretarías
                     </span>
                 </div>
                 <div class="flex flex-wrap items-center gap-x-3 mt-1.5 text-sm text-gray-500 dark:text-gray-400">
@@ -32,6 +32,16 @@
                     <span v-if="numeroContrato" class="ml-1 px-2 py-0.5 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-bold rounded-md border border-purple-100 dark:border-purple-800">
                         Contrato: {{ numeroContrato }}
                     </span>
+
+                    <!-- Botón Ver PDF Escaneado -->
+                    <div v-if="pathContrato" class="ml-2">
+                        <button @click="verContrato" :disabled="loadingContrato"
+                            class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold rounded-lg transition shadow-sm disabled:opacity-50">
+                            <svg v-if="!loadingContrato" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                            <svg v-else class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            {{ loadingContrato ? 'CARGANDO...' : 'VER PDF ESCANEADO' }}
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -277,6 +287,7 @@ const props = defineProps<{
 const emit = defineEmits(['close', 'refresh'])
 
 const loadingDetalles = ref(false)
+const loadingContrato = ref(false)
 const detallesData = ref<any>({})
 
 watch(() => props.show, (newVal) => {
@@ -585,6 +596,10 @@ const hasFechaAceptadoSecretariaCredito = computed(() => {
     return false;
 })
 
+const pathContrato = computed(() => {
+    return detallesData.value?.expediente?.seguimientos?.[0]?.path_contrato || null;
+})
+
 const numeroContrato = computed(() => {
     if (!detallesData.value?.expediente?.seguimientos || detallesData.value.expediente.seguimientos.length === 0) return null;
     const latest = detallesData.value.expediente.seguimientos[0];
@@ -597,5 +612,29 @@ const formatCurrency = (amount: number) => {
 
 const close = () => {
     emit('close')
+}
+
+const verContrato = async () => {
+  const idExpediente = props.expediente?.id || detallesData.value?.expediente?.id;
+  if (!idExpediente) return
+  
+  loadingContrato.value = true
+  try {
+    const res = await api.get(`/secretaria-credito/ver-contrato/${idExpediente}`)
+    if (res.data.success && res.data.url) {
+      window.open(res.data.url, '_blank')
+    } else {
+        throw new Error(res.data.message || 'Error al obtener URL del contrato.')
+    }
+  } catch (err: any) {
+    console.error("Error obteniendo contrato:", err)
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: err.message || 'No se pudo obtener el acceso al contrato escaneado.'
+    })
+  } finally {
+    loadingContrato.value = false
+  }
 }
 </script>
