@@ -99,10 +99,11 @@
                                 class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-azul-cope focus:ring-azul-cope sm:text-sm"
                              >
                                  <option value="COMPLETO">COMPLETO</option>
+                                 <option value="COMPLETO SADEC">COMPLETO SADEC</option>
                                  <option value="INCOMPLETO">INCOMPLETO</option>
                                  <option value="FALTANTE">FALTANTE</option>
                                  <!-- Fallback option if current state is not in list -->
-                                 <option v-if="form.estado && !['COMPLETO', 'INCOMPLETO', 'FALTANTE'].includes(form.estado)" :value="form.estado">
+                                 <option v-if="form.estado && !['COMPLETO', 'COMPLETO SADEC', 'INCOMPLETO', 'FALTANTE'].includes(form.estado)" :value="form.estado">
                                     {{ form.estado }}
                                  </option>
                              </select>
