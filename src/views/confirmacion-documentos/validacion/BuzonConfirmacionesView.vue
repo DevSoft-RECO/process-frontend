@@ -84,12 +84,22 @@
                 {{ formatDateTime(req.created_at) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium align-top">
-                <button 
-                  @click="openValidationModal(req)" 
-                  class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-md transition-colors"
-                >
-                  <i class="fas fa-clipboard-check mr-1"></i> Validar
-                </button>
+                <div class="flex items-center justify-end gap-2">
+                  <button 
+                    @click="openValidationModal(req)" 
+                    class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-md transition-colors"
+                  >
+                    <i class="fas fa-clipboard-check mr-1"></i> Validar
+                  </button>
+                  <button
+                    v-if="isSuperAdmin"
+                    @click="deleteRequest(req.id)"
+                    class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md transition-colors"
+                    title="Eliminar solicitud"
+                  >
+                    <i class="fas fa-trash mr-1"></i> Eliminar
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -151,6 +161,10 @@ import { ref, computed, onMounted } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
 import ConfirmationModal from './ConfirmationModal.vue';
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
+const isSuperAdmin = computed(() => authStore.hasRole('Super Admin'));
 
 const requests  = ref([]);
 const loading   = ref(false);
@@ -246,6 +260,30 @@ const handleRegistered = () => {
     icon: 'success',
     timer: 3000,
   });
+};
+
+const deleteRequest = async (id) => {
+  const result = await Swal.fire({
+    title: '¿Eliminar solicitud?',
+    text: 'Esta acción no se puede deshacer. La solicitud será eliminada permanentemente.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc2626',
+    cancelButtonColor: '#6b7280',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar',
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    await api.delete(`/confirmacion-documentos/${id}`);
+    Swal.fire('Eliminada', 'La solicitud fue eliminada correctamente.', 'success');
+    loadRequests(pagination.value.current_page);
+  } catch (error) {
+    console.error(error);
+    Swal.fire('Error', 'No se pudo eliminar la solicitud.', 'error');
+  }
 };
 
 onMounted(() => loadRequests());
