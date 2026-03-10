@@ -1,5 +1,5 @@
 <template>
-    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+    <div v-if="show" class="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl my-8">
             <div class="p-6 border-b border-gray-100 dark:border-gray-700">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white">
@@ -82,7 +82,7 @@ const form = reactive({
 const fetchGarantias = async () => {
     if (garantiasList.value.length > 0) return
     try {
-        const res = await api.get('/garantias')
+        const res = await api.get('/garantias?all=1')
         if (res.data.success) {
             garantiasList.value = res.data.data.data || res.data.data 
         }
