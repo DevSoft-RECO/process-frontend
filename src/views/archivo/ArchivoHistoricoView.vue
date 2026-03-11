@@ -379,7 +379,7 @@ const handleSearch = async () => {
         })
 
         if (response.data.success) {
-            expedientes.value = [response.data.data] // Exact match returns single object, wrap in array
+            expedientes.value = response.data.data // Now returns an array of matching records
         }
     } catch (error: any) {
         if (error.response && error.response.status === 404) {
