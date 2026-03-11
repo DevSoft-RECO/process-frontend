@@ -26,16 +26,56 @@
             </div>
          </div>
 
-         <button @click="handleSearch" class="px-4 py-2 bg-azul-cope text-white rounded-lg hover:bg-blue-900 transition flex items-center justify-center gap-2 text-sm shadow-md">
+          <button @click="handleSearch" class="px-4 py-2 bg-azul-cope text-white rounded-lg hover:bg-blue-900 transition flex items-center justify-center gap-2 text-sm shadow-md">
             Buscar
-         </button>
+          </button>
 
-         <button @click="resetFetch" class="px-4 py-2 bg-verde-cope text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2 text-sm shadow-md">
+          <!-- Filtro Agencia -->
+          <div class="w-full md:w-48">
+            <select 
+                v-model="selectedAgencia" 
+                @change="fetchExpedientes(1)"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-verde-cope outline-none transition-all"
+            >
+                <option value="">Todas las Agencias</option>
+                <option v-for="agencia in agencias" :key="agencia" :value="agencia">
+                    {{ agencia }}
+                </option>
+            </select>
+          </div>
+
+          <!-- Filtro Estado -->
+          <div class="w-full md:w-48">
+            <select 
+                v-model="selectedEstado" 
+                @change="fetchExpedientes(1)"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-verde-cope outline-none transition-all"
+            >
+                <option value="">Todos los Estados</option>
+                <option v-for="estado in estados" :key="estado" :value="estado">
+                    {{ estado }}
+                </option>
+            </select>
+          </div>
+
+          <!-- Filtro Orden -->
+          <div class="w-full md:w-40">
+            <select 
+                v-model="sortOrder" 
+                @change="fetchExpedientes(1)"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-verde-cope outline-none transition-all"
+            >
+                <option value="desc">Más Recientes</option>
+                <option value="asc">Más Antiguos</option>
+            </select>
+          </div>
+
+          <button @click="resetFetch" class="px-4 py-2 bg-verde-cope text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2 text-sm shadow-md">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
               <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
             </svg>
             Refrescar
-         </button>
+          </button>
       </div>
     </div>
 
@@ -266,6 +306,13 @@ const searchQuery = ref('')
 const isSearching = ref(false)
 const message = ref('')
 
+// Filters
+const sortOrder = ref('desc')
+const selectedAgencia = ref('')
+const selectedEstado = ref('')
+const agencias = ref<string[]>([])
+const estados = ref<string[]>([])
+
 // Modal state
 const showModal = ref(false)
 const selectedExpediente = ref<Expediente | null>(null)
@@ -290,7 +337,12 @@ const fetchExpedientes = async (page: number = 1) => {
     
     try {
         const response = await api.get('/expedientes', {
-            params: { page }
+            params: { 
+                page,
+                sort: sortOrder.value,
+                agencia: selectedAgencia.value,
+                estado: selectedEstado.value
+            }
         })
         if (response.data.success) {
             const resData = response.data.data
@@ -345,7 +397,32 @@ const handleSearch = async () => {
 const resetFetch = () => {
     searchQuery.value = ''
     isSearching.value = false
+    sortOrder.value = 'desc'
+    selectedAgencia.value = ''
+    selectedEstado.value = ''
     fetchExpedientes(1)
+}
+
+const fetchAgencias = async () => {
+    try {
+        const res = await api.get('/expedientes/agencias')
+        if (res.data.success) {
+            agencias.value = res.data.data
+        }
+    } catch (error) {
+        console.error("Error fetching agencias:", error)
+    }
+}
+
+const fetchEstados = async () => {
+    try {
+        const res = await api.get('/expedientes/estados')
+        if (res.data.success) {
+            estados.value = res.data.data
+        }
+    } catch (error) {
+        console.error("Error fetching estados:", error)
+    }
 }
 
 const goToPage = (page: number) => {
@@ -418,5 +495,7 @@ const formatDate = (dateStr: string) => {
 
 onMounted(() => {
     fetchExpedientes()
+    fetchAgencias()
+    fetchEstados()
 })
 </script>
