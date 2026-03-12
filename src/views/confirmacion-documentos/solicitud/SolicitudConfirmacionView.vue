@@ -117,6 +117,28 @@
                         </div>
                     </div>
 
+                    <!-- Campos Requeridos para Solicitud Manual -->
+                    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-5" v-if="!found">
+                        <div class="group">
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">
+                                Código Cliente <span class="text-red-500">*</span>
+                            </label>
+                            <input v-model="form.codigo_cliente" type="text"
+                                class="block w-full px-4 py-3 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50/50 transition-all font-semibold bg-white shadow-sm"
+                                placeholder="Ej. 10456"
+                            >
+                        </div>
+                        <div class="group">
+                             <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">
+                                Número Producto <span class="text-red-500">*</span>
+                             </label>
+                            <input v-model="form.numero_producto" type="text"
+                                class="block w-full px-4 py-3 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50/50 transition-all font-semibold bg-white shadow-sm"
+                                placeholder="Ej. 12600000007894"
+                            >
+                        </div>
+                    </div>
+
                     <!-- Owner & Authorizer -->
                     <div class="group">
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Propietario</label>
@@ -309,6 +331,11 @@ const searchDocument = async () => {
 };
 
 const submitRequest = async () => {
+    if (!found.value && (!form.value.codigo_cliente || !form.value.numero_producto)) {
+        await Swal.fire('Campos Obligatorios', 'Por favor, ingrese el Código Cliente y el Número de Producto para enviar la solicitud manual.', 'warning');
+        return;
+    }
+
     const { isConfirmed } = await Swal.fire({
         title: '¿Solicitar Confirmación?',
         text: found.value 
