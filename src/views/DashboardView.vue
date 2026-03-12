@@ -279,7 +279,9 @@
                             <template v-else>
                                 <tr v-for="(adv, i) in advisors.data" :key="i" class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
                                     <td class="px-4 py-3 font-medium text-gray-900 dark:text-white truncate max-w-[150px]" :title="adv.asesor">
-                                        {{ adv.asesor }}
+                                        <span :class="{'text-blue-600 dark:text-blue-400 font-bold': adv.advisor_id?.toLowerCase() === authStore.user?.username?.toLowerCase()}">
+                                            {{ adv.advisor_id }}
+                                        </span>
                                     </td>
                                     <td class="px-4 py-3 text-center">
                                         <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">

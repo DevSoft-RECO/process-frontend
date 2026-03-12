@@ -17,6 +17,7 @@ interface PipelineData {
 interface AdvisorData {
     data: {
         asesor: string
+        advisor_id: string
         active_cases: number
         rejected_cases: number
         total_cases: number
