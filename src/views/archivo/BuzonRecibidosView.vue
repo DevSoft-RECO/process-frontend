@@ -8,18 +8,46 @@
                     labelIndicator="Archivo"
                     indicator-color="bg-orange-600"
                 />
-                 <div class="flex items-center gap-2">
-                    <label class="text-sm font-medium text-gray-600 dark:text-gray-300">Filtrar por Agencia:</label>
-                    <select 
-                        v-model="selectedAgencia" 
-                        @change="fetchExpedientes()"
-                        class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 min-w-[200px]"
-                    >
-                        <option value="todas">Todas las Agencias</option>
-                        <option v-for="agencia in agencias" :key="agencia.id" :value="agencia.id">
-                            {{ agencia.nombre }}
-                        </option>
-                    </select>
+                 <div class="flex flex-col md:flex-row items-center gap-3">
+                    <!-- Buscador -->
+                    <div class="relative w-full md:w-auto">
+                        <input 
+                            v-model="searchQuery" 
+                            @keyup.enter="handleSearch"
+                            type="text" 
+                            placeholder="Buscar por código..." 
+                            class="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none w-full md:w-56 transition-all"
+                        />
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <button @click="handleSearch" class="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition flex items-center justify-center gap-2 text-sm shadow-sm font-medium">
+                        Buscar
+                    </button>
+
+                    <button @click="resetSearch" title="Refrescar y limpiar búsqueda" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex items-center justify-center gap-2 text-sm shadow-sm font-medium dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                        </svg>
+                    </button>
+
+                    <div class="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
+                        <label class="text-sm font-medium text-gray-600 dark:text-gray-300 hidden xl:block whitespace-nowrap">Agencia:</label>
+                        <select 
+                            v-model="selectedAgencia" 
+                            @change="handleSearch"
+                            class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 w-full min-w-[180px]"
+                        >
+                            <option value="todas">Todas las Agencias</option>
+                            <option v-for="agencia in agencias" :key="agencia.id" :value="agencia.id">
+                                {{ agencia.nombre }}
+                            </option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -78,7 +106,7 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr v-for="exp in expedientes" :key="exp.codigo_cliente" class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                        <tr v-for="exp in expedientes" :key="exp.id" class="group hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
                             <td class="px-4 py-4 text-center">
                                 <span class="text-slate-400 dark:text-slate-500 font-mono text-xs">{{ exp.id }}</span>
                             </td>
@@ -260,6 +288,18 @@ const nextPageUrl = ref<string | null>(null)
 // Filters
 const agencias = ref<any[]>([])
 const selectedAgencia = ref('todas')
+const searchQuery = ref('')
+
+const handleSearch = () => {
+    // Cuando buscamos o cambiamos filtro, resetear a primera página
+    fetchExpedientes()
+}
+
+const resetSearch = () => {
+    searchQuery.value = ''
+    selectedAgencia.value = 'todas'
+    fetchExpedientes()
+}
 
 const fetchAgencias = async () => {
     try {
@@ -288,6 +328,9 @@ const fetchExpedientes = async (url: string | null = null) => {
         const params: any = {}
         if (selectedAgencia.value && selectedAgencia.value !== 'todas') {
             params.id_agencia = selectedAgencia.value
+        }
+        if (searchQuery.value) {
+            params.codigo_cliente = searchQuery.value
         }
 
         const res = await api.get(endpoint, { params })
