@@ -182,11 +182,15 @@
                     <!-- Document Type & Registry -->
                      <div class="group">
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Tipo Documento</label>
-                        <input v-model="form.tipo_documento" type="text" :disabled="found" 
+                        <select v-model="form.tipo_documento" :disabled="found" 
                              class="block w-full px-4 py-3 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50/50 transition-all duration-200 font-medium"
                              :class="found ? 'bg-gray-50 border-transparent text-gray-500' : 'bg-white shadow-sm'"
-                             placeholder="Escritura, Acta, etc."
                         >
+                            <option value="" disabled selected>Seleccione un tipo de documento</option>
+                            <option v-for="tipo in tiposDocumentos" :key="tipo.id" :value="tipo.nombre">
+                                {{ tipo.nombre }}
+                            </option>
+                        </select>
                     </div>
                      <div class="group">
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Registro Propiedad</label>
@@ -244,6 +248,29 @@ const form = ref({});
 const found = ref(false);
 const hasSearched = ref(false);
 const loading = ref(false);
+
+const tiposDocumentos = ref([]);
+
+import { onMounted } from 'vue';
+
+const fetchTiposDocumentos = async () => {
+    try {
+        // Añadimos ?all=true para que el controlador devuelva un array completo, ignorando la paginación.
+        const response = await api.get('/tipo-documentos?all=true');
+        if (response.data && response.data.data) {
+            // response.data.data debería ser el array si type success es true.
+            tiposDocumentos.value = Array.isArray(response.data.data) ? response.data.data : response.data.data.data || [];
+        } else if (Array.isArray(response.data)) {
+            tiposDocumentos.value = response.data;
+        }
+    } catch (error) {
+        console.error('Error fetching Tipos de Documentos:', error);
+    }
+};
+
+onMounted(() => {
+    fetchTiposDocumentos();
+});
 
 const searchDocument = async () => {
     loading.value = true;
@@ -315,10 +342,11 @@ const searchDocument = async () => {
             }
         } else {
              // Populate form with search criteria to save manual entry
-            form.value = {
-                numero: searchForm.value.numero,
-                fecha: searchForm.value.fecha,
-            };
+                form.value = {
+                    numero: searchForm.value.numero,
+                    fecha: searchForm.value.fecha,
+                    tipo_documento: '', // Ensure default is empty
+                };
             hasSearched.value = true;
         }
 
