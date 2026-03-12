@@ -248,8 +248,26 @@ const loadCatalogs = async () => {
         catalogos.value.tipos = tiposRes.data.data || tiposRes.data;
         catalogos.value.registros = registrosRes.data.data || registrosRes.data;
 
+        // If the request is already loaded, try to map the types now
+        if (props.request && !props.request.documento_id && props.request.tipo_documento) {
+            mapTipoDocumento(props.request.tipo_documento);
+        }
+
     } catch (e) {
         console.error("Error loading catalogs", e);
+    }
+};
+
+const mapTipoDocumento = (nombreTipo) => {
+    if (!catalogos.value.tipos.length || !nombreTipo) return;
+    
+    // Buscar coincidencia exacta por nombre (ignorando mayúsculas/minúsculas)
+    const encontrado = catalogos.value.tipos.find(
+        (t) => t.nombre.toLowerCase() === nombreTipo.toLowerCase()
+    );
+
+    if (encontrado) {
+        form.value.tipo_documento_id = encontrado.id;
     }
 };
 
@@ -264,7 +282,7 @@ watch(() => props.request, (newVal) => {
         form.value = {
             numero: newVal.numero,
             fecha: newVal.fecha, // Assuming YYYY-MM-DD
-            tipo_documento_id: '', // User needs to select correct one
+            tipo_documento_id: '', // Will be mapped below if catalog is loaded
             registro_propiedad_id: '', // User needs to select correct one
             monto_poliza: newVal.monto_poliza || '',
             referencia: newVal.referencia || '',
@@ -276,6 +294,11 @@ watch(() => props.request, (newVal) => {
             no_dominio: newVal.no_dominio || '',
             observacion: newVal.observacion || '' // Pre-fill with request observation
         };
+
+        // Try to map building the ID from the name text
+        if (!isRegistered.value && newVal.tipo_documento) {
+             mapTipoDocumento(newVal.tipo_documento);
+        }
     }
 }, { immediate: true });
 
