@@ -310,6 +310,10 @@ const menuItems = computed(() => {
             permission: 'jefe_agencia',
             children: [
                 {
+                    label: 'Supervisión de Agencia',
+                    route: '/admin/supervision/agencia'
+                },
+                {
                     label: 'Listado Histórico',
                     route: '/admin/consultas/expedientes'
                 }
