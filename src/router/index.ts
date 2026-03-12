@@ -87,6 +87,12 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/supervision/SupervisionAgenciaView.vue'),
                 meta: { title: 'Supervisión de Agencia', permission: 'jefe_agencia' }
             },
+            {
+                path: 'supervision/regiones',
+                name: 'admin-supervision-regiones',
+                component: () => import('@/views/supervision/SupervisionRegionesView.vue'),
+                meta: { title: 'Supervisión Regional', permission: 'supervisor_regional' }
+            },
 
             // ==========================================
             // MÓDULO: BUZÓN SECRE. AGENCIA
