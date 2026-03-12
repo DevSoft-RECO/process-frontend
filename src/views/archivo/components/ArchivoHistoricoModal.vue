@@ -68,10 +68,6 @@
                             <label class="block text-xs font-medium text-gray-400 uppercase">Tipo Garantía</label>
                             <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ form.tipo_garantia }}</p>
                         </div>
-                        <div class="col-span-1">
-                            <label class="block text-xs font-medium text-gray-400 uppercase">Fecha Ingreso</label>
-                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ formatDate(form.ingreso) }}</p>
-                        </div>
 
                         <!-- Editable Fields Separator -->
                         <div class="col-span-full border-t border-gray-200 dark:border-gray-700 pt-4 mt-2">
@@ -107,6 +103,14 @@
                                     {{ form.estado }}
                                  </option>
                              </select>
+                         </div>
+ 
+                         <!-- Ingreso (Date) -->
+                         <div class="col-span-1">
+                             <label for="ingreso" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha Ingreso</label>
+                             <input type="date" id="ingreso" v-model="form.ingreso"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-azul-cope focus:ring-azul-cope sm:text-sm"
+                             >
                          </div>
 
                          <!-- Salida (Date) -->
