@@ -166,6 +166,9 @@
                             <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
                                 Monto / Tasa
                             </th>
+                            <th v-if="currentTab === 'rechazados'" scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
+                                Motivo de Rechazo
+                            </th>
                             <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
                                 Estado Actual
                             </th>
@@ -176,7 +179,7 @@
                     </thead>
                      <tbody class="divide-y divide-gray-100 dark:divide-slate-700/50">
                         <tr v-if="loading && expedientes.length === 0">
-                            <td colspan="8" class="px-6 py-12 text-center text-slate-400">
+                            <td :colspan="currentTab === 'rechazados' ? 9 : 8" class="px-6 py-12 text-center text-slate-400">
                                 <div class="flex flex-col items-center gap-2">
                                     <div class="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
                                     <span class="font-medium text-xs">Cargando expedientes regionales...</span>
@@ -184,7 +187,7 @@
                             </td>
                         </tr>
                          <tr v-else-if="expedientes.length === 0">
-                             <td colspan="8" class="px-6 py-12 text-center text-slate-400">
+                             <td :colspan="currentTab === 'rechazados' ? 9 : 8" class="px-6 py-12 text-center text-slate-400">
                                 <div class="flex flex-col items-center justify-center">
                                     <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
@@ -234,9 +237,18 @@
                                 </div>
                             </td>
 
+                            <td v-if="currentTab === 'rechazados'" class="px-6 py-4">
+                                <div class="max-w-xs text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-100 dark:border-red-800/30 italic">
+                                    "{{ exp.seguimientos?.[0]?.observacion_rechazo || 'Sin motivo especificado' }}"
+                                </div>
+                            </td>
+
                              <td class="px-6 py-4 text-center">
                                 <span v-if="esCompletado(exp)" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                                     Finalizado
+                                </span>
+                                <span v-else-if="exp.seguimientos?.[0]?.id_estado === 2" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                    Rechazado
                                 </span>
                                 <span v-else-if="exp.seguimientos && exp.seguimientos.length > 0" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                                     En Proceso
@@ -358,6 +370,7 @@ interface Seguimiento {
     id_expediente: number;
     id_estado: number;
     id_estado_secundario: number;
+    observacion_rechazo: string | null;
     archivado_at: string | null;
     created_at: string;
 }
@@ -430,10 +443,13 @@ const iconFinalizado = markRaw({
     }
 })
 
+const iconRechazado = markRaw({ render() { return h('svg', { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", class: "w-4 h-4" }, [h('path', { "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" })]) } })
+
 const tabs = [
     { id: 'nuevos', label: 'Cargados', icon: iconNuevo },
     { id: 'seguimiento', label: 'En Seguimiento', icon: iconSeguimiento },
-    { id: 'finalizados', label: 'Completados', icon: iconFinalizado }
+    { id: 'finalizados', label: 'Completados', icon: iconFinalizado },
+    { id: 'rechazados', label: 'Rechazados', icon: iconRechazado }
 ]
 
 const fetchAgencias = async () => {

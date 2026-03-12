@@ -104,6 +104,9 @@
                             <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
                                 Monto / Tasa
                             </th>
+                            <th v-if="currentTab === 'rechazados'" scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
+                                Motivo de Rechazo
+                            </th>
                             <th scope="col" class="px-6 py-4 font-bold uppercase tracking-wider text-[11px] border-b border-white/10 text-center">
                                 Estado Actual
                             </th>
@@ -114,7 +117,7 @@
                     </thead>
                      <tbody class="divide-y divide-gray-100 dark:divide-slate-700/50">
                         <tr v-if="loading && expedientes.length === 0">
-                            <td colspan="7" class="px-6 py-12 text-center text-slate-400">
+                            <td :colspan="currentTab === 'rechazados' ? 8 : 7" class="px-6 py-12 text-center text-slate-400">
                                 <div class="flex flex-col items-center gap-2">
                                     <div class="w-8 h-8 border-4 border-verde-cope border-t-transparent rounded-full animate-spin"></div>
                                     <span class="font-medium text-xs">Cargando expedientes...</span>
@@ -122,7 +125,7 @@
                             </td>
                         </tr>
                          <tr v-else-if="expedientes.length === 0">
-                             <td colspan="7" class="px-6 py-12 text-center text-slate-400">
+                             <td :colspan="currentTab === 'rechazados' ? 8 : 7" class="px-6 py-12 text-center text-slate-400">
                                 <div class="flex flex-col items-center justify-center">
                                     <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
@@ -166,9 +169,18 @@
                                 </div>
                             </td>
 
+                            <td v-if="currentTab === 'rechazados'" class="px-6 py-4">
+                                <div class="max-w-xs text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-100 dark:border-red-800/30 italic">
+                                    "{{ exp.seguimientos?.[0]?.observacion_rechazo || 'Sin motivo especificado' }}"
+                                </div>
+                            </td>
+
                              <td class="px-6 py-4 text-center">
                                 <span v-if="esCompletado(exp)" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                                     Finalizado
+                                </span>
+                                <span v-else-if="exp.seguimientos?.[0]?.id_estado === 2" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                    Rechazado
                                 </span>
                                 <span v-else-if="exp.seguimientos && exp.seguimientos.length > 0" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                                     En Proceso
@@ -279,7 +291,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, markRaw, h } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 import ArchivoDetalleModal from '../archivo/components/ArchivoDetalleModal.vue'
@@ -291,6 +303,7 @@ interface Seguimiento {
     id_expediente: number;
     id_estado: number;
     id_estado_secundario: number;
+    observacion_rechazo: string | null;
     archivado_at: string | null;
     created_at: string;
 }
@@ -331,22 +344,16 @@ const currentTab = ref('nuevos')
 const filtroAsesor = ref('')
 const filtroFecha = ref('')
 
+const iconNuevo = markRaw({ render() { return h('svg', { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", class: "w-4 h-4" }, [h('path', { "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" })]) } })
+const iconSeguimiento = markRaw({ render() { return h('svg', { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", class: "w-4 h-4" }, [h('path', { "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" })]) } })
+const iconFinalizado = markRaw({ render() { return h('svg', { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", class: "w-4 h-4" }, [h('path', { "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" })]) } })
+const iconRechazado = markRaw({ render() { return h('svg', { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", class: "w-4 h-4" }, [h('path', { "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" })]) } })
+
 const tabs = [
-    { 
-        id: 'nuevos', 
-        label: 'Cargados',
-        icon: { template: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg>` }
-    },
-    { 
-        id: 'seguimiento', 
-        label: 'En Seguimiento',
-        icon: { template: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>` }
-    },
-    { 
-        id: 'finalizados', 
-        label: 'Completados',
-        icon: { template: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>` }
-    }
+    { id: 'nuevos', label: 'Cargados', icon: iconNuevo },
+    { id: 'seguimiento', label: 'En Seguimiento', icon: iconSeguimiento },
+    { id: 'finalizados', label: 'Completados', icon: iconFinalizado },
+    { id: 'rechazados', label: 'Rechazados', icon: iconRechazado }
 ]
 
 const fetchExpedientes = async (page: number = 1) => {
