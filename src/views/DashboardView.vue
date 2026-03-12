@@ -278,10 +278,39 @@
                             </template>
                             <template v-else>
                                 <tr v-for="(adv, i) in advisors.data" :key="i" class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
-                                    <td class="px-4 py-3 font-medium text-gray-900 dark:text-white truncate max-w-[150px]" :title="adv.asesor">
-                                        <span :class="{'text-blue-600 dark:text-blue-400 font-bold': adv.advisor_id?.toLowerCase() === authStore.user?.username?.toLowerCase()}">
-                                            {{ adv.advisor_id }}
-                                        </span>
+                                    <td class="px-4 py-3 font-medium text-gray-900 dark:text-white truncate max-w-[150px] relative">
+                                        <div 
+                                            @click.stop="toggleAdvisorLabel(adv.advisor_id)"
+                                            class="cursor-pointer hover:text-blue-600 transition-colors inline-block group/id"
+                                        >
+                                            <span :class="{'text-blue-600 dark:text-blue-400 font-bold': adv.advisor_id?.toLowerCase() === authStore.user?.username?.toLowerCase()}">
+                                                {{ adv.advisor_id }}
+                                            </span>
+                                            
+                                            <!-- Floating Label -->
+                                            <Transition
+                                                enter-active-class="transition duration-200 ease-out"
+                                                enter-from-class="transform scale-95 opacity-0 -translate-y-1"
+                                                enter-to-class="transform scale-100 opacity-100 translate-y-0"
+                                                leave-active-class="transition duration-150 ease-in"
+                                                leave-from-class="transform scale-100 opacity-100 translate-y-0"
+                                                leave-to-class="transform scale-95 opacity-0 -translate-y-1"
+                                            >
+                                                <div 
+                                                    v-if="activeAdvisorId === adv.advisor_id"
+                                                    class="absolute z-[60] bottom-full mb-2 left-0 whitespace-nowrap bg-gray-900 text-white text-[11px] px-3 py-1.5 rounded-lg shadow-xl shadow-black/20 font-bold border border-white/10"
+                                                >
+                                                    <div class="flex items-center gap-2">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                        </svg>
+                                                        {{ adv.asesor }}
+                                                    </div>
+                                                    <!-- Arrow -->
+                                                    <div class="absolute top-full left-4 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                                                </div>
+                                            </Transition>
+                                        </div>
                                     </td>
                                     <td class="px-4 py-3 text-center">
                                         <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
@@ -470,6 +499,15 @@ const agenciesList = ref<{ id: number, nombre: string }[]>([])
 const selectedAgencies = ref<number[]>([])
 const isAgencyDropdownOpen = ref(false)
 const selectedMonth = ref(new Date().toISOString().slice(0, 7))
+const activeAdvisorId = ref<string | null>(null)
+
+const toggleAdvisorLabel = (id: string) => {
+    if (activeAdvisorId.value === id) {
+        activeAdvisorId.value = null
+    } else {
+        activeAdvisorId.value = id
+    }
+}
 
 const isAllAgenciesSelected = computed(() => {
     return selectedAgencies.value.length === 0 || selectedAgencies.value.length === agenciesList.value.length
@@ -496,6 +534,8 @@ const handleClickOutside = (event: MouseEvent) => {
     if (container && !container.contains(event.target as Node)) {
         isAgencyDropdownOpen.value = false
     }
+    // Close advisor label when clicking outside
+    activeAdvisorId.value = null
 }
 
 const loadAll = async () => {
