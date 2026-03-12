@@ -109,7 +109,20 @@
               </div>
           </div>
 
-          <div class="mt-4 flex justify-end gap-3">
+          <div class="mt-6 flex flex-col md:flex-row justify-between items-center bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <div class="mb-4 md:mb-0 text-gray-700">
+                  <p class="font-bold text-sm"><i class="fas fa-question-circle text-orange-500 mr-1"></i> ¿El documento NO existe?</p>
+                  <p class="text-xs text-gray-500">Si verifica que el documento no existe, puede rechazarlo sin registrarlo.</p>
+              </div>
+              <button 
+                @click="confirmNotExistsWithoutRegister"
+                class="px-5 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg shadow-sm hover:bg-red-100 font-bold flex items-center gap-2 whitespace-nowrap"
+              >
+                <i class="fas fa-times-circle"></i> NO EXISTE EN ARCHIVO
+              </button>
+          </div>
+
+          <div class="mt-6 flex justify-end gap-3 border-t pt-4">
               <button @click="close" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
                 Cancelar
               </button>
@@ -336,6 +349,35 @@ const registerDocument = async () => {
         Swal.fire('Error', error.response?.data?.message || 'Error al registrar documento.', 'error');
     } finally {
         registering.value = false;
+    }
+};
+
+const confirmNotExistsWithoutRegister = async () => {
+    const { value: observation, isConfirmed } = await Swal.fire({
+        title: 'Confirmar NO EXISTENCIA',
+        html: `
+            <p class="text-sm text-gray-600 mb-4 text-left">
+                Está a punto de confirmar que este documento manual <b>NO EXISTE o fue ingresado con error</b>. Se rechazará sin registrarlo en el sistema.
+            </p>
+            <div class="text-left w-full">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Observación (Recomendado):</label>
+            </div>
+        `,
+        input: 'textarea',
+        inputPlaceholder: 'Ingrese el motivo por el cual no existe...',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, NO existe',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#DC2626',
+        cancelButtonColor: '#6B7280',
+    });
+
+    if (isConfirmed) {
+        const data = {
+            confirmacion: 'NO',
+            observacion_confirmacion: observation || ''
+        };
+        emit('saved', { id: props.request.id, data });
     }
 };
 
