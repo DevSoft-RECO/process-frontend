@@ -11,7 +11,7 @@
             </div>
             
              <!-- Tabs and Filters -->
-            <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-4 bg-white/50 dark:bg-slate-800/50 p-4 rounded-xl border border-white/20 dark:border-slate-700/50 backdrop-blur-sm">
+            <div class="relative z-30 flex flex-col xl:flex-row xl:items-start justify-between gap-4 bg-white/50 dark:bg-slate-800/50 p-4 rounded-xl border border-white/20 dark:border-slate-700/50 backdrop-blur-sm">
                 
                 <div class="flex flex-col gap-4 w-full">
                     <!-- Tabs Navigation -->
