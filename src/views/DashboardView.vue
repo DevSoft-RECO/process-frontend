@@ -278,12 +278,15 @@
                             </template>
                             <template v-else>
                                 <tr v-for="(adv, i) in advisors.data" :key="i" class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition">
-                                    <td class="px-4 py-3 font-medium text-gray-900 dark:text-white truncate max-w-[150px] relative">
+                                    <td class="px-4 py-3 font-medium text-gray-900 dark:text-white relative">
                                         <div 
                                             @click.stop="toggleAdvisorLabel(adv.advisor_id)"
-                                            class="cursor-pointer hover:text-blue-600 transition-colors inline-block group/id"
+                                            class="cursor-pointer hover:text-blue-600 transition-colors inline-block group/id max-w-[150px]"
                                         >
-                                            <span :class="{'text-blue-600 dark:text-blue-400 font-bold': adv.advisor_id?.toLowerCase() === authStore.user?.username?.toLowerCase()}">
+                                            <span 
+                                                class="block truncate"
+                                                :class="{'text-blue-600 dark:text-blue-400 font-bold': adv.advisor_id?.toLowerCase() === authStore.user?.username?.toLowerCase()}"
+                                            >
                                                 {{ adv.advisor_id }}
                                             </span>
                                             
@@ -502,6 +505,7 @@ const selectedMonth = ref(new Date().toISOString().slice(0, 7))
 const activeAdvisorId = ref<string | null>(null)
 
 const toggleAdvisorLabel = (id: string) => {
+    console.log('Toggling label for:', id)
     if (activeAdvisorId.value === id) {
         activeAdvisorId.value = null
     } else {
