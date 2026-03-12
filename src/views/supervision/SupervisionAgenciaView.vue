@@ -4,10 +4,82 @@
              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                  <Encabezado
                     title="Supervisión de Agencia"
-                    subtitle="Listado general de expedientes activos e históricos de tu agencia."
+                    subtitle="Listado general de expedientes de tu agencia."
                     labelIndicator="Supervisión"
                     indicator-color="bg-purple-600"
                 />
+            </div>
+            
+             <!-- Tabs and Filters -->
+            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white/50 dark:bg-slate-800/50 p-4 rounded-xl border border-white/20 dark:border-slate-700/50 backdrop-blur-sm">
+                
+                <!-- Tabs Navigation -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <button 
+                        v-for="tab in tabs" 
+                        :key="tab.id"
+                        @click="changeTab(tab.id)"
+                        :class="[
+                            'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2',
+                            currentTab === tab.id 
+                                ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20' 
+                                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+                        ]"
+                    >
+                        <component :is="tab.icon" class="w-4 h-4" />
+                        {{ tab.label }}
+                    </button>
+                </div>
+
+                <!-- Filters -->
+                <div class="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
+                    <!-- Asesor Search -->
+                    <div class="relative w-full sm:w-64">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input
+                            v-model="filtroAsesor"
+                            @keyup.enter="aplicarFiltros"
+                            type="text"
+                            placeholder="Buscar asesor responsable..."
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow"
+                        />
+                    </div>
+
+                    <!-- Date Search -->
+                    <div class="w-full sm:w-48">
+                        <input
+                            v-model="filtroFecha"
+                            @change="aplicarFiltros"
+                            type="date"
+                            title="Filtrar por Fecha de Desembolso"
+                            class="block w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow text-slate-700 dark:text-slate-300"
+                        />
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center gap-2 hidden sm:flex">
+                         <button 
+                            v-if="filtroAsesor || filtroFecha"
+                            @click="limpiarFiltros"
+                            class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            title="Limpiar filtros"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                        <button 
+                            @click="aplicarFiltros"
+                            class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm dark:bg-slate-700 dark:hover:bg-slate-600"
+                        >
+                            Buscar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -98,8 +170,11 @@
                                 <span v-if="esCompletado(exp)" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                                     Finalizado
                                 </span>
-                                <span v-else class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                                <span v-else-if="exp.seguimientos && exp.seguimientos.length > 0" class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                                     En Proceso
+                                </span>
+                                <span v-else class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-800 dark:bg-gray-800/50 dark:text-gray-400">
+                                    Sin Ingresar
                                 </span>
                                 <div v-if="exp.seguimientos && exp.seguimientos.length > 0 && exp.seguimientos[0]" class="text-[10px] text-gray-500 mt-1">
                                     Actualizado: {{ formatDate(exp.seguimientos[0].created_at) }}
@@ -249,14 +324,41 @@ const showDetalleModal = ref(false)
 const selectedSeguimientoId = ref<number | null>(null)
 
 const showTrackingModal = ref(false)
-// Tracking modal usually works with a different structure, we'll try to adapt it
 const selectedTrackingExpediente = ref<any>(null)
+
+// Tabs and Filters State
+const currentTab = ref('nuevos')
+const filtroAsesor = ref('')
+const filtroFecha = ref('')
+
+const tabs = [
+    { 
+        id: 'nuevos', 
+        label: 'Cargados',
+        icon: { template: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg>` }
+    },
+    { 
+        id: 'seguimiento', 
+        label: 'En Seguimiento',
+        icon: { template: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>` }
+    },
+    { 
+        id: 'finalizados', 
+        label: 'Completados',
+        icon: { template: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>` }
+    }
+]
 
 const fetchExpedientes = async (page: number = 1) => {
     loading.value = true
     try {
         const response = await api.get('/supervision/agencia', {
-            params: { page }
+            params: { 
+                page,
+                tab: currentTab.value,
+                asesor: filtroAsesor.value || null,
+                fecha_inicio: filtroFecha.value || null
+            }
         })
 
         if (response.data.success) {
@@ -282,6 +384,21 @@ const goToPage = (page: number) => {
     if (page >= 1 && page <= pagination.value.last_page && !loading.value) {
         fetchExpedientes(page)
     }
+}
+
+const changeTab = (tabId: string) => {
+    currentTab.value = tabId
+    fetchExpedientes(1)
+}
+
+const aplicarFiltros = () => {
+    fetchExpedientes(1)
+}
+
+const limpiarFiltros = () => {
+    filtroAsesor.value = ''
+    filtroFecha.value = ''
+    fetchExpedientes(1)
 }
 
 const displayedPages = computed(() => {
