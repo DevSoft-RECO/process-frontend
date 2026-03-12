@@ -131,7 +131,7 @@
                              <select id="localizacion" v-model="form.localizacion"
                                 class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-azul-cope focus:ring-azul-cope sm:text-sm"
                              >
-                                 <option value="ARCHIVO">ARCHIVO</option>
+                                 <option value="ARCHIVO">EN ARCHIVO</option>
                                  <option value="RETIRADO">RETIRADO</option>
                                  <option value="FALTANTE">FALTANTE</option>
                                  <!-- Fallback option if current value is not in list -->

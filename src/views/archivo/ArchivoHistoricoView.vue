@@ -90,7 +90,7 @@
                         <th scope="col" class="px-4 py-3 min-w-[200px]">Asociado / Monto</th>
                         <th scope="col" class="px-4 py-3 min-w-[150px]">Garantía / Contrato</th>
                         <th scope="col" class="px-4 py-3 text-center min-w-[100px]">Garantía</th>
-                        <th scope="col" class="px-4 py-3 min-w-[150px]">Inscripción Otros</th>
+                        <th scope="col" class="px-4 py-3 min-w-[150px]">Localizacion</th>
                         <th scope="col" class="px-4 py-3 min-w-[150px]">Ingreso / Estado</th>
                         <th scope="col" class="px-4 py-3 text-center min-w-[80px]">Acciones</th>
                     </tr>
@@ -167,10 +167,16 @@
                              <span v-else class="text-xs text-gray-400 italic">N/A</span>
                         </td>
 
-                        <!-- Inscripción Otros -->
-                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300 text-xs">
-                             <span class="line-clamp-2" :title="exp.inscripcion_otros_contratos">
-                                {{ exp.inscripcion_otros_contratos }}
+                        <!-- Localización -->
+                         <td class="px-4 py-3">
+                             <span :class="[
+                                'px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors',
+                                exp.localizacion === 'EN ARCHIVO' ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800' : 
+                                exp.localizacion === 'RETIRADO' ? 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800' : 
+                                exp.localizacion === 'FALTANTE' ? 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800' : 
+                                'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'
+                             ]">
+                                {{ exp.localizacion || 'N/A' }}
                              </span>
                         </td>
 
@@ -285,7 +291,7 @@ interface Expediente {
     tipo_garantia: string
     datos_garantia: string
     contrato: string
-    inscripcion_otros_contratos: string
+    localizacion: string
     ingreso: string
     estado: string
     inventario: string
