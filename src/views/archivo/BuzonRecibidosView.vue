@@ -387,7 +387,7 @@ const archivarAction = async (exp: Expediente) => {
 
     if (result.isConfirmed) {
         try {
-            const res = await api.post(`/archivo/archivar/${exp.id}`)
+            const res = await api.post(`/archivo/${exp.id}/archivar`)
             if (res.data.success) {
                 Swal.fire('Éxito', res.data.message, 'success')
                 fetchExpedientes() // Refresh to update button state
@@ -450,7 +450,7 @@ const recibirContratoAction = async (exp: Expediente) => {
 
     if (result.isConfirmed) {
         try {
-            const res = await api.post(`/archivo/recibir-contrato/${exp.id}`)
+            const res = await api.post(`/archivo/${exp.id}/recibir-contrato`)
             if (res.data.success) {
                 Swal.fire('Éxito', res.data.message, 'success')
                 fetchExpedientes() // Refresh
@@ -483,7 +483,7 @@ const handleConfirmReceiveFromModal = async () => {
     try {
         const exp = selectedExpedienteForReceive.value
         // Logic from receivingGarantia
-        const res = await api.post(`/archivo/recibir-garantia/${exp.id}`)
+        const res = await api.post(`/archivo/${exp.id}/recibir-garantia`)
         
         if (res.data.success) {
             Swal.fire('Éxito', res.data.message, 'success')
