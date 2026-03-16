@@ -20,19 +20,34 @@
 
             <!-- Filtros y Búsqueda -->
              <div class="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row gap-4 justify-between items-center">
-                <div class="relative w-full md:max-w-md">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                         <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+                <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                    <div class="relative w-full md:w-80">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input 
+                            v-model="search"
+                            @input="debouncedSearch"
+                            type="text" 
+                            placeholder="Código, Nombre, CUI o Producto..." 
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-verde-cope focus:border-verde-cope sm:text-sm transition-colors"
+                        >
                     </div>
-                    <input 
-                        v-model="search"
-                        @input="debouncedSearch"
-                        type="text" 
-                        placeholder="Buscar por código, nombre o CUI..." 
-                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-verde-cope focus:border-verde-cope sm:text-sm transition-colors"
-                    >
+
+                    <div class="w-full md:w-64">
+                        <select 
+                            v-model="selectedAgencia"
+                            @change="debouncedSearch"
+                            class="block w-full px-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-1 focus:ring-verde-cope focus:border-verde-cope sm:text-sm transition-colors"
+                        >
+                            <option value="">Todas las Agencias</option>
+                            <option v-for="agencia in agencias" :key="agencia.id" :value="agencia.id">
+                                {{ agencia.nombre }}
+                            </option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -267,6 +282,8 @@ interface Expediente {
 const expedientes = ref<Expediente[]>([])
 const loading = ref(false)
 const search = ref('')
+const selectedAgencia = ref('')
+const agencias = ref<any[]>([])
 const pagination = ref({
     current_page: 1,
     last_page: 1,
@@ -293,7 +310,8 @@ const fetchExpedientes = async () => {
     try {
         const params = {
             page: pagination.value.current_page,
-            search: search.value
+            search: search.value,
+            id_agencia: selectedAgencia.value
         }
         const res = await api.get('/secretaria-credito/escanear-documentos', { params })
         if (res.data.success) {
@@ -343,7 +361,17 @@ const closeModal = () => {
     selectedExpediente.value = null
 }
 
+const fetchAgencias = async () => {
+    try {
+        const res = await api.get('/agencias', { params: { all: 1 } })
+        agencias.value = res.data.data
+    } catch (error) {
+        console.error('Error fetching agencies:', error)
+    }
+}
+
 onMounted(() => {
+    fetchAgencias()
     fetchExpedientes()
 })
 </script>
