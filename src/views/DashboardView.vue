@@ -255,7 +255,7 @@
                                 <th class="px-4 py-3 rounded-l-lg">Asesor</th>
                                 <th class="px-4 py-3 text-center">Activos</th>
                                 <th class="px-4 py-3 text-center">Rechazos Hist.</th>
-                                <th class="px-4 py-3 text-right">Créditos</th>
+                                <th class="px-4 py-3 text-center">Pendientes</th>
                                 <th class="px-4 py-3 text-center">Tasa Exito</th>
                                 <th class="px-4 py-3 text-right rounded-r-lg">Tasa Rechazo</th>
                             </tr>
@@ -323,8 +323,8 @@
                                     <td class="px-4 py-3 text-center text-red-600 dark:text-red-400 font-medium">
                                         {{ adv.rejected_cases }}
                                     </td>
-                                    <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">
-                                        {{ formatCurrency(adv.creditos ?? 0) }}
+                                    <td class="px-4 py-3 text-center font-bold text-gray-900 dark:text-white">
+                                        {{ adv.pending_cases ?? 0 }}
                                     </td>
                                     <td class="px-4 py-3 text-center">
                                         <div class="flex items-center justify-center gap-2">
