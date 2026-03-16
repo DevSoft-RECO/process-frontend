@@ -348,7 +348,11 @@ const closeModal = () => {
 const fetchAgencias = async () => {
     try {
         const res = await api.get('/agencias', { params: { all: 1 } })
-        agencias.value = res.data.data
+        if (Array.isArray(res.data)) {
+            agencias.value = res.data
+        } else if (res.data.data && Array.isArray(res.data.data)) {
+            agencias.value = res.data.data
+        }
     } catch (error) {
         console.error('Error fetching agencies:', error)
     }
