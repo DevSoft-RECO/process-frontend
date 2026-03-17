@@ -108,11 +108,22 @@
                 <div class="text-gray-500 dark:text-gray-400 text-xs truncate max-w-[200px]" :title="req.titulo_nombre">{{ req.titulo_nombre }}</div>
               </td>
               <td class="px-6 py-4 text-sm max-w-xs">
-                 <div class="font-bold mb-1" :class="req.tipo_retiro === 'Definitivo' ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'">
-                    {{ req.tipo_retiro }}
-                 </div>
-                 <div class="text-gray-500 dark:text-gray-400 text-xs truncate" :title="req.justificacion">
-                    {{ req.justificacion }}
+                 <div class="flex justify-between items-start">
+                    <div>
+                        <div class="font-bold mb-1" :class="req.tipo_retiro === 'Definitivo' ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'">
+                           {{ req.tipo_retiro }}
+                        </div>
+                        <div class="text-gray-500 dark:text-gray-400 text-xs truncate max-w-[150px]" :title="req.justificacion">
+                           {{ req.justificacion }}
+                        </div>
+                    </div>
+                    <button 
+                      @click="showWithdrawalDetails(req)"
+                      class="ml-2 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                      title="Ver todos los detalles"
+                    >
+                      <i class="fas fa-info-circle text-lg"></i>
+                    </button>
                  </div>
               </td>
               <td v-if="filterState === 4" class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate" :title="req.observacion_retorno">
@@ -452,6 +463,53 @@ const closeDetailModal = () => {
   showDetailModal.value = false;
   selectedDocument.value = null;
   currentRequest.value = null;
+};
+
+const showWithdrawalDetails = (req) => {
+    let htmlContent = `
+        <div class="text-left space-y-4 pt-4">
+            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-100 dark:border-gray-600">
+                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Justificación de la Solicitud</h4>
+                <p class="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-line">${req.justificacion || 'Sin justificación.'}</p>
+            </div>
+    `;
+
+    if (req.observacion_despacho) {
+        htmlContent += `
+            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-100 dark:border-gray-600">
+                <h4 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">Observación de Despacho</h4>
+                <p class="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-line">${req.observacion_despacho}</p>
+            </div>
+        `;
+    }
+
+    if (req.observacion_retorno) {
+        htmlContent += `
+            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-100 dark:border-gray-600">
+                <h4 class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">Observación de Retorno</h4>
+                <p class="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-line">${req.observacion_retorno}</p>
+            </div>
+        `;
+    }
+
+    htmlContent += `</div>`;
+
+    Swal.fire({
+        title: `<div class="flex items-center space-x-2 text-xl font-bold">
+                    <i class="fas fa-file-alt text-blue-500"></i>
+                    <span>Detalles del Retiro #${req.id}</span>
+                </div>`,
+        html: htmlContent,
+        width: '600px',
+        showCloseButton: true,
+        confirmButtonText: 'Cerrar',
+        confirmButtonColor: '#3B82F6',
+        customClass: {
+            popup: 'rounded-xl shadow-2xl', // Background handled by global CSS
+            title: 'text-left pb-2 border-b dark:border-gray-700',
+            confirmButton: 'rounded-lg px-6 py-2'
+        }
+    });
 };
 
 // --- Registration Logic ---
