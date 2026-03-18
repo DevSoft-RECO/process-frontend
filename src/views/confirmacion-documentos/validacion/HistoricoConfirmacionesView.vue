@@ -76,15 +76,14 @@
               </td>
 
               <!-- Col 5: Datos Registrales -->
-              <td class="px-6 py-4 whitespace-nowrap align-top">
-                <div class="text-xs text-gray-600">
-                  <span class="font-semibold">F:</span> {{ item.no_finca || '-' }} &nbsp;|&nbsp; 
-                  <span class="font-semibold">F:</span> {{ item.folio || '-' }}
-                </div>
-                <div class="text-xs text-gray-600">
-                  <span class="font-semibold">L:</span> {{ item.libro || '-' }} &nbsp;|&nbsp; 
-                  <span class="font-semibold">D:</span> {{ item.no_dominio || '-' }}
-                </div>
+              <td class="px-6 py-4 whitespace-nowrap align-top text-center">
+                <button 
+                  @click="showDocumentData(item.documento)"
+                  class="text-blue-500 hover:text-blue-700 transition p-2 bg-blue-50 rounded-full hover:bg-blue-100"
+                  title="Ver datos del documento registrado"
+                >
+                  <i class="fas fa-info-circle fa-lg"></i>
+                </button>
               </td>
 
               <!-- Col 6: Observaciones -->
@@ -228,6 +227,62 @@ const formatDateTime = (dateString) => {
   const date = new Date(dateString);
   if (isNaN(date)) return dateString;
   return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+};
+
+const showDocumentData = (documento) => {
+  if (!documento) {
+    Swal.fire('Atención', 'No hay datos del documento disponibles.', 'info');
+    return;
+  }
+
+  const tipoDoc = documento.tipo_documento?.nombre || 'Documento';
+  
+  const htmlContent = `
+    <div class="text-left text-sm space-y-4 mt-2">
+      <div class="grid grid-cols-2 gap-3 border-b border-gray-100 pb-3">
+        <div><span class="text-gray-500 font-semibold block text-xs uppercase">Tipo Documento</span><span class="text-gray-800">${tipoDoc}</span></div>
+        <div><span class="text-gray-500 font-semibold block text-xs uppercase">Número</span><span class="text-gray-800">${documento.numero || '-'}</span></div>
+        <div class="col-span-2"><span class="text-gray-500 font-semibold block text-xs uppercase">Fecha</span><span class="text-gray-800">${formatDate(documento.fecha)}</span></div>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-3 border-b border-gray-100 pb-3">
+        <div class="col-span-2"><span class="text-gray-500 font-semibold block text-xs uppercase">Propietario</span><span class="text-gray-800">${documento.propietario || '-'}</span></div>
+        <div><span class="text-gray-500 font-semibold block text-xs uppercase">Autorizador</span><span class="text-gray-800">${documento.autorizador || '-'}</span></div>
+        <div><span class="text-gray-500 font-semibold block text-xs uppercase">Referencia</span><span class="text-gray-800">${documento.referencia || '-'}</span></div>
+        <div class="col-span-2"><span class="text-gray-500 font-semibold block text-xs uppercase">Monto Póliza</span><span class="text-gray-800">${documento.monto_poliza ? 'Q ' + documento.monto_poliza : '-'}</span></div>
+      </div>
+      
+      <div class="border-b border-gray-100 pb-3">
+        <span class="text-gray-500 font-semibold block text-xs uppercase mb-2">Datos Registrales</span>
+        <div class="grid grid-cols-4 gap-2 text-center">
+          <div class="bg-gray-50 p-2 rounded border border-gray-200"><span class="text-xs text-gray-500 block mb-1">Finca</span><span class="font-bold text-gray-800">${documento.no_finca || '-'}</span></div>
+          <div class="bg-gray-50 p-2 rounded border border-gray-200"><span class="text-xs text-gray-500 block mb-1">Folio</span><span class="font-bold text-gray-800">${documento.folio || '-'}</span></div>
+          <div class="bg-gray-50 p-2 rounded border border-gray-200"><span class="text-xs text-gray-500 block mb-1">Libro</span><span class="font-bold text-gray-800">${documento.libro || '-'}</span></div>
+          <div class="bg-gray-50 p-2 rounded border border-gray-200"><span class="text-xs text-gray-500 block mb-1">Dominio</span><span class="font-bold text-gray-800">${documento.no_dominio || '-'}</span></div>
+        </div>
+      </div>
+      
+      <div>
+        <span class="text-gray-500 font-semibold block text-xs uppercase mb-1">Observaciones del documento</span>
+        <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200 text-gray-700 italic text-xs">
+          ${documento.observacion || 'Sin observaciones'}
+        </div>
+      </div>
+    </div>
+  `;
+
+  Swal.fire({
+    title: '<div class="flex items-center"><i class="fas fa-file-alt text-blue-500 mr-2"></i> <span>Datos del Documento Registrado</span></div>',
+    html: htmlContent,
+    width: '600px',
+    showCloseButton: true,
+    showConfirmButton: false,
+    customClass: {
+      popup: 'rounded-xl shadow-xl',
+      title: 'text-lg font-bold text-gray-800 w-full text-left',
+      closeButton: 'focus:outline-none'
+    }
+  });
 };
 
 onMounted(() => loadHistory());
