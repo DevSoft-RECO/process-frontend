@@ -162,8 +162,15 @@ const fetchExpedientes = async () => {
             }
         })
         
+        // Verificar si la respuesta es paginada (res.data.data.data) o un arreglo directo (res.data.data)
         if (res.data && res.data.data) {
-            expedientes.value = res.data.data
+            if (res.data.data.data && Array.isArray(res.data.data.data)) {
+                expedientes.value = res.data.data.data
+            } else if (Array.isArray(res.data.data)) {
+                expedientes.value = res.data.data
+            } else {
+                expedientes.value = []
+            }
         } else {
             expedientes.value = []
         }
@@ -198,11 +205,12 @@ const downloadCSV = async () => {
 }
 
 const filteredExpedientes = computed(() => {
+    if (!Array.isArray(expedientes.value)) return []
     if (!search.value) return expedientes.value
     const s = search.value.toLowerCase()
     return expedientes.value.filter(e => 
-        e.id.toString().includes(s) || 
-        e.nombre_asociado?.toLowerCase().includes(s)
+        (e?.id?.toString().includes(s)) || 
+        (e?.nombre_asociado?.toLowerCase().includes(s))
     )
 })
 
