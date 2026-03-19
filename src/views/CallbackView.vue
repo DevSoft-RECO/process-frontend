@@ -13,7 +13,14 @@ const subStatus = ref(
   'Estamos verificando tu identidad con los sistemas de la Cooperativa YAMAN KUTX.'
 )
 
+let isProcessingCallback = false
+
 onMounted(async () => {
+  if (isProcessingCallback) {
+      console.warn("Callback ya en proceso, ignorando doble ejecución.");
+      return;
+  }
+  isProcessingCallback = true;
   const code = route.query.code as string
 
   if (!code) {
@@ -28,6 +35,10 @@ onMounted(async () => {
     const client_id = import.meta.env.VITE_CLIENT_ID || '019b27d0-4adc-70f7-ba93-84024bf43d46'
     const redirect_uri = `${window.location.origin}/callback`
     const MOTHER_API_URL = import.meta.env.VITE_MOTHER_API_URL || 'http://localhost:8000'
+
+    if (!code_verifier) {
+        throw new Error("No se encontró el pkce_verifier en almacenamiento local.");
+    }
 
     const { data } = await axios.post(`${MOTHER_API_URL}/oauth/token`, {
         grant_type: 'authorization_code',
