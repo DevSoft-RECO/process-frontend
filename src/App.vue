@@ -2,6 +2,7 @@
 import { onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { startSessionGuards } from '@/utils/sessionGuards'
 
 const authStore = useAuthStore()
 
@@ -11,6 +12,7 @@ onMounted(async () => {
 
   if (!isCallbackRoute) {
       await authStore.checkAuth() 
+      startSessionGuards()
   }
 
   // Remove preloader with fade-out

@@ -18,7 +18,13 @@ export default {
      * 1. INICIAR LOGIN (Navegador)
      */
     async login(): Promise<void> {
-        window.location.href = `${MOTHER_APP_URL}`;
+        const { preparePKCE } = await import('../utils/auth-crypto');
+        const challenge = await preparePKCE();
+        const client_id = import.meta.env.VITE_CLIENT_ID || '019b27d0-4adc-70f7-ba93-84024bf43d46';
+        const redirect_uri = `${window.location.origin}/callback`;
+        
+        const authUrl = `${MOTHER_API_URL}/oauth/authorize?client_id=${client_id}&redirect_uri=${encodeURIComponent(redirect_uri)}&response_type=code&scope=&code_challenge=${challenge}&code_challenge_method=S256`;
+        window.location.href = authUrl;
     },
 
     /**
@@ -66,6 +72,7 @@ export default {
     logoutLocal(): void {
         localStorage.removeItem('access_token');
         localStorage.removeItem('user_data');
-        localStorage.removeItem('pkce_verifier');
+        sessionStorage.removeItem('user_data');
+        sessionStorage.removeItem('pkce_verifier');
     }
 };

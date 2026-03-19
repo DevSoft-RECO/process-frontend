@@ -35,7 +35,10 @@ api.interceptors.response.use(
     (error: AxiosError) => {
         if (error.response && error.response.status === 401) {
             console.error('[Axios Local] Error 401. El token fue enviado pero rechazado por el servidor.');
-            console.error('Detalles del error:', error.response.data);
+            localStorage.clear();
+            sessionStorage.clear();
+            const MOTHER_APP_URL = import.meta.env.VITE_MOTHER_APP_URL || 'http://localhost:5173';
+            window.location.href = `${MOTHER_APP_URL}/login?session=expired`;
         }
         return Promise.reject(error);
     }

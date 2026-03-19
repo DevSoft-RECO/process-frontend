@@ -13,7 +13,7 @@ export interface User {
 
 export const useAuthStore = defineStore('auth', () => {
     // --- STATE ---
-    const user = ref<User | null>(null)
+    const user = ref<User | null>(JSON.parse(sessionStorage.getItem('user_data') || 'null'))
     const token = ref<string | null>(localStorage.getItem('access_token') || null)
     const processingSSO = ref<boolean>(false)
     const isReady = ref<boolean>(false)
@@ -63,15 +63,23 @@ export const useAuthStore = defineStore('auth', () => {
             return
         }
 
+        // Si ya tenemos los datos en caché, no hacemos la petición
+        if (user.value) {
+            isReady.value = true
+            return
+        }
+
         try {
-            const { default: axios } = await import('../api/axios')
-            const response = await axios.get('/me')
+            const { default: api } = await import('../api/axios')
+            const response = await api.get('/me')
             const userData = response.data
 
             user.value = userData
-            localStorage.setItem('user_data', JSON.stringify(userData))
+            sessionStorage.setItem('user_data', JSON.stringify(userData))
+            // Quitamos de localStorage si estuviera ahí por versiones anteriores
+            localStorage.removeItem('user_data')
         } catch (error) {
-            console.warn('Sesión expirada o inválida, o error al conectar con Api Local', error)
+            console.warn('Sesión expirada o inválida, o error al conectar con Api', error)
         } finally {
             isReady.value = true
         }
