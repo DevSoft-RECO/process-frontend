@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <link rel="icon" href="/favicon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SADEC</title>
+  <title>Portal YK - SADEC</title>
   <script>
     // PRE-BOOT THEME DETECTION: Prevents white flash during loading
     (function () {
@@ -16,7 +16,7 @@
     })();
   </script>
   <style>
-    /* --- NEW BORDERLESS ATOM LOADER (Mask & Conic Gradient Trick) --- */
+    /* --- NEW POINTED RINGS DESIGN --- */
     :root {
       --bg-light: radial-gradient(circle at center, #ffffff 0%, #f0f5f9 100%);
       --bg-dark: radial-gradient(circle at center, #1a202c 0%, #0f172a 100%);
@@ -78,61 +78,40 @@
       color: var(--color-white-dark);
     }
 
-    /* Common definition for the borderless rings */
-    .ring-wrapper {
-      position: absolute;
+    /* --- POINTED RINGS --- */
+    #ring {
       width: 190px;
       height: 190px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .ring-mask {
-      width: 100%;
-      height: 100%;
-      position: relative;
+      border: 1px solid transparent;
       border-radius: 50%;
-      overflow: hidden;
-      /* MASK TRICK: Creates the thin ring shape without using borders */
-      mask-image: radial-gradient(transparent 65%, black 67%);
-      -webkit-mask-image: radial-gradient(transparent 65%, black 67%);
-    }
-
-    .ring-color {
-      content: '';
       position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      /* CONIC GRADIENT: Draws the specific arc segment */
-      background: conic-gradient(transparent,
-          var(--ring-color) 5deg,
-          var(--ring-color) 45deg,
-          transparent 50deg);
     }
 
-    /* Original Animations applied to the mask containers */
-    .ring-wrapper:nth-child(1) {
-      --ring-color: var(--color-navy);
+    /* Ring 1 - Navy */
+    #ring:nth-child(1) {
+      border-bottom: 8px solid var(--color-navy);
       animation: rotate1 2s linear infinite;
     }
 
-    .dark .ring-wrapper:nth-child(1) {
-      --ring-color: var(--color-white-dark);
+    .dark #ring:nth-child(1) {
+      border-bottom-color: var(--color-white-dark);
     }
 
-    .ring-wrapper:nth-child(2) {
-      --ring-color: var(--color-green-dark);
+    /* Ring 2 - Green Dark */
+    #ring:nth-child(2) {
+      border-bottom: 8px solid var(--color-green-dark);
       animation: rotate2 2s linear infinite;
     }
 
-    .ring-wrapper:nth-child(3) {
-      --ring-color: var(--color-blue);
+    /* Ring 3 - Blue */
+    #ring:nth-child(3) {
+      border-bottom: 8px solid var(--color-blue);
       animation: rotate3 2s linear infinite;
     }
 
-    .ring-wrapper:nth-child(4) {
-      --ring-color: var(--color-green-light);
+    /* Ring 4 - Green Light */
+    #ring:nth-child(4) {
+      border-bottom: 8px solid var(--color-green-light);
       animation: rotate4 2s linear infinite;
     }
 
@@ -232,32 +211,16 @@
   <div id="loading-wrapper">
     <div id="page">
       <div id="container">
-        <div class="ring-wrapper">
-          <div class="ring-mask">
-            <div class="ring-color"></div>
-          </div>
-        </div>
-        <div class="ring-wrapper">
-          <div class="ring-mask">
-            <div class="ring-color"></div>
-          </div>
-        </div>
-        <div class="ring-wrapper">
-          <div class="ring-mask">
-            <div class="ring-color"></div>
-          </div>
-        </div>
-        <div class="ring-wrapper">
-          <div class="ring-mask">
-            <div class="ring-color"></div>
-          </div>
-        </div>
+        <div id="ring"></div>
+        <div id="ring"></div>
+        <div id="ring"></div>
+        <div id="ring"></div>
         <div id="h3">SADEC</div>
       </div>
     </div>
 
     <div class="brand-group">
-      <h1 class="brand-main">PORTAL <span>YK</span></h1>
+      <h1 class="brand-main">YAMAN<span> KUTX</span></h1>
       <p class="brand-sub">SISTEMAS</p>
     </div>
   </div>
