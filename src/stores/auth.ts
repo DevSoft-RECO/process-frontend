@@ -14,11 +14,13 @@ export interface User {
 export const useAuthStore = defineStore('auth', () => {
 
     // --- MIGRACIÓN Y LIMPIEZA DE CACHÉ (Anti-Old-Data) ---
-    const STORAGE_VERSION = 'v2_pkce';
+    const STORAGE_VERSION = 'v3_hija5_pkce'; 
     if (localStorage.getItem('yk_storage_version') !== STORAGE_VERSION) {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('user_data');
-        sessionStorage.removeItem('user_data');
+        const keysToRemove = ['access_token', 'user_data', 'pkce_verifier'];
+        keysToRemove.forEach(k => {
+           localStorage.removeItem(k);
+           sessionStorage.removeItem(k);
+        });
         localStorage.setItem('yk_storage_version', STORAGE_VERSION);
     }
 
@@ -67,14 +69,14 @@ export const useAuthStore = defineStore('auth', () => {
         AuthService.logout()
     }
 
-    async function fetchUser(): Promise<void> {
+    async function fetchUser(force = false): Promise<void> {
         if (!token.value) {
             isReady.value = true
             return
         }
 
-        // Si ya tenemos los datos en caché, no hacemos la petición
-        if (user.value) {
+        // SI FORCE ES TRUE, IGNORAMOS EL CACHÉ Y OBLIGAMOS A CONSULTAR AL BACKEND
+        if (!force && user.value) {
             isReady.value = true
             return
         }

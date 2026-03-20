@@ -59,7 +59,7 @@ onMounted(async () => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
     // 2. Cargar usuario cacheando en sessionStorage
-    await authStore.fetchUser()
+    await authStore.fetchUser(true)
 
     status.value = 'Acceso autorizado'
     subStatus.value =
