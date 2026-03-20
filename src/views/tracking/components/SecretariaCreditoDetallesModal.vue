@@ -268,13 +268,21 @@
                     </button>
 
                 <!-- Acción: Adjuntar (Si es estado 10 y NO tiene contrato y NO está cargando) -->
-                <button v-if="isDevuelto && !hasContrato && !loadingDetalles && !isArchived" @click="adjuntarExpediente" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
+                <button v-if="isDevuelto && !hasContrato" @click="adjuntarExpediente" class="px-5 py-2.5 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
                     Adjuntar Expediente
                 </button>
 
+                <!-- Botón: Modificar/Agregar Número de Contrato (Siempre disponible para Secretaría) -->
+                <button v-if="!isArchived" @click="handleAction('adjuntar-contrato')" 
+                    class="px-5 py-2.5 border border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400 font-bold rounded-lg hover:bg-indigo-600 hover:text-white transition-colors flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    {{ numeroContrato ? 'Modificar No. Contrato' : 'Agregar No. Contrato' }}
+                </button>
             </div>
         </div>
     </div>
@@ -613,6 +621,46 @@ const handleAction = async (action: string) => {
             } catch (error: any) {
                 console.error(error)
                 Swal.fire('Error', error.response?.data?.message || 'Error al enviar expediente.', 'error')
+            }
+        }
+        return;
+    }
+
+    if (action === 'adjuntar-contrato') {
+        const result = await Swal.fire({
+            title: 'Modificar/Adjuntar Contrato',
+            text: "Ingrese el número de contrato:",
+            input: 'text',
+            inputValue: numeroContrato.value || '',
+            inputPlaceholder: 'Número de contrato...',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#0ea5e9',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Debe ingresar un número de contrato'
+                }
+            }
+        })
+
+        if (result.isConfirmed) {
+            try {
+                const res = await api.post('/secretaria-agencia/adjuntar-contrato', {
+                    id: props.expediente.id,
+                    numero_contrato: result.value
+                })
+
+                if (res.data.success) {
+                    Swal.fire('Guardado', 'Número de contrato actualizado correctamente.', 'success')
+                    emit('refresh')
+                    fetchDetalles()
+                }
+            } catch (error: any) {
+                console.error(error)
+                Swal.fire('Error', error.response?.data?.message || 'Error al actualizar contrato.', 'error')
             }
         }
         return;
