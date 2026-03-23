@@ -8,7 +8,24 @@
           labelIndicator="Secretaria Agencia"
           indicator-color="bg-purple-600"
         />
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3">
+             <div class="relative w-64 md:w-80">
+                  <input 
+                      v-model="searchQuery" 
+                      @keyup.enter="handleSearch"
+                      type="text" 
+                      placeholder="Buscar (Código, Nombre, Producto)..." 
+                      class="w-full pl-10 pr-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:border-purple-600 transition-all shadow-sm"
+                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-2.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+              </div>
+             <button @click="resetFetch" class="p-2 text-slate-500 hover:text-purple-600 bg-white/50 dark:bg-slate-800/50 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-xl border border-slate-200 dark:border-slate-700 transition shadow-sm" title="Refrescar">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+             </button>
             <router-link 
                 :to="{ name: 'admin-tracking-secretaria-edicion' }"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
@@ -207,6 +224,7 @@ const expedientes = ref<Expediente[]>([])
 const loading = ref(false)
 const nextPageUrl = ref<string | null>(null)
 const activeTab = ref<'buzon' | 'regresados' | 'aceptados'>('buzon')
+const searchQuery = ref('')
 
 const tabs = [
     { id: 'buzon', label: 'Buzón (Pendientes)', color: 'verde-cope' },
@@ -226,8 +244,13 @@ const fetchExpedientes = async (url: string | null = null) => {
         if (activeTab.value === 'regresados') status = 2;
         if (activeTab.value === 'aceptados') status = 3;
         
+        const params: any = { status }
+        if (searchQuery.value) {
+            params.search = searchQuery.value
+        }
+
         const res = await api.get(endpoint, {
-            params: { status }
+            params
         })
 
         if (res.data.success) {
@@ -256,6 +279,16 @@ const loadMore = () => {
 const openDetalles = (expor: any) => {
     selectedExpediente.value = expor
     showModal.value = true
+}
+
+const handleSearch = () => {
+    // When searching, we want to reset pagination
+    fetchExpedientes(null)
+}
+
+const resetFetch = () => {
+    searchQuery.value = ''
+    fetchExpedientes(null)
 }
 
 const handleRefresh = () => {
