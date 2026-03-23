@@ -11,6 +11,18 @@
         </div>
 
         <div class="flex items-center gap-3">
+           <div class="relative w-72 md:w-80">
+                <input 
+                    v-model="searchQuery" 
+                    @keyup.enter="handleSearch"
+                    type="text" 
+                    placeholder="Buscar (Código, Nombre, Producto)..." 
+                    class="w-full pl-10 pr-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-naranja-cope focus:border-naranja-cope transition-all shadow-sm"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-2.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
            <button 
             @click="resetFetch" 
             class="group px-5 py-2.5 bg-naranja-cope backdrop-blur-md border border-white/20 text-white rounded-xl 
@@ -84,6 +96,7 @@ import Encabezado from '../../components/common/encabezado.vue'
 const expedientes = ref<any[]>([])
 const loading = ref(false)
 const pagination = ref<any | null>(null)
+const searchQuery = ref('')
 
 // Modal State
 const showAdjuntarModal = ref(false)
@@ -101,6 +114,10 @@ const fetchExpedientes = async (url: string | null = null) => {
     // Only append tab if not already present in url
     if (!endpoint.includes('tab=')) {
         endpoint = `${endpoint}${separator}tab=nuevos`
+    }
+
+    if (searchQuery.value && !endpoint.includes('search=')) {
+        endpoint += (endpoint.includes('?') ? '&' : '?') + `search=${encodeURIComponent(searchQuery.value)}`
     }
 
     try {
@@ -123,7 +140,14 @@ const fetchExpedientes = async (url: string | null = null) => {
     }
 }
 
-const resetFetch = () => fetchExpedientes(null)
+const handleSearch = () => {
+    fetchExpedientes()
+}
+
+const resetFetch = () => {
+    searchQuery.value = ''
+    fetchExpedientes(null)
+}
 
 const handleSaved = () => {
     fetchExpedientes()
