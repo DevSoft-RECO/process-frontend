@@ -476,7 +476,7 @@ router.beforeEach(async (to, _from) => {
                     const requiredPerm = record.meta.permission as string;
                     if (!hasRequiredPermission(requiredPerm)) {
                         console.warn(`⛔ Acceso denegado: Usuario carece del permiso jerárquico '${requiredPerm}'.`)
-                        // window.location.href = `${motherAppUrl}/apps`
+                        window.location.href = `${motherAppUrl}/apps`
                         return false
                     }
                 }
@@ -486,7 +486,7 @@ router.beforeEach(async (to, _from) => {
                     const requiredRole = record.meta.role as string;
                     if (!authStore.hasRole(requiredRole)) {
                         console.warn(`⛔ Acceso denegado: Usuario carece del rol '${requiredRole}'.`)
-                        // window.location.href = `${motherAppUrl}/apps`
+                        window.location.href = `${motherAppUrl}/apps`
                         return false
                     }
                 }
