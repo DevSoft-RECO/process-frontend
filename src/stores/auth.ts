@@ -37,9 +37,41 @@ export const useAuthStore = defineStore('auth', () => {
 
     // --- ACTIONS ---
 
-    async function login(): Promise<void> {
-        processingSSO.value = true
-        await AuthService.login()
+    async function login(redirectTo: string | null = null): Promise<void> {
+        if (processingSSO.value) return;
+        processingSSO.value = true;
+        
+        if (redirectTo) {
+            sessionStorage.setItem('auth_redirect_to', String(redirectTo));
+        }
+        
+        await AuthService.login();
+    }
+
+    async function handlePKCECallback(code: string): Promise<void> {
+        const verifier = sessionStorage.getItem('pkce_verifier')
+        if (!verifier) throw new Error('No se encontró el verifier PKCE')
+
+        const client_id = import.meta.env.VITE_CLIENT_ID;
+        const redirect_uri = `${window.location.origin}/callback`;
+        const MOTHER_API_URL = import.meta.env.VITE_MOTHER_API_URL || 'http://localhost:8000';
+
+        const { default: axios } = await import('axios');
+        const response = await axios.post(`${MOTHER_API_URL}/oauth/token`, {
+            grant_type: 'authorization_code',
+            client_id: client_id,
+            redirect_uri: redirect_uri,
+            code_verifier: verifier,
+            code: code
+        });
+
+        const accessToken = response.data.access_token;
+        token.value = accessToken;
+        localStorage.setItem('access_token', accessToken);
+        sessionStorage.removeItem('pkce_verifier');
+        processingSSO.value = false;
+
+        await fetchUser(true); // Forzar descarga de perfil limpio tras login
     }
 
     async function handleDirectToken(incomingToken: string, userData: any = null): Promise<void> {
@@ -126,6 +158,7 @@ export const useAuthStore = defineStore('auth', () => {
         isReady,
         userAvatar,
         login,
+        handlePKCECallback,
         handleDirectToken,
         logout,
         fetchUser,

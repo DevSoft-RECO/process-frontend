@@ -2,7 +2,6 @@
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import axios from 'axios' // Mantenemos axios para la configuración robusta
 
 const route = useRoute()
 const router = useRouter()
@@ -31,42 +30,23 @@ onMounted(async () => {
   }
 
   try {
-    const code_verifier = sessionStorage.getItem('pkce_verifier')
-    const client_id = import.meta.env.VITE_CLIENT_ID || '019b27d0-4adc-70f7-ba93-84024bf43d46'
-    const redirect_uri = `${window.location.origin}/callback`
-    const MOTHER_API_URL = import.meta.env.VITE_MOTHER_API_URL || 'http://localhost:8000'
-
-    if (!code_verifier) {
-        throw new Error("No se encontró el pkce_verifier en almacenamiento local.");
-    }
-
-    const { data } = await axios.post(`${MOTHER_API_URL}/oauth/token`, {
-        grant_type: 'authorization_code',
-        client_id,
-        redirect_uri,
-        code_verifier,
-        code,
-    });
-
-    const token = data.access_token;
-    
-    // Limpieza de URL
+    // 1. Limpieza de URL (Visual)
     window.history.replaceState({}, document.title, window.location.pathname);
 
-    // 1. Configuración Robusta
-    authStore.token = token
-    localStorage.setItem('access_token', token)
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    // 2. Procesar el intercambio de código en el store (Centralizado)
+    await authStore.handlePKCECallback(code);
 
-    // 2. Cargar usuario cacheando en sessionStorage
-    await authStore.fetchUser(true)
+    // 3. Redirección Dinámica: Volver a donde el usuario intentaba entrar
+    const redirectUrl = sessionStorage.getItem('auth_redirect_to') || { name: 'dashboard' };
+    if (sessionStorage.getItem('auth_redirect_to')) {
+       sessionStorage.removeItem('auth_redirect_to');
+    }
 
     status.value = 'Acceso autorizado'
-    subStatus.value =
-      'Bienvenido a los sistemas internos de la Cooperativa YAMAN KUTX.'
+    subStatus.value = 'Bienvenido a los sistemas internos de la Cooperativa YAMAN KUTX.'
 
     setTimeout(() => {
-      router.push({ name: 'dashboard' })
+        router.push(redirectUrl)
     }, 900)
 
   } catch (e) {

@@ -4,6 +4,7 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
+import { startSessionGuards } from '@/utils/sessionGuards'
 import App from './App.vue'
 import router from './router'
 import { useLayoutStore } from '@/stores/layout'
@@ -23,5 +24,8 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () 
         layoutStore.initTheme()
     }
 })
+
+// --- GUARDIANES SILENCIOSOS ---
+startSessionGuards()
 
 app.mount('#app')
