@@ -453,6 +453,7 @@ router.beforeEach(async (to, _from) => {
             try {
                 await authStore.fetchUser()
             } catch {
+                authStore.login(to.fullPath);
                 return false
             }
         }

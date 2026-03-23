@@ -14,7 +14,7 @@ export interface User {
 export const useAuthStore = defineStore('auth', () => {
 
     // --- MIGRACIÓN Y LIMPIEZA DE CACHÉ (Anti-Old-Data) ---
-    const STORAGE_VERSION = 'v3_hija5_pkce'; 
+    const STORAGE_VERSION = 'v3_hija5_clean'; 
     if (localStorage.getItem('yk_storage_version') !== STORAGE_VERSION) {
         const keysToRemove = ['access_token', 'user_data', 'pkce_verifier'];
         keysToRemove.forEach(k => {
@@ -26,7 +26,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     // --- STATE ---
     const user = ref<User | null>(JSON.parse(sessionStorage.getItem('user_data') || 'null'))
-    const token = ref<string | null>(localStorage.getItem('access_token') || null)
+    const token = ref<string | null>(sessionStorage.getItem('access_token') || null)
     const processingSSO = ref<boolean>(false)
     const isReady = ref<boolean>(false)
 
@@ -67,7 +67,7 @@ export const useAuthStore = defineStore('auth', () => {
 
         const accessToken = response.data.access_token;
         token.value = accessToken;
-        localStorage.setItem('access_token', accessToken);
+        sessionStorage.setItem('access_token', accessToken);
         sessionStorage.removeItem('pkce_verifier');
         processingSSO.value = false;
 

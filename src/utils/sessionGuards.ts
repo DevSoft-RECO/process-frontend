@@ -6,7 +6,7 @@ export const startSessionGuards = () => {
     // 1. EL "HEARTBEAT" CADA 5 MINUTOS (Sondeo Seguro)
     // ----------------------------------------------------
     setInterval(() => {
-        const token = localStorage.getItem('access_token');
+        const token = sessionStorage.getItem('access_token');
         if (token) {
             const MOTHER_API_URL = import.meta.env.VITE_MOTHER_API_URL || 'https://api.madre.com';
             api.get(`${MOTHER_API_URL}/api/me`).catch(() => {
@@ -27,7 +27,7 @@ export const startSessionGuards = () => {
     // Si ya pasaron las 5:50 PM, no ponemos el timeout para hoy
     if (msUntilAlert > 0) {
         setTimeout(() => {
-            const token = localStorage.getItem('access_token');
+            const token = sessionStorage.getItem('access_token');
             if (token) {
                 // Notificación visual flotante estilo Toast (Top End)
                 Swal.fire({

@@ -12,7 +12,7 @@ const api = axios.create({
 // --- INTERCEPTOR DE REQUEST (Salida) ---
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const token = localStorage.getItem('access_token');
+        const token = sessionStorage.getItem('access_token');
 
         console.log(`[Axios Local] Preparando petición a: ${config.url}`);
 
@@ -35,10 +35,9 @@ api.interceptors.response.use(
     (error: AxiosError) => {
         if (error.response && error.response.status === 401) {
             console.error('[Axios Local] Error 401. El token fue enviado pero rechazado por el servidor.');
-            localStorage.clear();
+            sessionStorage.removeItem('access_token');
             sessionStorage.clear();
-            const MOTHER_APP_URL = import.meta.env.VITE_MOTHER_APP_URL || 'http://localhost:5173';
-            window.location.href = `${MOTHER_APP_URL}/login?session=expired`;
+            import('@/services/AuthService').then(module => module.default.login());
         }
         return Promise.reject(error);
     }

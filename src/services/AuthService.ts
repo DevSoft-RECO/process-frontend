@@ -23,11 +23,17 @@ export default {
         const client_id = import.meta.env.VITE_CLIENT_ID || '019b27d0-4adc-70f7-ba93-84024bf43d46';
         const redirect_uri = `${window.location.origin}/callback`;
 
-        const authUrl = `${MOTHER_API_URL}/oauth/authorize?client_id=${client_id}&redirect_uri=${encodeURIComponent(redirect_uri)}&response_type=code&scope=&code_challenge=${challenge}&code_challenge_method=S256`;
+        const authUrl = new URL(`${MOTHER_API_URL}/oauth/authorize`);
+        authUrl.searchParams.append('client_id', client_id);
+        authUrl.searchParams.append('redirect_uri', redirect_uri);
+        authUrl.searchParams.append('response_type', 'code');
+        authUrl.searchParams.append('scope', '');
+        authUrl.searchParams.append('code_challenge', challenge);
+        authUrl.searchParams.append('code_challenge_method', 'S256');
 
         // Timeout para asegurar I/O en incognito antes de destruir la página
         setTimeout(() => {
-            window.location.href = authUrl;
+            window.location.href = authUrl.toString();
         }, 150);
     },
 
@@ -74,10 +80,11 @@ export default {
     },
 
     logoutLocal(): void {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('user_data');
-        sessionStorage.removeItem('user_data');
-        sessionStorage.removeItem('pkce_verifier');
+        const keysToRemove = ['access_token', 'user_data', 'pkce_verifier'];
+        keysToRemove.forEach(k => {
+            localStorage.removeItem(k);
+            sessionStorage.removeItem(k);
+        });
     }
 
 

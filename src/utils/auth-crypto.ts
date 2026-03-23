@@ -1,26 +1,39 @@
-// Genera una cadena aleatoria para el verifier
-const generateRandomString = (length: number) => {
-    const array = new Uint32Array(length);
-    window.crypto.getRandomValues(array);
-    return Array.from(array, dec => ('0' + dec.toString(16)).slice(-2)).join('');
-};
+export function generateRandomString(length: number): string {
+    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+    const randomValues = window.crypto.getRandomValues(new Uint8Array(length));
+    let result = '';
+    for (let i = 0; i < randomValues.length; i++) {
+        const val = randomValues[i];
+        if (val !== undefined) {
+            result += charset.charAt(val % charset.length);
+        }
+    }
+    return result;
+}
 
-// Crea el challenge SHA-256 (Base64 URL Safe)
-const sha256 = async (plain: string) => {
+export async function sha256(plain: string): Promise<ArrayBuffer> {
     const encoder = new TextEncoder();
     const data = encoder.encode(plain);
     return window.crypto.subtle.digest('SHA-256', data);
-};
+}
 
-const base64urlencode = (a: ArrayBuffer) => {
-    return btoa(String.fromCharCode.apply(null, new Uint8Array(a) as any))
-        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-};
+export function base64urlencode(buffer: ArrayBuffer): string {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < bytes.byteLength; i++) {
+        const val = bytes[i];
+        if (val !== undefined) {
+            binary += String.fromCharCode(val);
+        }
+    }
+    const base64 = btoa(binary);
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
 
-export const preparePKCE = async () => {
-    const verifier = generateRandomString(32);
-    const challenge = base64urlencode(await sha256(verifier));
-    // El verifier se guarda solo en esta pestaña
+export async function preparePKCE(): Promise<string> {
+    const verifier = generateRandomString(128);
+    const challengeBuffer = await sha256(verifier);
+    const challenge = base64urlencode(challengeBuffer);
     sessionStorage.setItem('pkce_verifier', verifier);
     return challenge;
-};
+}
