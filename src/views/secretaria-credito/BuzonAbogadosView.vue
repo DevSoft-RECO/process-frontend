@@ -170,7 +170,7 @@ onMounted(() => {
 const fetchExpedientes = async () => {
     loading.value = true
     try {
-        const res = await api.get('/secretaria-credito/abogados')
+        const res = await api.get('/abogado/buzon')
         if (res.data.success) {
             expedientes.value = res.data.data
         }

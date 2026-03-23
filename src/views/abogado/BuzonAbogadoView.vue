@@ -33,6 +33,23 @@
                             class="pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-full sm:w-64 transition-all shadow-sm group-hover:shadow-md"
                         >
                     </div>
+
+                    <div class="relative group">
+                        <select 
+                            v-model="selectedAgencia"
+                            class="pl-4 pr-10 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-full sm:w-64 transition-all shadow-sm group-hover:shadow-md appearance-none"
+                        >
+                            <option value="">Todas las Agencias</option>
+                            <option v-for="ag in agenciasUnicas" :key="ag.id" :value="ag.id">
+                                {{ ag.nombre }}
+                            </option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -52,13 +69,15 @@
     
                         <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Id Expediente / cliente</th>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Asociado</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Agencia</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">No. Contrato</th>
                          <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Fecha Recibido</th>
                         <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-900">
                      <tr v-if="filteredExpedientes.length === 0" class="group">
-                        <td colspan="4" class="px-6 py-12 text-center">
+                        <td colspan="6" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center justify-center gap-3">
                                 <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-full">
                                     <svg class="w-8 h-8 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
@@ -81,6 +100,12 @@
                         </td>
                          <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-900 dark:text-white">{{ expediente.nombre_asociado || 'N/A' }}</div>
+                        </td>
+                         <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900 dark:text-white">{{ expediente.agencia?.nombre || 'N/A' }}</div>
+                        </td>
+                         <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900 dark:text-white font-mono">{{ expediente.seguimientos?.[0]?.numero_contrato || '---' }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-900 dark:text-white" v-if="expediente.fechas?.f_aceptado_abogado">
@@ -126,6 +151,7 @@ import { formatDistanceToNow } from 'date-fns'
 const expedientes = ref<any[]>([])
 const loading = ref(true)
 const search = ref('')
+const selectedAgencia = ref('')
 const showModal = ref(false)
 const selectedExpediente = ref<any>(null)
 
@@ -147,13 +173,34 @@ const fetchExpedientes = async () => {
     }
 }
 
+const agenciasUnicas = computed(() => {
+    const agencias = new Map()
+    expedientes.value.forEach(e => {
+        if (e.agencia && e.agencia.id) {
+            agencias.set(e.agencia.id, e.agencia)
+        }
+    })
+    return Array.from(agencias.values())
+})
+
 const filteredExpedientes = computed(() => {
-    if (!search.value) return expedientes.value
-    const s = search.value.toLowerCase()
-    return expedientes.value.filter(e => 
-        e.codigo_cliente.toString().includes(s) || 
-        e.nombre_asociado?.toLowerCase().includes(s)
-    )
+    let result = expedientes.value
+
+    if (selectedAgencia.value) {
+        result = result.filter(e => e.agencia && e.agencia.id === selectedAgencia.value)
+    }
+
+    if (search.value) {
+        const s = search.value.toLowerCase()
+        result = result.filter(e => 
+            e.codigo_cliente.toString().includes(s) || 
+            e.nombre_asociado?.toLowerCase().includes(s) ||
+            e.agencia?.nombre?.toLowerCase().includes(s) ||
+            e.seguimientos?.[0]?.numero_contrato?.toLowerCase().includes(s)
+        )
+    }
+
+    return result
 })
 
 const formatDate = (dateString: string) => {
