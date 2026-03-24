@@ -143,6 +143,7 @@ import api from '@/api/axios';
 import Swal from 'sweetalert2';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import logoYK from '@/assets/logoyk.svg';
 
 const results = ref([]);
 const loading = ref(false);
@@ -177,107 +178,155 @@ const formatDateTime = (dateString) => {
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 };
 
-const downloadPDF = (res) => {
+// Helper function to load image and return as canvas/dataURL for better compatibility
+const loadImage = (url) => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.src = url;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size respecting aspect ratio (High Resolution)
+            const scaleFactor = 4; // To keep quality high
+            canvas.width = (img.width || 300) * scaleFactor;
+            canvas.height = (img.height || 100) * scaleFactor;
+            
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve({
+                data: canvas.toDataURL('image/png'),
+                ratio: canvas.width / canvas.height
+            });
+        };
+        img.onerror = (e) => reject(e);
+    });
+};
+
+const downloadPDF = async (res) => {
     const doc = new jsPDF({
         orientation: 'p',
         unit: 'mm',
-        format: 'a4'
+        format: 'letter'
     });
 
-    // --- Header / Branding ---
-    const primaryColor = [0, 48, 96]; // Azul Marino (Navy Blue)
-    const accentColor = res.confirmacion === 'SI' ? [16, 185, 129] : [239, 68, 68]; // Green or Red
-    
-    // Top Banner
-    doc.setFillColor(...primaryColor);
-    doc.rect(0, 0, 210, 40, 'F');
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    doc.text('CONSTANCIA DE CONFIRMACIÓN', 105, 22, { align: 'center' });
-    
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    const systemName = 'SISTEMA SADEC - DEPARTAMENTO DE ARCHIVO';
-    doc.text(systemName, 105, 30, { align: 'center' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const centerX = pageWidth / 2;
 
-    // --- Details Section ---
-    doc.setTextColor(50, 50, 50);
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.text('INFORMACIÓN DE LA SOLICITUD', 20, 55);
-    doc.line(20, 57, 190, 57);
-
-    const confirmationDate = res.fecha_confirmacion ? formatDateTime(res.fecha_confirmacion) : '-';
-    
-    autoTable(doc, {
-        startY: 62,
-        margin: { left: 20, right: 20 },
-        theme: 'plain',
-        body: [
-            ['ID de Confirmación:', `#${res.id}`, 'Fecha Confirmación:', confirmationDate],
-            ['Documento No.:', res.numero, 'Tipo Documento:', res.tipo_documento || '-'],
-            ['Registro:', res.registro_propiedad || '-', 'Referencia:', res.referencia || '-'],
-            ['Propietario / Titular:', res.propietario || '-', '', ''],
-            ['Autorizador / Notario:', res.autorizador || '-', '', ''],
-        ],
-        bodyStyles: { fontSize: 10, cellPadding: 3 },
-        columnStyles: {
-            0: { fontStyle: 'bold', cellWidth: 35 },
-            1: { cellWidth: 50 },
-            2: { fontStyle: 'bold', cellWidth: 35 },
-            3: { cellWidth: 50 }
+    try {
+        // --- Branding Top ---
+        let textStartX = 20; // Default if logo fails
+        try {
+            const logoObj = await loadImage(logoYK);
+            const logoH = 15;
+            const logoW = logoH * logoObj.ratio;
+            doc.addImage(logoObj.data, 'PNG', 20, 14, logoW, logoH);
+            textStartX = 20 + logoW + 8; // Start text 8mm after logo
+        } catch (e) {
+            console.error("Error loading logo for PDF:", e);
         }
-    });
 
-    // --- Result Box (The most important part) ---
-    const finalY = doc.lastAutoTable.finalY + 15;
-    
-    // Outer Border
-    doc.setDrawColor(...accentColor);
-    doc.setLineWidth(1);
-    doc.roundedRect(40, finalY, 130, 35, 3, 3, 'D');
-    
-    // Background light shade
-    const bgColor = res.confirmacion === 'SI' ? [240, 253, 244] : [254, 242, 242];
-    doc.setFillColor(...bgColor);
-    doc.roundedRect(40.5, finalY + 0.5, 129, 34, 3, 3, 'F');
+        doc.setTextColor(0, 48, 96); // Navy blue
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text('COOPERATIVA YAMAN KUTX', textStartX, 20);
+        
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Departamento de Archivo', textStartX, 26);
+        doc.text('Sistema SADEC - Constancia Oficial', textStartX, 31);
 
-    // Title inside box
-    doc.setTextColor(...accentColor);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('RESULTADO DE LA VERIFICACIÓN:', 105, finalY + 10, { align: 'center' });
+        // --- Header Banner ---
+        const primaryColor = [0, 48, 96]; // Azul Marino (Navy Blue)
+        const accentColor = res.confirmacion === 'SI' ? [16, 185, 129] : [239, 68, 68]; // Green or Red
+        
+        // Top Banner
+        doc.setFillColor(...primaryColor);
+        doc.rect(0, 40, pageWidth, 15, 'F');
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`CONSTANCIA DE CONFIRMACIÓN #${res.id}`, centerX, 50, { align: 'center' });
 
-    // Result Value
-    doc.setFontSize(28);
-    const resultText = res.confirmacion === 'SI' ? 'EXISTE' : 'NO EXISTE';
-    doc.text(resultText, 105, finalY + 25, { align: 'center' });
-
-    // --- Observations ---
-    if (res.observacion_confirmacion) {
+        // --- Details Section ---
         doc.setTextColor(50, 50, 50);
         doc.setFontSize(11);
         doc.setFont('helvetica', 'bold');
-        doc.text('OBSERVACIONES DE CONFIRMACIÓN:', 20, finalY + 55);
+        doc.text('DETALLES DE LA VERIFICACIÓN', 20, 68);
+        doc.line(20, 70, pageWidth - 20, 70);
+
+        const confirmationDate = res.fecha_confirmacion ? formatDateTime(res.fecha_confirmacion) : '-';
         
+        autoTable(doc, {
+            startY: 75,
+            margin: { left: 20, right: 20 },
+            theme: 'plain',
+            body: [
+                ['Fecha Confirmación:', confirmationDate, '', ''],
+                ['Documento No.:', res.numero, 'Tipo Documento:', res.tipo_documento || '-'],
+                ['Registro:', res.registro_propiedad || '-', 'Referencia:', res.referencia || '-'],
+                ['Propietario / Titular:', res.propietario || '-', '', ''],
+                ['Autorizador / Notario:', res.autorizador || '-', '', ''],
+            ],
+            bodyStyles: { fontSize: 9, cellPadding: 2.5 },
+            columnStyles: {
+                0: { fontStyle: 'bold', cellWidth: 35 },
+                1: { cellWidth: 50 },
+                2: { fontStyle: 'bold', cellWidth: 35 },
+                3: { cellWidth: 50 }
+            }
+        });
+
+        // --- Result Box ---
+        const finalY = doc.lastAutoTable.finalY + 12;
+        
+        doc.setDrawColor(...accentColor);
+        doc.setLineWidth(1);
+        doc.roundedRect(40, finalY, 130, 35, 3, 3, 'D');
+        
+        const bgColor = res.confirmacion === 'SI' ? [240, 253, 244] : [254, 242, 242];
+        doc.setFillColor(...bgColor);
+        doc.roundedRect(40.5, finalY + 0.5, 129, 34, 3, 3, 'F');
+
+        doc.setTextColor(...accentColor);
         doc.setFontSize(10);
-        doc.setFont('helvetica', 'italic');
-        const splitText = doc.splitTextToSize(res.observacion_confirmacion, 170);
-        doc.text(splitText, 20, finalY + 62);
+        doc.setFont('helvetica', 'bold');
+        doc.text('RESULTADO FINAL:', centerX, finalY + 10, { align: 'center' });
+
+        doc.setFontSize(28);
+        const resultText = res.confirmacion === 'SI' ? 'EXISTE' : 'NO EXISTE';
+        doc.text(resultText, centerX, finalY + 25, { align: 'center' });
+
+        // --- Observations ---
+        if (res.observacion_confirmacion) {
+            doc.setTextColor(50, 50, 50);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('OBSERVACIONES ADICIONALES:', 20, finalY + 55);
+            
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'italic');
+            const splitText = doc.splitTextToSize(res.observacion_confirmacion, pageWidth - 40);
+            doc.text(splitText, 20, finalY + 62);
+        }
+
+        // --- Footer ---
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(150, 150, 150);
+        const footerText = 'Esta constancia es para uso interno de la Cooperativa Yaman Kutx. La información contenida refleja el estado de la verificación al momento de su emisión.';
+        const splitFooter = doc.splitTextToSize(footerText, pageWidth - 50);
+        doc.text(splitFooter, centerX, pageHeight - 25, { align: 'center' });
+        doc.text('SADEC - Generado el: ' + new Date().toLocaleString(), centerX, pageHeight - 15, { align: 'center' });
+
+        // Download
+        doc.save(`Constancia_Confirmacion_${res.id}.pdf`);
+    } catch (e) {
+        console.error("PDF Error:", e);
+        Swal.fire('Error', 'No se pudo generar el PDF. Intente de nuevo.', 'error');
     }
-
-    // --- Footer ---
-    const pageHeight = doc.internal.pageSize.height;
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(150, 150, 150);
-    doc.text('Esta es una constancia generada automáticamente por el sistema.', 105, pageHeight - 20, { align: 'center' });
-    doc.text('SADEC - ' + new Date().toLocaleString(), 105, pageHeight - 15, { align: 'center' });
-
-    // Download
-    doc.save(`Constancia_Confirmacion_${res.id}.pdf`);
 };
 
 onMounted(() => {
