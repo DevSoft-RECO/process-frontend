@@ -185,7 +185,7 @@ const downloadPDF = (res) => {
     });
 
     // --- Header / Branding ---
-    const primaryColor = [31, 41, 55]; // Dark Gray
+    const primaryColor = [0, 48, 96]; // Azul Marino (Navy Blue)
     const accentColor = res.confirmacion === 'SI' ? [16, 185, 129] : [239, 68, 68]; // Green or Red
     
     // Top Banner
