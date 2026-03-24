@@ -162,6 +162,7 @@
 import { ref, computed, onMounted } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
+import { formatDate, formatDateTime } from '@/utils/formatters';
 
 const history = ref([]);
 const loading = ref(false);
@@ -213,20 +214,6 @@ const loadHistory = async (page = 1) => {
 const changePage = (page) => {
   if (page < 1 || page > pagination.value.last_page) return;
   loadHistory(page);
-};
-
-const formatDate = (dateString) => {
-  if (!dateString) return '-';
-  if (dateString.length === 10) return new Date(dateString + 'T00:00:00').toLocaleDateString();
-  const date = new Date(dateString);
-  return isNaN(date) ? dateString : date.toLocaleDateString();
-};
-
-const formatDateTime = (dateString) => {
-  if (!dateString) return '-';
-  const date = new Date(dateString);
-  if (isNaN(date)) return dateString;
-  return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
 const showDocumentData = (documento) => {

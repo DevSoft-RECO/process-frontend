@@ -74,7 +74,7 @@
                           </div>
                           <div class="text-sm text-gray-600 mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1">
                               <p><span class="font-semibold text-gray-700">Tipo:</span> {{ doc.tipo_documento?.nombre || 'N/A' }}</p>
-                              <p><span class="font-semibold text-gray-700">Fecha:</span> {{ doc.fecha ? new Date(doc.fecha).toLocaleDateString() : 'N/A' }}</p>
+                              <p><span class="font-semibold text-gray-700">Fecha:</span> {{ formatDate(doc.fecha) }}</p>
                               <p><span class="font-semibold text-gray-700">Propietario:</span> {{ doc.propietario || 'N/A' }}</p>
                               <p><span class="font-semibold text-gray-700">Monto:</span> {{ doc.monto_poliza || 'N/A' }}</p>
                               <p><span class="font-semibold text-gray-700">Autorizador:</span> {{ doc.autorizador || 'N/A' }}</p>
@@ -116,7 +116,7 @@
       <!-- Detalle Simple (Solo para Manual o sin lista) -->
       <div v-if="isManual || (documentInfo && documentsList.length === 0)" class="bg-gray-50 p-4 rounded border border-gray-200 text-sm grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4">
            <div><span class="font-bold text-gray-700">Tipo:</span> {{ documentInfo?.tipo_documento?.nombre || 'N/A' }}</div>
-           <div><span class="font-bold text-gray-700">Fecha:</span> {{ documentInfo?.fecha ? new Date(documentInfo.fecha).toLocaleDateString() : 'N/A' }}</div>
+           <div><span class="font-bold text-gray-700">Fecha:</span> {{ formatDate(documentInfo?.fecha) }}</div>
            <div><span class="font-bold text-gray-700">Propietario:</span> {{ documentInfo?.propietario || 'N/A' }}</div>
            <div><span class="font-bold text-gray-700">Monto:</span> {{ documentInfo?.monto_poliza || 'N/A' }}</div>
            <div><span class="font-bold text-gray-700">Autorizador:</span> {{ documentInfo?.autorizador || 'N/A' }}</div>
@@ -289,7 +289,7 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 <div class="font-medium">{{ item.numero_documento }}</div>
                 <div class="text-xs text-gray-500 mt-1" v-if="item.fecha_documento">
-                    <i class="far fa-calendar-alt"></i> {{ new Date(item.fecha_documento).toLocaleDateString() }}
+                    <i class="far fa-calendar-alt"></i> {{ formatDate(item.fecha_documento) }}
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.titulo_nombre }}</td>
@@ -393,7 +393,7 @@
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     <div class="font-medium">{{ item.numero_documento }}</div>
                     <div class="text-xs text-gray-500 mt-1" v-if="item.fecha_documento">
-                        <i class="far fa-calendar-alt"></i> {{ new Date(item.fecha_documento).toLocaleDateString() }}
+                        <i class="far fa-calendar-alt"></i> {{ formatDate(item.fecha_documento) }}
                     </div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.titulo_nombre }}</td>
@@ -466,6 +466,7 @@ import { ref, onMounted, reactive, computed } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
 import { useAuthStore } from '@/stores/auth'; // Import auth store
+import { formatDate, formatDateTime, formatCurrency } from '@/utils/formatters';
 
 import SolicitudRetiroHistoricoForm from './SolicitudRetiroHistoricoForm.vue';
 
@@ -782,11 +783,7 @@ const resetForm = () => {
   isHistorico.value = false; // Reset historic flag
 };
 
-const formatDate = (dateString) => {
-  if (!dateString) return '-';
-  const date = new Date(dateString);
-  return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-};
+// Removed local formatDate to use global from @utils/formatters
 
 const getStatusLabel = (status) => {
   switch (Number(status)) {

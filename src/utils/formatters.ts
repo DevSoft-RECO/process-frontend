@@ -13,13 +13,12 @@ export const formatDate = (dateString: string | null | undefined): string => {
     if (!dateString) return '-';
     
     try {
-        let date: Date;
-        if (dateString.length === 10 && !dateString.includes('T')) {
-            // YYYY-MM-DD format - force midnight in local timezone
-            date = new Date(dateString + 'T00:00:00');
-        } else {
-            date = new Date(dateString);
-        }
+        // Handle input like "2022-10-17 00:00:00" or "2022-10-17"
+        // Take only the first 10 characters to avoid timezone shifts in Date constructor
+        const onlyDatePart = dateString.substring(0, 10);
+        
+        // Use T00:00:00 to ensure it's treated as local time
+        const date = new Date(onlyDatePart + 'T00:00:00');
 
         if (isNaN(date.getTime())) return dateString;
         
