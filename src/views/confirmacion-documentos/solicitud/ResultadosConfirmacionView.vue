@@ -45,7 +45,7 @@
             <!-- Col 1: Documento -->
             <td class="px-6 py-4 whitespace-nowrap align-top">
               <div class="text-sm font-bold text-gray-900">No. {{ res.numero }}</div>
-              <div class="text-xs text-gray-500">Fecha: {{ formatDate(res.fecha) }}</div>
+              <div class="text-xs text-gray-500">Fecha: {{ formatDate(res.documento?.fecha || res.fecha) }}</div>
               <div class="text-xs text-gray-500 mt-1">{{ res.tipo_documento }}</div>
               <div class="text-xs text-gray-400">{{ res.registro_propiedad }}</div>
             </td>
@@ -248,7 +248,7 @@ const downloadPDF = async (res) => {
             margin: { left: 20, right: 20 },
             theme: 'plain',
             body: [
-                ['Fecha Confirmación:', confirmationDate, '', ''],
+                ['Fecha Emisión:', formatDate(res.documento?.fecha || res.fecha), 'Fecha Validación:', confirmationDate],
                 ['Documento No.:', res.numero, 'Tipo Documento:', res.tipo_documento || '-'],
                 ['Registro:', res.registro_propiedad || '-', 'Referencia:', res.referencia || '-'],
                 ['Propietario / Titular:', res.propietario || '-', '', ''],

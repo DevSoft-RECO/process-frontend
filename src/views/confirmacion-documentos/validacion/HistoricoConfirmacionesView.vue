@@ -42,7 +42,7 @@
               <!-- Col 1: Documento -->
               <td class="px-6 py-4 whitespace-nowrap align-top">
                 <div class="text-sm font-bold text-gray-900">No. {{ item.numero }}</div>
-                <div class="text-xs text-gray-500">Fecha: {{ formatDate(item.fecha) }}</div>
+                <div class="text-xs text-gray-500">Fecha: {{ formatDate(item.documento?.fecha || item.fecha) }}</div>
                 <div class="text-xs text-gray-500 mt-1">{{ item.tipo_documento }}</div>
                 <div class="text-xs text-gray-400">{{ item.registro_propiedad }}</div>
               </td>
