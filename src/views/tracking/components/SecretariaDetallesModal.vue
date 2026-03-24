@@ -156,7 +156,7 @@
                                         <span class="font-bold text-gray-700 dark:text-gray-200">{{ d.tipo_documento?.nombre || 'Documento' }}</span>
                                         <span class="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-0.5 rounded">No. Documento: {{ d.numero }}</span>
                                     </div>
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ d.fecha }}</span>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ formatDate(d.fecha) }}</span>
                                 </div>
                                 <div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6 text-sm">
                                     
@@ -276,6 +276,7 @@
 import { ref, watch, computed } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
+import { formatDate, formatCurrency } from '@/utils/formatters'
 
 const props = defineProps<{
     show: boolean
@@ -605,10 +606,6 @@ const numeroContrato = computed(() => {
     const latest = detallesData.value.expediente.seguimientos[0];
     return latest.numero_contrato;
 })
-
-const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
-}
 
 const close = () => {
     emit('close')

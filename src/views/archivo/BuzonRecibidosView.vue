@@ -256,6 +256,7 @@ import api from '@/api/axios'
 import Swal from 'sweetalert2'
 import Encabezado from '../../components/common/encabezado.vue'
 import ArchivoDetalleModal from './components/ArchivoDetalleModal.vue'
+import { formatDate, formatCurrency } from '@/utils/formatters'
 
 interface Expediente {
     id: number;
@@ -398,18 +399,6 @@ const archivarAction = async (exp: Expediente) => {
             Swal.fire('Error', msg, 'error')
         }
     }
-}
-  
-const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
-}
-
-const formatDate = (dateString: string) => {
-    if (!dateString) return '-'
-    if (dateString.includes('T') || dateString.includes(' ')) {
-         return new Date(dateString).toLocaleDateString('es-ES')
-    }
-    return new Date(dateString + 'T00:00:00').toLocaleDateString('es-ES')
 }
   
 const showObservation = (text: string) => {

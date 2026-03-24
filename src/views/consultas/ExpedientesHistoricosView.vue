@@ -151,6 +151,7 @@ import { ref, onMounted } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 import Encabezado from '../../components/common/encabezado.vue'
+import { formatDate, formatCurrency } from '@/utils/formatters'
 
 interface Expediente {
     codigo_cliente: number
@@ -257,23 +258,6 @@ const showGarantia = (text: string) => {
             htmlContainer: 'text-left text-sm max-h-[60vh] overflow-y-auto'
         }
     })
-}
-
-const formatCurrency = (amount: number) => {
-    if (amount === null || amount === undefined) return '-'
-    return new Intl.NumberFormat('es-GT', { 
-        style: 'currency', 
-        currency: 'GTQ' 
-    }).format(amount)
-}
-
-const formatDate = (dateStr: string) => {
-    if (!dateStr) return '-'
-    if (dateStr.length === 10) {
-        return new Date(dateStr + 'T00:00:00').toLocaleDateString()
-    }
-    const date = new Date(dateStr)
-    return isNaN(date.getTime()) ? dateStr : date.toLocaleDateString()
 }
 
 onMounted(() => {
