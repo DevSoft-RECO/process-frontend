@@ -13,6 +13,8 @@
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.3",
     "date-fns": "^4.1.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
     "pinia": "^3.0.4",
     "sweetalert2": "^11.26.17",
     "tailwindcss": "^4.1.18",
