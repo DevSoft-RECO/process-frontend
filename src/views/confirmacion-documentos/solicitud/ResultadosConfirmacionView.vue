@@ -216,7 +216,7 @@ const downloadPDF = (res) => {
         margin: { left: 20, right: 20 },
         theme: 'plain',
         body: [
-            ['ID de Confirmación:', `#${res.id}`, 'Fecha Proceso:', confirmationDate],
+            ['ID de Confirmación:', `#${res.id}`, 'Fecha Confirmación:', confirmationDate],
             ['Documento No.:', res.numero, 'Tipo Documento:', res.tipo_documento || '-'],
             ['Registro:', res.registro_propiedad || '-', 'Referencia:', res.referencia || '-'],
             ['Propietario / Titular:', res.propietario || '-', '', ''],
