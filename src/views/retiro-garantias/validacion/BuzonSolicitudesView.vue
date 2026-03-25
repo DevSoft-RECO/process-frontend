@@ -101,11 +101,16 @@
                   <div class="text-gray-500 dark:text-gray-400" title="Usuario Solicitante"><i class="text-gray-400 dark:text-gray-500 mr-1"></i> {{ req.numero_producto || 'N/A' }}</div>
               </td>
               <td class="px-6 py-4 text-sm">
-                <div class="font-bold text-gray-900 dark:text-gray-100 truncate max-w-[200px]" :title="req.numero_documento">{{ req.numero_documento }}</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1" v-if="req.fecha_documento">
-                    <i class="far fa-calendar-alt"></i> {{ formatDate(req.fecha_documento) }}
+                <!-- Priorizar datos del documento registrado físicamente -->
+                <div class="font-bold text-gray-900 dark:text-gray-100 truncate max-w-[200px]" :title="req.documento?.numero || req.numero_documento">
+                    {{ req.documento?.numero || req.numero_documento }}
                 </div>
-                <div class="text-gray-500 dark:text-gray-400 text-xs truncate max-w-[200px]" :title="req.titulo_nombre">{{ req.titulo_nombre }}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1" v-if="req.documento?.fecha || req.fecha_documento">
+                    <i class="far fa-calendar-alt"></i> {{ formatDate(req.documento?.fecha || req.fecha_documento) }}
+                </div>
+                <div class="text-gray-500 dark:text-gray-400 text-xs truncate max-w-[200px]" :title="req.documento?.propietario || req.titulo_nombre">
+                    {{ req.documento?.propietario || req.titulo_nombre }}
+                </div>
               </td>
               <td class="px-6 py-4 text-sm max-w-xs">
                  <div class="flex justify-between items-start">
@@ -148,10 +153,12 @@
                     <button 
                       v-else
                       @click="openRegistrationModal(req)" 
-                      class="bg-blue-600 text-white px-3 py-1 mb-1 rounded hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 shadow-sm block text-xs"
-                      title="Debe registrar el documento físico antes de despachar"
+                      class="px-3 py-1 mb-1 rounded shadow-sm block text-xs"
+                      :class="req.documento ? 'bg-orange-600 hover:bg-orange-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'"
+                      :title="req.documento ? 'La fecha del documento asociado no coincide. Haga clic para corregir.' : 'Debe registrar el documento físico antes de despachar'"
                     >
-                      <i class="fas fa-file-signature"></i> Registrar Doc.
+                      <i class="fas" :class="req.documento ? 'fa-edit' : 'fa-file-signature'"></i> 
+                      {{ req.documento ? 'Corregir Doc.' : 'Registrar Doc.' }}
                     </button>
                 </template>
                 <button 
@@ -359,8 +366,21 @@ const selectedRequestForRegistration = ref(null);
 
 // Computeds/Helpers
 const isHistoricoSinDocumento = (req) => {
-    // Es histórico si no tiene id_expediente. Y requiere registro si no trae documento asociado.
-    return !req.id_expediente && !req.documento;
+    // Es histórico si no tiene id_expediente (expediente del sistema).
+    if (req.id_expediente) return false;
+
+    // Si no trae documento asociado, requiere registro.
+    if (!req.documento) return true;
+
+    // MEJORA: Si tiene documento pero la FECHA no coincide con la solicitada (fecha_documento),
+    // permitimos que se registre manualmente el documento correcto para subsanar errores de asociación previa.
+    if (req.fecha_documento && req.documento.fecha) {
+        const reqDate = new Date(req.fecha_documento).toISOString().split('T')[0];
+        const docDate = new Date(req.documento.fecha).toISOString().split('T')[0];
+        return reqDate !== docDate;
+    }
+
+    return false;
 };
 
 // Methods
