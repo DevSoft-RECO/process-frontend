@@ -213,6 +213,46 @@
             <textarea v-model="editForm.justificacion" rows="3" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" required></textarea>
           </div>
 
+          <!-- Evidencia -->
+          <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+            <h4 class="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-verde-cope">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+              </svg>
+              Evidencia de Entrega
+            </h4>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+              <div v-if="selectedSolicitud.evidencia_entrega_path">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Archivo actual:</p>
+                <button 
+                  type="button"
+                  @click="verEvidencia(selectedSolicitud.id)"
+                  class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Ver Evidencia Actual
+                </button>
+              </div>
+              <div v-else>
+                <p class="text-sm text-gray-500 italic">No hay evidencia cargada aún.</p>
+              </div>
+
+              <div>
+                <label class="block text-xs text-gray-500 dark:text-gray-400 mb-2">Reemplazar / Subir nueva evidencia:</label>
+                <input 
+                  type="file" 
+                  @change="handleFileChange"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-verde-cope file:text-white hover:file:bg-green-700"
+                />
+              </div>
+            </div>
+          </div>
+
           <div class="flex justify-end gap-3 pt-6 border-t border-gray-100 dark:border-gray-700">
              <button type="button" @click="resetSearch" class="px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium">
                 Cancelar
@@ -251,6 +291,7 @@ const loading = ref(false)
 const searched = ref(false)
 const selectedSolicitud = ref<any>(null)
 const saving = ref(false)
+const newEvidencia = ref<File | null>(null)
 
 const agencias = ref<any[]>([])
 const usuarios = ref<any[]>([])
@@ -324,6 +365,26 @@ const selectSolicitud = (item: any) => {
   editForm.id_usuario_entrega = item.id_usuario_entrega
   editForm.id_agencia_entrega = item.id_agencia_entrega
   editForm.estado_actual = item.estado_actual
+  newEvidencia.value = null
+}
+
+const handleFileChange = (event: any) => {
+  const file = event.target.files[0]
+  if (file) {
+    newEvidencia.value = file
+  }
+}
+
+const verEvidencia = async (id: number) => {
+  try {
+    const response = await api.get(`/solicitudes-retiro/${id}/ver-evidencia`)
+    if (response.data.success && response.data.url) {
+      window.open(response.data.url, '_blank')
+    }
+  } catch (error) {
+    console.error(error)
+    Swal.fire('Error', 'No se pudo obtener el archivo de evidencia', 'error')
+  }
 }
 
 const formatDateTime = (val: string | null) => {
@@ -334,8 +395,30 @@ const formatDateTime = (val: string | null) => {
 const updateSolicitud = async () => {
   saving.value = true
   try {
-    const payload = { ...editForm }
-    await api.put(`/solicitud-retiro-edicion/${selectedSolicitud.value.id}`, payload)
+    const formData = new FormData()
+    
+    // Convert current editForm fields to FormData
+    Object.keys(editForm).forEach(key => {
+      const value = (editForm as any)[key]
+      if (value !== null && value !== undefined) {
+        formData.append(key, value)
+      }
+    })
+
+    // Add new evidence if selected
+    if (newEvidencia.value) {
+      formData.append('evidencia', newEvidencia.value)
+    }
+
+    // Add _method for Laravel PUT support in multipart
+    formData.append('_method', 'PUT')
+
+    await api.post(`/solicitud-retiro-edicion/${selectedSolicitud.value.id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
     Swal.fire('¡Éxito!', 'La solicitud ha sido actualizada.', 'success')
     resetSearch()
   } catch (error: any) {
