@@ -25,16 +25,17 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo de Retiro</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado Final</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Finalización</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Evidencia</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-if="loading">
-              <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+              <td colspan="7" class="px-6 py-4 text-center text-gray-500">
                 <i class="fas fa-spinner fa-spin mr-2"></i> Cargando historial...
               </td>
             </tr>
             <tr v-else-if="history.length === 0">
-              <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+              <td colspan="7" class="px-6 py-4 text-center text-gray-500">
                 <div class="flex flex-col items-center justify-center py-6">
                   <i class="fas fa-archive text-gray-300 text-4xl mb-3"></i>
                   <p>No se encontraron solicitudes finalizadas o devueltas en el historial de esta categoría.</p>
@@ -62,6 +63,17 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ item.updated_at ? formatDate(item.updated_at) : '-' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                <button 
+                  v-if="item.evidencia_entrega_path"
+                  @click="viewEvidence(item.id)"
+                  class="text-blue-600 hover:text-blue-800"
+                  title="Ver Evidencia"
+                >
+                  <i class="fas fa-file-pdf text-lg"></i>
+                </button>
+                <span v-else class="text-gray-400 text-xs">N/A</span>
               </td>
             </tr>
           </tbody>
@@ -128,6 +140,7 @@
 import { ref, onMounted } from 'vue';
 import api from '@/api/axios';
 import { useAuthStore } from '@/stores/auth';
+import Swal from 'sweetalert2';
 
 const authStore = useAuthStore();
 
@@ -161,6 +174,19 @@ const loadHistory = async (page = 1) => {
   } finally {
     loading.value = false;
   }
+};
+
+const viewEvidence = async (id) => {
+    try {
+        const response = await api.get(`/solicitudes-retiro/evidencia/${id}`);
+        if (response.data.success && response.data.url) {
+            window.open(response.data.url, '_blank');
+        } else {
+            Swal.fire('Error', 'No se pudo obtener la URL de la evidencia', 'error');
+        }
+    } catch (error) {
+        Swal.fire('Error', error.response?.data?.message || 'Error al visualizar evidencia', 'error');
+    }
 };
 
 onMounted(() => {
