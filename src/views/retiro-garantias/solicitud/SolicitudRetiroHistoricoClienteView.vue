@@ -178,7 +178,7 @@ const loadHistory = async (page = 1) => {
 
 const viewEvidence = async (id) => {
     try {
-        const response = await api.get(`/solicitudes-retiro/evidencia/${id}`);
+        const response = await api.get(`/solicitudes-retiro/${id}/ver-evidencia`);
         if (response.data.success && response.data.url) {
             window.open(response.data.url, '_blank');
         } else {
