@@ -141,7 +141,8 @@ const totalItems = ref(0);
 const loadHistory = async (page = 1) => {
   loading.value = true;
   try {
-    const agencyId = authStore.user?.id_agencia || authStore.user?.agencia_id || authStore.user?.agencia?.id;
+    const isSuperAdmin = authStore.hasRole('Super Admin');
+    const agencyId = isSuperAdmin ? null : (authStore.user?.id_agencia || authStore.user?.agencia_id || authStore.user?.agencia?.id);
     const response = await api.get('/solicitudes-retiro/agencia/historico', {
       params: { 
           id_agencia: agencyId,

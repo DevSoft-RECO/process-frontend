@@ -500,6 +500,8 @@ const documentInfo = ref(null); // Nuevo estado para la info del documento
 const documentsList = ref([]);
 const expedienteActive = ref(false);
 
+const isSuperAdmin = computed(() => authStore.hasRole('Super Admin'));
+
 const formData = reactive({
   id_expediente: null,
   id_expediente_historico: null,
@@ -603,11 +605,13 @@ const selectedDoc = computed(() => {
 });
 
 const isSelectionLinked = computed(() => {
+    if (isSuperAdmin.value) return false;
     if (!formData.id_documento || isManual.value) return false;
     return selectedDoc.value ? !selectedDoc.value.permite_definitivo : false;
 });
 
 const isTemporalDisabled = computed(() => {
+    if (isSuperAdmin.value) return false;
     if (!formData.id_documento || isManual.value) return false;
     return selectedDoc.value ? !selectedDoc.value.permite_temporal : false;
 });
@@ -713,7 +717,7 @@ const submitRequest = async () => {
 const loadHistory = async (page = 1) => {
   loadingHistory.value = true;
   try {
-    const agencyId = authStore.user?.id_agencia || authStore.user?.agencia_id || authStore.user?.agencia?.id;
+    const agencyId = isSuperAdmin.value ? null : (authStore.user?.id_agencia || authStore.user?.agencia_id || authStore.user?.agencia?.id);
     const response = await api.get('/solicitudes-retiro/agencia', {
       params: { 
           id_agencia: agencyId,
@@ -736,7 +740,7 @@ const loadHistory = async (page = 1) => {
 const loadIncoming = async (page = 1) => {
   loadingIncoming.value = true;
   try {
-    const agencyId = authStore.user?.id_agencia || authStore.user?.agencia_id || authStore.user?.agencia?.id;
+    const agencyId = isSuperAdmin.value ? null : (authStore.user?.id_agencia || authStore.user?.agencia_id || authStore.user?.agencia?.id);
     const response = await api.get('/solicitudes-retiro/incoming', {
       params: { 
           id_agencia: agencyId,
