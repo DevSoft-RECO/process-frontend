@@ -149,6 +149,22 @@ export const useReportStore = defineStore('report', {
             }
         },
 
+        async requestReporteHistoricoArchivo() {
+            this.isRequesting = true;
+            try {
+                await api.post('/exportar/historico-archivo');
+
+                this.isWidgetVisible = true;
+                this.isWidgetMinimized = false;
+                await this.fetchMyReports();
+            } catch (error) {
+                console.error('Error enviando a cola reporte histórico archivo', error);
+                Swal.fire('Error', 'No se pudo generar el reporte histórico de archivo.', 'error');
+            } finally {
+                this.isRequesting = false;
+            }
+        },
+
         async fetchMyReports() {
             if (this.myReports.length === 0) {
                 this.loadingReports = true;

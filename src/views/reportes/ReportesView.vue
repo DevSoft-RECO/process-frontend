@@ -289,6 +289,45 @@
          </div>
       </div>
 
+       <!-- Export Historico Archivo (Indigo/Slate) -->
+       <div v-if="hasRequiredPermission('archivo')"
+           class="group relative cursor-pointer overflow-hidden rounded-3xl p-[2px] transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_30px_-5px_rgba(99,102,241,0.5)]"
+         :class="{'pointer-events-none opacity-80': reportStore.isRequesting}"
+         @click="dispararReporteHistoricoArchivo"
+      >
+         <div class="absolute inset-0 bg-gradient-to-br from-indigo-400 via-slate-500 to-slate-700"></div>
+         <div class="relative flex h-full flex-col justify-between rounded-[22px] bg-white p-8 transition-colors duration-300 dark:bg-gray-950">
+           <div class="mb-6 flex items-start justify-between">
+             <div class="relative">
+               <div class="absolute inset-0 scale-150 bg-indigo-500/20 blur-2xl transition-opacity group-hover:opacity-100"></div>
+               <div class="relative rounded-2xl bg-indigo-50 p-4 transition-transform duration-500 group-hover:rotate-6 dark:bg-indigo-900/20">
+                 <i class="fas fa-database text-2xl text-indigo-600 dark:text-indigo-400"></i>
+               </div>
+             </div>
+             <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300">
+               Copia de Seguridad
+             </span>
+           </div>
+           <div class="mb-8">
+             <h3 class="mb-3 text-2xl font-black tracking-tight text-gray-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
+               Reporte Histórico Archivo
+             </h3>
+             <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+               Exportación pura de toda la tabla de expedientes para auditoría y respaldo histórico de datos.
+             </p>
+           </div>
+           <div class="flex items-center font-bold text-indigo-600 dark:text-indigo-400">
+             <span class="text-sm transition-all duration-300 group-hover:mr-3">
+               {{ reportStore.isRequesting ? 'Procesando...' : 'Descargar Todo' }}
+             </span>
+             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 opacity-0 transition-all duration-300 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 dark:bg-indigo-900/30">
+               <i v-if="reportStore.isRequesting" class="fas fa-spinner fa-spin text-indigo-600 dark:text-indigo-400"></i>
+               <i v-else class="fas fa-arrow-right text-indigo-600 dark:text-indigo-400"></i>
+             </div>
+           </div>
+         </div>
+      </div>
+
     </div>
     
     <!-- Modal Selection Agencias -->
@@ -342,5 +381,9 @@ const dispararReporteSolicitudesRetiro = async () => {
 
 const dispararReporteConfirmaciones = async () => {
     await reportStore.requestReporteConfirmaciones();
+};
+
+const dispararReporteHistoricoArchivo = async () => {
+    await reportStore.requestReporteHistoricoArchivo();
 };
 </script>
