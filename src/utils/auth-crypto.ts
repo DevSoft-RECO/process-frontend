@@ -36,6 +36,10 @@ export async function preparePKCE(): Promise<string> {
     const verifier = generateRandomString(128);
     const challengeBuffer = await sha256(verifier);
     const challenge = base64urlencode(challengeBuffer);
+    
+    // Guardar en AMBOS almacenamientos para máxima compatibilidad
+    localStorage.setItem(AUTH_KEYS.PKCE_VERIFIER, verifier);
     sessionStorage.setItem(AUTH_KEYS.PKCE_VERIFIER, verifier);
+    
     return challenge;
 }

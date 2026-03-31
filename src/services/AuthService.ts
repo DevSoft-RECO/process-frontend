@@ -30,11 +30,17 @@ export default {
         authUrl.searchParams.append('scope', '*');
         authUrl.searchParams.append('code_challenge', challenge);
         authUrl.searchParams.append('code_challenge_method', 'S256');
+        authUrl.searchParams.append('v', Date.now().toString());
 
-        // Anti-Race Condition: setTimeout de 150ms para permitir que sessionStorage aterrice en el disco
+        console.log(`[AuthService] Iniciando Login SSO. 
+            Client ID: ${client_id}
+            Redirect URI: ${redirect_uri}
+            Target URL: ${authUrl.toString()}`);
+
+        // Anti-Race Condition: setTimeout de 300ms para asegurar que el almacenamiento se persista
         setTimeout(() => {
             window.location.href = authUrl.toString();
-        }, 150);
+        }, 300);
     },
 
     /**

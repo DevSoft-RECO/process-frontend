@@ -17,7 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
     // --- MIGRACIÓN Y LIMPIEZA DE CACHÉ (Anti-Old-Data) ---
     const STORAGE_VERSION = 'v5_prefixed'; 
     const isCallbackPage = window.location.pathname.includes('/callback');
-    const hasPKCEVerifier = !!sessionStorage.getItem(AUTH_KEYS.PKCE_VERIFIER);
+    const hasPKCEVerifier = !!localStorage.getItem(AUTH_KEYS.PKCE_VERIFIER);
     const hasNewToken = !!sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
 
     const savedVersion = localStorage.getItem(AUTH_KEYS.STORAGE_VERSION);
@@ -31,7 +31,6 @@ export const useAuthStore = defineStore('auth', () => {
             localStorage.setItem(AUTH_KEYS.STORAGE_VERSION, STORAGE_VERSION);
         } else {
             console.log("[Store] Versión pendiente de actualizar, pero respetando flujo PKCE activo.");
-            // Si estamos en proceso, NO borramos, pero marcamos la versión como actualizada
             localStorage.setItem(AUTH_KEYS.STORAGE_VERSION, STORAGE_VERSION);
         }
     }
@@ -39,10 +38,10 @@ export const useAuthStore = defineStore('auth', () => {
     // --- STATE ---
     const user = ref<User | null>(JSON.parse(sessionStorage.getItem(AUTH_KEYS.USER_DATA) || 'null'))
     const token = ref<string | null>(sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN) || null)
-    
-    console.log(`[Store] Estado Inicial: Token=${!!token.value ? 'SI' : 'NO'}, User=${!!user.value ? 'SI' : 'NO'}`);
     const processingSSO = ref<boolean>(false)
     const isReady = ref<boolean>(false)
+
+    console.log(`[Store] Estado Inicial: Token=${!!token.value ? 'SI' : 'NO'}, User=${!!user.value ? 'SI' : 'NO'}`);
 
     // --- GETTERS ---
     const userAvatar = computed(() => {
@@ -63,8 +62,14 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     async function handlePKCECallback(code: string): Promise<void> {
-        const verifier = sessionStorage.getItem(AUTH_KEYS.PKCE_VERIFIER)
-        if (!verifier) throw new Error('No se encontró el verifier PKCE')
+        const localVerifier = localStorage.getItem(AUTH_KEYS.PKCE_VERIFIER);
+        const sessionVerifier = sessionStorage.getItem(AUTH_KEYS.PKCE_VERIFIER);
+        
+        if (!localVerifier && !sessionVerifier) {
+            throw new Error('No se encontró el verifier PKCE en ningún almacenamiento');
+        }
+
+        const finalVerifier = localVerifier || (sessionVerifier as string);
 
         const client_id = import.meta.env.VITE_CLIENT_ID;
         const redirect_uri = import.meta.env.VITE_REDIRECT_URI;
@@ -77,7 +82,7 @@ export const useAuthStore = defineStore('auth', () => {
             grant_type: 'authorization_code',
             client_id: client_id,
             redirect_uri: redirect_uri,
-            code_verifier: verifier,
+            code_verifier: finalVerifier,
             code: code
         });
 
@@ -86,8 +91,10 @@ export const useAuthStore = defineStore('auth', () => {
         
         token.value = accessToken;
         sessionStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, accessToken);
+        
+        // Limpiar verifier de todos los posibles lugares
         sessionStorage.removeItem(AUTH_KEYS.PKCE_VERIFIER);
-        sessionStorage.removeItem(AUTH_KEYS.SSO_LOCK);
+        localStorage.removeItem(AUTH_KEYS.PKCE_VERIFIER);
         processingSSO.value = false;
 
         await fetchUser(true); // Forzar descarga de perfil limpio tras login
