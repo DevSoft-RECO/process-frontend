@@ -14,6 +14,20 @@ export interface User {
 
 export const useAuthStore = defineStore('auth', () => {
 
+    // --- DIAGNÓSTICO PROFUNDO DE PREFIJOS ---
+    const PREFIX_ENV = import.meta.env.VITE_STORAGE_PREFIX || 'hija_default_';
+    console.log(`[Store] DIAGNÓSTICO:
+        - Prefijo Detectado: "${PREFIX_ENV}"
+        - Clave Verifier Esperada: "${AUTH_KEYS.PKCE_VERIFIER}"
+        - URL Actual: ${window.location.href}
+    `);
+
+    // Listar todo lo que hay en storage para ver si hay "fugas" de nombres
+    const allSession = Object.keys(sessionStorage).filter(k => k.includes('sadec') || k.includes('pkce') || k.includes('hija'));
+    const allLocal = Object.keys(localStorage).filter(k => k.includes('sadec') || k.includes('pkce') || k.includes('hija'));
+    console.log(`[Store] Items encontrados en Session:`, allSession);
+    console.log(`[Store] Items encontrados en Local:`, allLocal);
+
     // --- MIGRACIÓN Y LIMPIEZA DE CACHÉ (Anti-Old-Data) ---
     const STORAGE_VERSION = 'v5_prefixed'; 
     const isCallbackPage = window.location.pathname.includes('/callback');
