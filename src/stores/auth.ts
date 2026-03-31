@@ -76,14 +76,29 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     async function handlePKCECallback(code: string): Promise<void> {
-        const localVerifier = localStorage.getItem(AUTH_KEYS.PKCE_VERIFIER);
-        const sessionVerifier = sessionStorage.getItem(AUTH_KEYS.PKCE_VERIFIER);
-        
-        if (!localVerifier && !sessionVerifier) {
-            throw new Error('No se encontró el verifier PKCE en ningún almacenamiento');
+        // --- TOLERANCIA TOTAL A NOMBRES (Anti-Cache) ---
+        // Intentamos todas las combinaciones posibles por si el navegador usó un script viejo para salir
+        const localPrefixed = localStorage.getItem(AUTH_KEYS.PKCE_VERIFIER);
+        const sessionPrefixed = sessionStorage.getItem(AUTH_KEYS.PKCE_VERIFIER);
+        const sessionLegacy = sessionStorage.getItem('pkce_verifier'); // Clave sin prefijo (lo que detectó el log)
+        const localLegacy = localStorage.getItem('pkce_verifier');
+
+        const finalVerifier = localPrefixed || sessionPrefixed || sessionLegacy || localLegacy;
+
+        if (!finalVerifier) {
+            console.error("[Store] No se encontró el verifier en NINGUNA variante:", {
+                esperado: AUTH_KEYS.PKCE_VERIFIER,
+                encontrados_session: Object.keys(sessionStorage),
+                encontrados_local: Object.keys(localStorage)
+            });
+            throw new Error('No se encontró el verifier PKCE en ningún almacenamiento (Tolerancia Fallida)');
         }
 
-        const finalVerifier = localVerifier || (sessionVerifier as string);
+        console.log(`[Store] Verifier recuperado con éxito usando variante: ${
+            localPrefixed ? 'Local Prefixed' : 
+            sessionPrefixed ? 'Session Prefixed' : 
+            sessionLegacy ? 'Session Legacy (No-Prefix)' : 'Local Legacy'
+        }`);
 
         const client_id = import.meta.env.VITE_CLIENT_ID;
         const redirect_uri = import.meta.env.VITE_REDIRECT_URI;
