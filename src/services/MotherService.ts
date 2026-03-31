@@ -1,30 +1,17 @@
 import axios, { type InternalAxiosRequestConfig } from 'axios';
+import { AUTH_KEYS } from '../utils/auth-keys';
 
-// URL de la App Madre (Debe estar en .env)
-// Helper para asegurar que la URL termine en /api
-const getBaseUrl = () => {
-    let url = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-    // Quitamos slash final si existe
-    if (url.endsWith('/')) {
-        url = url.slice(0, -1);
-    }
-    // Si no termina en /api, lo agregamos
-    if (!url.endsWith('/api')) {
-        url += '/api';
-    }
-    return url;
-};
-
-const MOTHER_API_URL = getBaseUrl();
+// URL de la App Madre (Desde el .env)
+const MOTHER_API_URL = import.meta.env.VITE_MOTHER_API_URL || 'http://localhost:8000';
 
 const motherApi = axios.create({
-    baseURL: MOTHER_API_URL,
+    baseURL: `${MOTHER_API_URL}/api`,
 });
 
-// Interceptor para inyectar SIEMPRE el token que tienes en localStorage
+// Interceptor para inyectar SIEMPRE el token desde sessionStorage
 motherApi.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const token = localStorage.getItem('access_token');
+        const token = sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
         if (token) {
             const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
             config.headers.Authorization = authHeader;

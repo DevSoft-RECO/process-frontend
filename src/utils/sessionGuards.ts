@@ -1,12 +1,13 @@
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
+import { AUTH_KEYS } from './auth-keys';
 
 export const startSessionGuards = () => {
     // ----------------------------------------------------
     // 1. EL "HEARTBEAT" CADA 5 MINUTOS (Sondeo Seguro)
     // ----------------------------------------------------
     setInterval(() => {
-        const token = sessionStorage.getItem('access_token');
+        const token = sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
         if (token) {
             const MOTHER_API_URL = import.meta.env.VITE_MOTHER_API_URL || 'https://api.madre.com';
             api.get(`${MOTHER_API_URL}/api/me`).catch(() => {

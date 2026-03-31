@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import AuthService from '../services/AuthService'
 import { getAvatarUrl } from '../utils/imageUtils'
+import { AUTH_KEYS } from '../utils/auth-keys'
 
 export interface User {
     [key: string]: any;
@@ -14,19 +15,15 @@ export interface User {
 export const useAuthStore = defineStore('auth', () => {
 
     // --- MIGRACIÓN Y LIMPIEZA DE CACHÉ (Anti-Old-Data) ---
-    const STORAGE_VERSION = 'v3_hija5_clean'; 
-    if (localStorage.getItem('yk_storage_version') !== STORAGE_VERSION) {
-        const keysToRemove = ['access_token', 'user_data', 'pkce_verifier'];
-        keysToRemove.forEach(k => {
-           localStorage.removeItem(k);
-           sessionStorage.removeItem(k);
-        });
-        localStorage.setItem('yk_storage_version', STORAGE_VERSION);
+    const STORAGE_VERSION = 'v5_prefixed'; 
+    if (localStorage.getItem(AUTH_KEYS.STORAGE_VERSION) !== STORAGE_VERSION) {
+        AuthService.logoutLocal();
+        localStorage.setItem(AUTH_KEYS.STORAGE_VERSION, STORAGE_VERSION);
     }
 
     // --- STATE ---
-    const user = ref<User | null>(JSON.parse(sessionStorage.getItem('user_data') || 'null'))
-    const token = ref<string | null>(sessionStorage.getItem('access_token') || null)
+    const user = ref<User | null>(JSON.parse(sessionStorage.getItem(AUTH_KEYS.USER_DATA) || 'null'))
+    const token = ref<string | null>(sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN) || null)
     const processingSSO = ref<boolean>(false)
     const isReady = ref<boolean>(false)
 
@@ -42,18 +39,18 @@ export const useAuthStore = defineStore('auth', () => {
         processingSSO.value = true;
         
         if (redirectTo) {
-            sessionStorage.setItem('auth_redirect_to', String(redirectTo));
+            sessionStorage.setItem(AUTH_KEYS.AUTH_REDIRECT, String(redirectTo));
         }
         
         await AuthService.login();
     }
 
     async function handlePKCECallback(code: string): Promise<void> {
-        const verifier = sessionStorage.getItem('pkce_verifier')
+        const verifier = sessionStorage.getItem(AUTH_KEYS.PKCE_VERIFIER)
         if (!verifier) throw new Error('No se encontró el verifier PKCE')
 
         const client_id = import.meta.env.VITE_CLIENT_ID;
-        const redirect_uri = `${window.location.origin}/callback`;
+        const redirect_uri = import.meta.env.VITE_REDIRECT_URI;
         const MOTHER_API_URL = import.meta.env.VITE_MOTHER_API_URL || 'http://localhost:8000';
 
         const { default: axios } = await import('axios');
@@ -67,8 +64,9 @@ export const useAuthStore = defineStore('auth', () => {
 
         const accessToken = response.data.access_token;
         token.value = accessToken;
-        sessionStorage.setItem('access_token', accessToken);
-        sessionStorage.removeItem('pkce_verifier');
+        sessionStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, accessToken);
+        sessionStorage.removeItem(AUTH_KEYS.PKCE_VERIFIER);
+        sessionStorage.removeItem(AUTH_KEYS.SSO_LOCK);
         processingSSO.value = false;
 
         await fetchUser(true); // Forzar descarga de perfil limpio tras login
@@ -119,9 +117,7 @@ export const useAuthStore = defineStore('auth', () => {
             const userData = response.data
 
             user.value = userData
-            sessionStorage.setItem('user_data', JSON.stringify(userData))
-            // Quitamos de localStorage si estuviera ahí por versiones anteriores
-            localStorage.removeItem('user_data')
+            sessionStorage.setItem(AUTH_KEYS.USER_DATA, JSON.stringify(userData))
         } catch (error) {
             console.warn('Sesión expirada o inválida, o error al conectar con Api', error)
         } finally {

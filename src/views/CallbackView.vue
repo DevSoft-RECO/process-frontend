@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { AUTH_KEYS } from '@/utils/auth-keys'
 
 const route = useRoute()
 const router = useRouter()
@@ -12,6 +13,7 @@ const subStatus = ref(
   'Estamos verificando tu identidad con los sistemas de la Cooperativa YAMAN KUTX.'
 )
 
+// Semáforo Global para evitar race-conditions si Vue monta doble
 let isProcessingCallback = false
 
 onMounted(async () => {
@@ -37,9 +39,11 @@ onMounted(async () => {
     await authStore.handlePKCECallback(code);
 
     // 3. Redirección Dinámica: Volver a donde el usuario intentaba entrar
-    const redirectUrl = sessionStorage.getItem('auth_redirect_to') || { name: 'dashboard' };
-    if (sessionStorage.getItem('auth_redirect_to')) {
-       sessionStorage.removeItem('auth_redirect_to');
+    const savedRedirect = sessionStorage.getItem(AUTH_KEYS.AUTH_REDIRECT);
+    const redirectUrl = savedRedirect || { name: 'dashboard' };
+    
+    if (savedRedirect) {
+       sessionStorage.removeItem(AUTH_KEYS.AUTH_REDIRECT);
     }
 
     status.value = 'Acceso autorizado'

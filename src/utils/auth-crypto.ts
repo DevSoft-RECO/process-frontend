@@ -30,10 +30,12 @@ export function base64urlencode(buffer: ArrayBuffer): string {
     return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
+import { AUTH_KEYS } from './auth-keys';
+
 export async function preparePKCE(): Promise<string> {
     const verifier = generateRandomString(128);
     const challengeBuffer = await sha256(verifier);
     const challenge = base64urlencode(challengeBuffer);
-    sessionStorage.setItem('pkce_verifier', verifier);
+    sessionStorage.setItem(AUTH_KEYS.PKCE_VERIFIER, verifier);
     return challenge;
 }

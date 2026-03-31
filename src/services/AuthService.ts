@@ -1,8 +1,8 @@
 import axios from 'axios';
+import { AUTH_KEYS } from '../utils/auth-keys';
 
 // Variables de entorno
 const MOTHER_API_URL = import.meta.env.VITE_MOTHER_API_URL || 'http://localhost:8000';
-const MOTHER_APP_URL = import.meta.env.VITE_MOTHER_APP_URL || 'http://localhost:5173';
 
 export interface UserData {
     [key: string]: any;
@@ -21,17 +21,17 @@ export default {
         const { preparePKCE } = await import('../utils/auth-crypto');
         const challenge = await preparePKCE();
         const client_id = import.meta.env.VITE_CLIENT_ID || '019b27d0-4adc-70f7-ba93-84024bf43d46';
-        const redirect_uri = `${window.location.origin}/callback`;
+        const redirect_uri = import.meta.env.VITE_REDIRECT_URI;
 
         const authUrl = new URL(`${MOTHER_API_URL}/oauth/authorize`);
         authUrl.searchParams.append('client_id', client_id);
         authUrl.searchParams.append('redirect_uri', redirect_uri);
         authUrl.searchParams.append('response_type', 'code');
-        authUrl.searchParams.append('scope', '');
+        authUrl.searchParams.append('scope', '*');
         authUrl.searchParams.append('code_challenge', challenge);
         authUrl.searchParams.append('code_challenge_method', 'S256');
 
-        // Timeout para asegurar I/O en incognito antes de destruir la página
+        // Anti-Race Condition: setTimeout de 150ms para permitir que sessionStorage aterrice en el disco
         setTimeout(() => {
             window.location.href = authUrl.toString();
         }, 150);
@@ -43,11 +43,11 @@ export default {
     processDirectToken(token: string, userData: any = null): TokenResponse {
         if (!token) throw new Error('Token no proporcionado.');
 
-        localStorage.setItem('access_token', token);
+        sessionStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, token);
 
         if (userData) {
             const user = typeof userData === 'string' ? JSON.parse(userData) : userData;
-            localStorage.setItem('user_data', JSON.stringify(user));
+            sessionStorage.setItem(AUTH_KEYS.USER_DATA, JSON.stringify(user));
             return { access_token: token, user };
         }
 
@@ -58,7 +58,7 @@ export default {
      * 3. OBTENER USUARIO (API Madre)
      */
     async getUser(): Promise<any> {
-        const token = localStorage.getItem('access_token');
+        const token = sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
         if (!token) throw new Error("No hay token disponible");
 
         const response = await axios.get(`${MOTHER_API_URL}/api/user`, {
@@ -76,16 +76,14 @@ export default {
      */
     logout(): void {
         this.logoutLocal();
-        window.location.href = `${MOTHER_APP_URL}/logout`;
+        window.location.href = `${MOTHER_API_URL}/logout`;
     },
 
     logoutLocal(): void {
-        const keysToRemove = ['access_token', 'user_data', 'pkce_verifier'];
+        const keysToRemove = Object.values(AUTH_KEYS);
         keysToRemove.forEach(k => {
             localStorage.removeItem(k);
             sessionStorage.removeItem(k);
         });
     }
-
-
 };
