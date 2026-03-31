@@ -475,20 +475,27 @@ router.beforeEach(async (to, _from) => {
             for (const record of to.matched) {
                 if (record.meta.permission) {
                     const requiredPerm = record.meta.permission as string;
-                    if (!hasRequiredPermission(requiredPerm)) {
-                        console.warn(`⛔ Acceso denegado: Usuario carece del permiso jerárquico '${requiredPerm}'.`)
-                        window.location.href = `${motherAppUrl}/apps`
-                        return false
+                    const hasPerm = hasRequiredPermission(requiredPerm);
+                    console.log(`[Router] Verificando permiso '${requiredPerm}': ${hasPerm ? 'CONCEDIDO' : 'DENEGADO'}`);
+                    
+                    if (!hasPerm) {
+                        console.warn(`⛔ Acceso denegado: Usuario carece del permiso jerárquico '${requiredPerm}'.`);
+                        console.log(`[Router] Permisos del usuario:`, authStore.user?.permissions || authStore.user?.permisos || []);
+                        window.location.href = `${motherAppUrl}/apps`;
+                        return false;
                     }
                 }
 
                 // 2) Verificamos cadena de roles
                 if (record.meta.role) {
                     const requiredRole = record.meta.role as string;
-                    if (!authStore.hasRole(requiredRole)) {
-                        console.warn(`⛔ Acceso denegado: Usuario carece del rol '${requiredRole}'.`)
-                        window.location.href = `${motherAppUrl}/apps`
-                        return false
+                    const hasR = authStore.hasRole(requiredRole);
+                    console.log(`[Router] Verificando rol '${requiredRole}': ${hasR ? 'CONCEDIDO' : 'DENEGADO'}`);
+                    
+                    if (!hasR) {
+                        console.warn(`⛔ Acceso denegado: Usuario carece del rol '${requiredRole}'.`);
+                        window.location.href = `${motherAppUrl}/apps`;
+                        return false;
                     }
                 }
             }

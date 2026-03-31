@@ -28,7 +28,7 @@ export const startSessionGuards = () => {
     // Si ya pasaron las 5:50 PM, no ponemos el timeout para hoy
     if (msUntilAlert > 0) {
         setTimeout(() => {
-            const token = sessionStorage.getItem('access_token');
+            const token = sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
             if (token) {
                 // Notificación visual flotante estilo Toast (Top End)
                 Swal.fire({

@@ -80,8 +80,17 @@ export default {
     },
 
     logoutLocal(): void {
+        // 1. Limpiar claves prefijadas (NUEVO ESTÁNDAR)
         const keysToRemove = Object.values(AUTH_KEYS);
         keysToRemove.forEach(k => {
+            localStorage.removeItem(k);
+            sessionStorage.removeItem(k);
+        });
+
+        // 2. Limpiar claves antiguas/comunes (HISTÓRICO)
+        // Para evitar colisiones si el usuario tiene pestañas viejas abiertas.
+        const legacyKeys = ['access_token', 'user_data', 'pkce_verifier', 'auth_redirect_to', 'yk_storage_version'];
+        legacyKeys.forEach(k => {
             localStorage.removeItem(k);
             sessionStorage.removeItem(k);
         });
