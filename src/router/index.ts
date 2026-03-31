@@ -441,8 +441,8 @@ router.beforeEach(async (to, _from) => {
     // Caso 1: Ruta protegida sin token
     if (to.matched.some(record => record.meta.requiresAuth) || to.path === '/') {
         if (!isAuthenticated) {
-            console.warn('🔒 Acceso Hija: Usuario sin sesión. Redirección desactivada para DEBBUGING.');
-            // authStore.login(to.fullPath)
+            console.log('🔒 Acceso Hija: Usuario sin sesión. Iniciando flujo SSO...')
+            authStore.login(to.fullPath)
             return false
         }
     }

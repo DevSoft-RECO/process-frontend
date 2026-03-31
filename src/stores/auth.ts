@@ -16,9 +16,19 @@ export const useAuthStore = defineStore('auth', () => {
 
     // --- MIGRACIÓN Y LIMPIEZA DE CACHÉ (Anti-Old-Data) ---
     const STORAGE_VERSION = 'v5_prefixed'; 
+    const isCallbackPage = window.location.pathname.includes('/callback');
+    const hasPKCEVerifier = !!sessionStorage.getItem(AUTH_KEYS.PKCE_VERIFIER);
+
     if (localStorage.getItem(AUTH_KEYS.STORAGE_VERSION) !== STORAGE_VERSION) {
-        AuthService.logoutLocal();
-        localStorage.setItem(AUTH_KEYS.STORAGE_VERSION, STORAGE_VERSION);
+        // Solo limpiamos si NO estamos en medio de un flujo de retorno (Callback)
+        if (!isCallbackPage && !hasPKCEVerifier) {
+            AuthService.logoutLocal();
+            localStorage.setItem(AUTH_KEYS.STORAGE_VERSION, STORAGE_VERSION);
+        } else if (isCallbackPage) {
+            // Si es la página de callback, solo marcamos la versión pero NO limpiamos
+            // para no borrar el PKCE_VERIFIER que necesitamos justo ahora.
+            localStorage.setItem(AUTH_KEYS.STORAGE_VERSION, STORAGE_VERSION);
+        }
     }
 
     // --- STATE ---
