@@ -18,15 +18,20 @@ export const useAuthStore = defineStore('auth', () => {
     const STORAGE_VERSION = 'v5_prefixed'; 
     const isCallbackPage = window.location.pathname.includes('/callback');
     const hasPKCEVerifier = !!sessionStorage.getItem(AUTH_KEYS.PKCE_VERIFIER);
+    const hasNewToken = !!sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
 
-    if (localStorage.getItem(AUTH_KEYS.STORAGE_VERSION) !== STORAGE_VERSION) {
-        // Solo limpiamos si NO estamos en medio de un flujo de retorno (Callback)
-        if (!isCallbackPage && !hasPKCEVerifier) {
+    const savedVersion = localStorage.getItem(AUTH_KEYS.STORAGE_VERSION);
+    
+    console.log(`[Store] Version Check: Local=${savedVersion}, App=${STORAGE_VERSION}. Flow: Callback=${isCallbackPage}, Verifier=${hasPKCEVerifier}, Token=${hasNewToken}`);
+
+    if (savedVersion !== STORAGE_VERSION) {
+        if (!isCallbackPage && !hasPKCEVerifier && !hasNewToken) {
+            console.warn("[Store] Versión antigua detectada. Ejecutando limpieza nuclear de almacenamiento...");
             AuthService.logoutLocal();
             localStorage.setItem(AUTH_KEYS.STORAGE_VERSION, STORAGE_VERSION);
-        } else if (isCallbackPage) {
-            // Si es la página de callback, solo marcamos la versión pero NO limpiamos
-            // para no borrar el PKCE_VERIFIER que necesitamos justo ahora.
+        } else {
+            console.log("[Store] Versión pendiente de actualizar, pero respetando flujo PKCE activo.");
+            // Si estamos en proceso, NO borramos, pero marcamos la versión como actualizada
             localStorage.setItem(AUTH_KEYS.STORAGE_VERSION, STORAGE_VERSION);
         }
     }
@@ -34,6 +39,8 @@ export const useAuthStore = defineStore('auth', () => {
     // --- STATE ---
     const user = ref<User | null>(JSON.parse(sessionStorage.getItem(AUTH_KEYS.USER_DATA) || 'null'))
     const token = ref<string | null>(sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN) || null)
+    
+    console.log(`[Store] Estado Inicial: Token=${!!token.value ? 'SI' : 'NO'}, User=${!!user.value ? 'SI' : 'NO'}`);
     const processingSSO = ref<boolean>(false)
     const isReady = ref<boolean>(false)
 
@@ -64,6 +71,8 @@ export const useAuthStore = defineStore('auth', () => {
         const MOTHER_API_URL = import.meta.env.VITE_MOTHER_API_URL || 'http://localhost:8000';
 
         const { default: axios } = await import('axios');
+        console.log(`[Store] Intercambiando código PKCE... Code=${code.substring(0, 10)}...`);
+        
         const response = await axios.post(`${MOTHER_API_URL}/oauth/token`, {
             grant_type: 'authorization_code',
             client_id: client_id,
@@ -73,6 +82,8 @@ export const useAuthStore = defineStore('auth', () => {
         });
 
         const accessToken = response.data.access_token;
+        console.log(`[Store] Token recibido con éxito. Guardando en key: ${AUTH_KEYS.ACCESS_TOKEN}`);
+        
         token.value = accessToken;
         sessionStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, accessToken);
         sessionStorage.removeItem(AUTH_KEYS.PKCE_VERIFIER);
