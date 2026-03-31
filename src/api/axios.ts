@@ -42,9 +42,12 @@ api.interceptors.response.use(
                 sessionStorage.removeItem(AUTH_KEYS.ACCESS_TOKEN);
                 sessionStorage.removeItem(AUTH_KEYS.USER_DATA);
 
+                /*
                 import('@/services/AuthService').then(module => {
                     module.default.login();
                 });
+                */
+                console.error("[Axios Local] Error 401 detectado, pero la redirección automática está deshabilitada (Modo Debug).");
             }
         }
         return Promise.reject(error);

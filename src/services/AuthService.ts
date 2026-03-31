@@ -32,9 +32,12 @@ export default {
         authUrl.searchParams.append('code_challenge_method', 'S256');
 
         // Anti-Race Condition: setTimeout de 150ms para permitir que sessionStorage aterrice en el disco
+        console.warn("⚠️ REDIRECCIÓN SSO DESACTIVADA PARA DEBBUGING.");
+        /*
         setTimeout(() => {
             window.location.href = authUrl.toString();
         }, 150);
+        */
     },
 
     /**
