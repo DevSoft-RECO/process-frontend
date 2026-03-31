@@ -32,11 +32,6 @@ export default {
         authUrl.searchParams.append('code_challenge_method', 'S256');
         authUrl.searchParams.append('v', Date.now().toString());
 
-        console.log(`[AuthService] Iniciando Login SSO. 
-            Client ID: ${client_id}
-            Redirect URI: ${redirect_uri}
-            Target URL: ${authUrl.toString()}`);
-
         // Anti-Race Condition: setTimeout de 300ms para asegurar que el almacenamiento se persista
         setTimeout(() => {
             window.location.href = authUrl.toString();

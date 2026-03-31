@@ -14,20 +14,6 @@ export interface User {
 
 export const useAuthStore = defineStore('auth', () => {
 
-    // --- DIAGNÓSTICO PROFUNDO DE PREFIJOS ---
-    const PREFIX_ENV = import.meta.env.VITE_STORAGE_PREFIX || 'hija_default_';
-    console.log(`[Store] DIAGNÓSTICO:
-        - Prefijo Detectado: "${PREFIX_ENV}"
-        - Clave Verifier Esperada: "${AUTH_KEYS.PKCE_VERIFIER}"
-        - URL Actual: ${window.location.href}
-    `);
-
-    // Listar todo lo que hay en storage para ver si hay "fugas" de nombres
-    const allSession = Object.keys(sessionStorage).filter(k => k.includes('sadec') || k.includes('pkce') || k.includes('hija'));
-    const allLocal = Object.keys(localStorage).filter(k => k.includes('sadec') || k.includes('pkce') || k.includes('hija'));
-    console.log(`[Store] Items encontrados en Session:`, allSession);
-    console.log(`[Store] Items encontrados en Local:`, allLocal);
-
     // --- MIGRACIÓN Y LIMPIEZA DE CACHÉ (Anti-Old-Data) ---
     const STORAGE_VERSION = 'v5_prefixed'; 
     const isCallbackPage = window.location.pathname.includes('/callback');
@@ -35,16 +21,12 @@ export const useAuthStore = defineStore('auth', () => {
     const hasNewToken = !!sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
 
     const savedVersion = localStorage.getItem(AUTH_KEYS.STORAGE_VERSION);
-    
-    console.log(`[Store] Version Check: Local=${savedVersion}, App=${STORAGE_VERSION}. Flow: Callback=${isCallbackPage}, Verifier=${hasPKCEVerifier}, Token=${hasNewToken}`);
 
     if (savedVersion !== STORAGE_VERSION) {
         if (!isCallbackPage && !hasPKCEVerifier && !hasNewToken) {
-            console.warn("[Store] Versión antigua detectada. Ejecutando limpieza nuclear de almacenamiento...");
             AuthService.logoutLocal();
             localStorage.setItem(AUTH_KEYS.STORAGE_VERSION, STORAGE_VERSION);
         } else {
-            console.log("[Store] Versión pendiente de actualizar, pero respetando flujo PKCE activo.");
             localStorage.setItem(AUTH_KEYS.STORAGE_VERSION, STORAGE_VERSION);
         }
     }
@@ -54,8 +36,6 @@ export const useAuthStore = defineStore('auth', () => {
     const token = ref<string | null>(sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN) || null)
     const processingSSO = ref<boolean>(false)
     const isReady = ref<boolean>(false)
-
-    console.log(`[Store] Estado Inicial: Token=${!!token.value ? 'SI' : 'NO'}, User=${!!user.value ? 'SI' : 'NO'}`);
 
     // --- GETTERS ---
     const userAvatar = computed(() => {
@@ -86,26 +66,15 @@ export const useAuthStore = defineStore('auth', () => {
         const finalVerifier = localPrefixed || sessionPrefixed || sessionLegacy || localLegacy;
 
         if (!finalVerifier) {
-            console.error("[Store] No se encontró el verifier en NINGUNA variante:", {
-                esperado: AUTH_KEYS.PKCE_VERIFIER,
-                encontrados_session: Object.keys(sessionStorage),
-                encontrados_local: Object.keys(localStorage)
-            });
             throw new Error('No se encontró el verifier PKCE en ningún almacenamiento (Tolerancia Fallida)');
         }
 
-        console.log(`[Store] Verifier recuperado con éxito usando variante: ${
-            localPrefixed ? 'Local Prefixed' : 
-            sessionPrefixed ? 'Session Prefixed' : 
-            sessionLegacy ? 'Session Legacy (No-Prefix)' : 'Local Legacy'
-        }`);
 
         const client_id = import.meta.env.VITE_CLIENT_ID;
         const redirect_uri = import.meta.env.VITE_REDIRECT_URI;
         const MOTHER_API_URL = import.meta.env.VITE_MOTHER_API_URL || 'http://localhost:8000';
 
         const { default: axios } = await import('axios');
-        console.log(`[Store] Intercambiando código PKCE... Code=${code.substring(0, 10)}...`);
         
         const response = await axios.post(`${MOTHER_API_URL}/oauth/token`, {
             grant_type: 'authorization_code',
@@ -116,7 +85,6 @@ export const useAuthStore = defineStore('auth', () => {
         });
 
         const accessToken = response.data.access_token;
-        console.log(`[Store] Token recibido con éxito. Guardando en key: ${AUTH_KEYS.ACCESS_TOKEN}`);
         
         token.value = accessToken;
         sessionStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, accessToken);

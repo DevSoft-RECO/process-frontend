@@ -441,7 +441,6 @@ router.beforeEach(async (to, _from) => {
     // Caso 1: Ruta protegida sin token
     if (to.matched.some(record => record.meta.requiresAuth) || to.path === '/') {
         if (!isAuthenticated) {
-            console.log('🔒 Acceso Hija: Usuario sin sesión. Iniciando flujo SSO...')
             authStore.login(to.fullPath)
             return false
         }
@@ -476,11 +475,7 @@ router.beforeEach(async (to, _from) => {
                 if (record.meta.permission) {
                     const requiredPerm = record.meta.permission as string;
                     const hasPerm = hasRequiredPermission(requiredPerm);
-                    console.log(`[Router] Verificando permiso '${requiredPerm}': ${hasPerm ? 'CONCEDIDO' : 'DENEGADO'}`);
-                    
                     if (!hasPerm) {
-                        console.warn(`⛔ Acceso denegado: Usuario carece del permiso jerárquico '${requiredPerm}'.`);
-                        console.log(`[Router] Permisos del usuario:`, authStore.user?.permissions || authStore.user?.permisos || []);
                         window.location.href = `${motherAppUrl}/apps`;
                         return false;
                     }
@@ -490,10 +485,7 @@ router.beforeEach(async (to, _from) => {
                 if (record.meta.role) {
                     const requiredRole = record.meta.role as string;
                     const hasR = authStore.hasRole(requiredRole);
-                    console.log(`[Router] Verificando rol '${requiredRole}': ${hasR ? 'CONCEDIDO' : 'DENEGADO'}`);
-                    
                     if (!hasR) {
-                        console.warn(`⛔ Acceso denegado: Usuario carece del rol '${requiredRole}'.`);
                         window.location.href = `${motherAppUrl}/apps`;
                         return false;
                     }

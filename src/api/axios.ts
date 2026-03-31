@@ -14,14 +14,9 @@ api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         const token = sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
 
-        console.log(`[Axios Local] Preparando petición a: ${config.url}`);
-
         if (token) {
-            console.log("[Axios Local] Token encontrado en sessionStorage. Agregando header Authorization.");
             const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
             config.headers.Authorization = authHeader;
-        } else {
-            console.warn("[Axios Local] ADVERTENCIA: No se encontró token en sessionStorage. La petición irá sin autenticación.");
         }
 
         return config;
@@ -34,7 +29,6 @@ api.interceptors.response.use(
     (response: AxiosResponse) => response,
     (error: AxiosError) => {
         if (error.response && error.response.status === 401) {
-            console.error('[Axios Local] Error 401. El token fue enviado pero rechazado por el servidor.');
             
             // Evitar bucles de redirección (Cerrojo SSO)
             if (!sessionStorage.getItem(AUTH_KEYS.SSO_LOCK)) {
