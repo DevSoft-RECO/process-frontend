@@ -9,12 +9,24 @@ export const startSessionGuards = () => {
     setInterval(() => {
         const token = sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
         if (token) {
-            const MOTHER_API_URL = import.meta.env.VITE_MOTHER_API_URL || 'https://api.madre.com';
-            api.get(`${MOTHER_API_URL}/api/me`).catch(() => {
-                console.log("Heartbeat detectó cierre global u offline.");
+            const MOTHER_API_URL = import.meta.env.VITE_MOTHER_API_URL || 'https://api-portal.yamankutx.com.gt';
+            api.get(`${MOTHER_API_URL}/api/me`).catch((error) => {
+                if (error.response && error.response.status === 401) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Sesión Expirada',
+                        text: 'Tu sesión ha expirado por inactividad. Serás redirigido al inicio por seguridad.',
+                        confirmButtonText: 'Entendido',
+                        allowOutsideClick: false,
+                        confirmButtonColor: '#3085d6',
+                    }).then(() => {
+                        const MOTHER_FRONT_URL = import.meta.env.VITE_MOTHER_APP_URL || 'https://api-portal.yamankutx.com.gt';
+                        window.location.href = `${MOTHER_FRONT_URL}/login?session_expired=true`;
+                    });
+                }
             });
         }
-    }, 5 * 60 * 1000); // 5 minutos
+    }, 5 * 60 * 1000); // cada 5 minutos
 
     // ----------------------------------------------------
     // 2. EL AVISO DE CORTE DE JORNADA A LAS 5:50 PM
