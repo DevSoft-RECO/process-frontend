@@ -112,7 +112,22 @@
                 <h4 class="text-sm font-bold text-gray-400 uppercase tracking-tighter mb-3 border-b pb-1">Detalle Registral</h4>
                 <div class="grid grid-cols-1 gap-6">
                   <div v-for="doc in detalle.nuevo_expediente.documentos" :key="doc.id" 
-                       class="p-4 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-sm space-y-4">
+                       class="bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-sm overflow-hidden space-y-0">
+                    
+                    <!-- Fila 0: Estado del Documento -->
+                    <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800/50 p-2 border-b dark:border-gray-600">
+                        <span class="text-[10px] font-black uppercase text-gray-400 tracking-widest pl-2">Estatus de Garantía</span>
+                        <span :class="[
+                            'px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-sm border',
+                            doc.estado?.toLowerCase() === 'activo' 
+                                ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-400 dark:border-green-800' 
+                                : 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-400 dark:border-red-800'
+                        ]">
+                            {{ doc.estado || 'DESCONOCIDO' }}
+                        </span>
+                    </div>
+
+                    <div class="p-4 space-y-4">
                     
                     <!-- Fila 1: Datos Principales de Finca -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center border-b dark:border-gray-600 pb-3">
@@ -169,7 +184,7 @@
                             "{{ doc.observacion }}"
                         </p>
                     </div>
-
+                    </div>
                   </div>
                 </div>
               </section>
