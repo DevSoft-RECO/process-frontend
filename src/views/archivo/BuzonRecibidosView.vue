@@ -3,10 +3,10 @@
         <div class="flex flex-col gap-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                  <Encabezado
-                    title="Buzón de Recibidos (Archivo)"
-                    subtitle="Expedientes enviados a archivo (Estado 4)."
+                    :title="currentTab === 'recibidos' ? 'Buzón de Recibidos (Archivo)' : 'Pendientes por Ingreso'"
+                    :subtitle="currentTab === 'recibidos' ? 'Expedientes enviados a archivo (Estado 4).' : 'Expedientes en tránsito hacia archivo (Información de Garantía).'"
                     labelIndicator="Archivo"
-                    indicator-color="bg-orange-600"
+                    :indicator-color="currentTab === 'recibidos' ? 'bg-orange-600' : 'bg-indigo-600'"
                 />
                  <div class="flex flex-col md:flex-row items-center gap-3">
                     <!-- Buscador -->
@@ -50,10 +50,36 @@
                     </div>
                 </div>
             </div>
+
+            <!-- TABS NAVIGATION -->
+            <div class="flex items-center gap-1 bg-gray-100/50 dark:bg-slate-800/50 p-1.5 rounded-2xl w-fit border border-gray-200 dark:border-slate-700/50">
+                <button 
+                    @click="currentTab = 'recibidos'; handleSearch()"
+                    :class="[
+                        'px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all',
+                        currentTab === 'recibidos' 
+                            ? 'bg-white dark:bg-slate-700 text-azul-cope dark:text-white shadow-sm border border-gray-200 dark:border-slate-600' 
+                            : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                    ]"
+                >
+                    Recibidos (Estado 4)
+                </button>
+                <button 
+                    @click="currentTab = 'pendientes'; handleSearch()"
+                    :class="[
+                        'px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all',
+                        currentTab === 'pendientes' 
+                            ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm border border-gray-200 dark:border-slate-600' 
+                            : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                    ]"
+                >
+                    Pendientes por Ingreso
+                </button>
+            </div>
         </div>
 
-        <!-- Table Card -->
-        <div class="bg-white/90 dark:bg-slate-900/80 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden border border-white/20 dark:border-slate-700/50">
+        <!-- Table Card: Recibidos -->
+        <div v-if="currentTab === 'recibidos'" class="bg-white/90 dark:bg-slate-900/80 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden border border-white/20 dark:border-slate-700/50">
             <div class="overflow-x-auto custom-scrollbar">
                 <table class="w-full text-sm text-left border-separate border-spacing-0">
                     <thead class="bg-table-azul dark:bg-table-verde text-white">
@@ -232,18 +258,29 @@
                 </table>
             </div>
             
-             <!-- Paginación -->
+             <!-- Paginación: Recibidos -->
             <div v-if="nextPageUrl" class="bg-slate-50/50 dark:bg-slate-800/30 px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex justify-center">
-                <button @click="loadMore" :disabled="loading" class="text-sm text-azul-cope font-bold hover:text-blue-800 transition-colors">
+                <button @click="loadMore" :disabled="loading" class="text-sm text-azul-cope font-bold hover:text-blue-800 transition-colors uppercase tracking-widest leading-none">
                     {{ loading ? 'Cargando...' : 'Cargar más expedientes' }}
                 </button>
             </div>
         </div>
 
+        <!-- Table Card: Pendientes por Ingreso -->
+        <PendientesIngresoTable 
+            v-else
+            :items="expedientes"
+            :loading="loading"
+            :next-page-url="nextPageUrl"
+            @show-info="openRecibirGarantiaModal"
+            @load-more="loadMore"
+            @show-observation="showObservation"
+        />
+
         <ArchivoDetalleModal 
             :show="showDetalleModal"
             :id-seguimiento="selectedSeguimientoId"
-            :show-receive-action="true"
+            :show-receive-action="currentTab === 'recibidos'"
             @close="showDetalleModal = false"
             @confirm-receive="handleConfirmReceiveFromModal"
         />
@@ -256,6 +293,7 @@ import api from '@/api/axios'
 import Swal from 'sweetalert2'
 import Encabezado from '../../components/common/encabezado.vue'
 import ArchivoDetalleModal from './components/ArchivoDetalleModal.vue'
+import PendientesIngresoTable from './components/PendientesIngresoTable.vue'
 import { formatDate, formatCurrency } from '@/utils/formatters'
 
 interface Expediente {
@@ -285,6 +323,7 @@ interface Expediente {
 const expedientes = ref<Expediente[]>([])
 const loading = ref(false)
 const nextPageUrl = ref<string | null>(null)
+const currentTab = ref<'recibidos' | 'pendientes'>('recibidos')
 
 // Filters
 const agencias = ref<any[]>([])
@@ -323,7 +362,7 @@ const fetchAgencias = async () => {
 const fetchExpedientes = async (url: string | null = null) => {
     loading.value = true
     try {
-        let endpoint = url || '/archivo/buzon-recibidos'
+        let endpoint = url || (currentTab.value === 'recibidos' ? '/archivo/buzon-recibidos' : '/archivo/pendientes-ingreso')
         
         // Append filter params
         const params: any = {}
