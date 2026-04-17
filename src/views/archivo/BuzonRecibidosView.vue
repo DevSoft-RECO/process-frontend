@@ -4,7 +4,7 @@
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                  <Encabezado
                     :title="currentTab === 'recibidos' ? 'Buzón de Recibidos (Archivo)' : 'Pendientes por Ingreso'"
-                    :subtitle="currentTab === 'recibidos' ? 'Expedientes enviados a archivo (Estado 4).' : 'Expedientes en tránsito hacia archivo (Información de Garantía).'"
+                    :subtitle="currentTab === 'recibidos' ? 'Expedientes enviados a archivo.' : 'Expedientes en tránsito hacia archivo (Información de Garantía).'"
                     labelIndicator="Archivo"
                     :indicator-color="currentTab === 'recibidos' ? 'bg-orange-600' : 'bg-indigo-600'"
                 />
@@ -62,7 +62,7 @@
                             : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                     ]"
                 >
-                    Recibidos (Estado 4)
+                    Recibidos
                 </button>
                 <button 
                     @click="currentTab = 'pendientes'; handleSearch()"
