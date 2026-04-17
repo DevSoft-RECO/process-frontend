@@ -661,7 +661,7 @@ const menuItems = computed(() => {
                     route: '/admin/configuracion/gestion-lotes'
                 },
                 {
-                    label: 'Desvincular Garantías',
+                    label: 'Vincular/Desvincular Garantías',
                     route: '/admin/configuracion/desvincular-garantias',
                     permission: 'ajustes'
                 }

@@ -104,10 +104,21 @@
             <h3 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">Documentos Vinculados</h3>
             <p class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest mt-1">Auditoría de relaciones activas en el sistema</p>
           </div>
-          <div class="bg-white dark:bg-gray-700 px-5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm">
-            <span class="text-gray-900 dark:text-white font-black text-xs uppercase tracking-widest">
-              {{ (expediente as any).documentos?.length || 0 }} Registros
-            </span>
+          <div class="flex items-center gap-3">
+            <div class="bg-white dark:bg-gray-700 px-5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm">
+              <span class="text-gray-900 dark:text-white font-black text-xs uppercase tracking-widest">
+                {{ (expediente as any).documentos?.length || 0 }} Registros
+              </span>
+            </div>
+            <button 
+              @click="openLinkModal"
+              class="flex items-center gap-2 px-5 py-2.5 bg-verde-cope hover:bg-green-700 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md active:scale-95"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+              </svg>
+              Vincular Garantía
+            </button>
           </div>
         </div>
 
@@ -164,7 +175,72 @@
     </div>
     
 
+    <!-- MODAL VINCULACIÓN -->
+    <Teleport to="body">
+      <div v-if="showLinkModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-2xl rounded-[2.5rem] border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden animate-slide-up flex flex-col">
+          
+          <!-- Modal Header -->
+          <div class="px-8 py-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
+            <div>
+              <h3 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">Vincular Nueva Garantía</h3>
+              <p class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest mt-1">Busque y seleccione el documento para asociar</p>
+            </div>
+            <button @click="closeLinkModal" class="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-500">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
 
+          <!-- Modal Content -->
+          <div class="p-8 space-y-6 overflow-y-auto max-h-[80vh] custom-scrollbar">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Número de Garantía</label>
+                <input v-model="linkSearch.numero" type="text" placeholder="Ej: 123456" class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-bold focus:border-verde-cope transition-all focus:ring-0">
+              </div>
+              <div>
+                <label class="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Fecha de Garantía</label>
+                <input v-model="linkSearch.fecha" type="date" class="w-full px-4 py-3 rounded-xl border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-bold focus:border-verde-cope transition-all focus:ring-0">
+              </div>
+            </div>
+
+            <button 
+              @click="searchGuarantees"
+              :disabled="!linkSearch.numero || !linkSearch.fecha || searchingGuarantees"
+              class="w-full py-4 bg-azul-cope hover:bg-verde-cope text-white rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
+            >
+              <span v-if="searchingGuarantees" class="animate-spin border-2 border-white/30 border-t-white rounded-full w-5 h-5"></span>
+              {{ searchingGuarantees ? 'Buscando Registros...' : 'Consultar Garantía' }}
+            </button>
+
+            <!-- Results List -->
+            <div v-if="linkResults.length > 0" class="space-y-3">
+               <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Resultados Encontrados ({{ linkResults.length }})</p>
+               <div class="space-y-3">
+                  <div v-for="res in linkResults" :key="res.id" class="p-5 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-gray-100 dark:border-gray-700 flex items-center justify-between group hover:border-verde-cope transition-all">
+                    <div class="space-y-1">
+                      <p class="text-[10px] font-black text-verde-cope uppercase tracking-[0.2em]">{{ res.tipo_documento?.nombre || 'General' }}</p>
+                      <p class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">{{ res.propietario || 'Sin Propietario' }}</p>
+                      <p class="text-[10px] font-bold text-gray-500 dark:text-gray-400 font-mono">ID: {{ res.id }} | NÚMERO: {{ res.numero }}</p>
+                    </div>
+                    <button 
+                      @click="linkDocument(res.id)"
+                      class="px-5 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-verde-cope hover:text-white hover:border-verde-cope transition-all shadow-sm active:scale-95"
+                    >
+                      Vincular
+                    </button>
+                  </div>
+               </div>
+            </div>
+            <div v-else-if="guaranteesSearched && linkResults.length === 0" class="py-12 text-center bg-gray-50 dark:bg-gray-900/50 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700">
+               <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+               <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">No se encontraron garantías</p>
+               <p class="text-[10px] text-gray-400 uppercase mt-1">Verifique el número y la fecha ingresada</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -179,6 +255,16 @@ const lastSearch = ref('')
 const searching = ref(false)
 const expediente = ref<any>(null)
 const expedienteEncontrado = ref<boolean | null>(null)
+
+// Vincular Garantía State
+const showLinkModal = ref(false)
+const searchingGuarantees = ref(false)
+const guaranteesSearched = ref(false)
+const linkSearch = ref({
+    numero: '',
+    fecha: ''
+})
+const linkResults = ref<any[]>([])
 
 // Methods
 const searchExpediente = async () => {
@@ -302,6 +388,79 @@ const formatDate = (dateString: string) => {
 const errorReseter = () => {
   expedienteEncontrado.value = null
   expediente.value = null
+}
+
+// Vincular Garantía Methods
+const openLinkModal = () => {
+    linkSearch.value = { numero: '', fecha: '' }
+    linkResults.value = []
+    guaranteesSearched.value = false
+    showLinkModal.value = true 
+}
+
+const closeLinkModal = () => {
+    showLinkModal.value = false
+}
+
+const searchGuarantees = async () => {
+    if (!linkSearch.value.numero || !linkSearch.value.fecha) return
+    
+    searchingGuarantees.value = true
+    guaranteesSearched.value = true
+    
+    try {
+        const { data } = await api.get('/admin/desvinculacion/search-documentos', {
+            params: linkSearch.value
+        })
+        if (data.success) {
+            linkResults.value = data.data
+        }
+    } catch (error) {
+        console.error('Search guarantees error:', error)
+        linkResults.value = []
+    } finally {
+        searchingGuarantees.value = false
+    }
+}
+
+const linkDocument = async (documentoId: number) => {
+    const isDark = document.documentElement.classList.contains('dark')
+    try {
+        Swal.showLoading()
+        const { data } = await api.post('/admin/desvinculacion/link', {
+            nuevo_expediente_id: expediente.value.id,
+            documento_id: documentoId
+        })
+        
+        if (data.success) {
+            // Refresh local data (re-run search to get complete object with relations)
+            await searchExpediente()
+            closeLinkModal()
+            
+            Swal.fire({
+                icon: 'success',
+                title: '¡Vínculo Exitoso!',
+                text: 'La garantía ha sido vinculada correctamente.',
+                timer: 2000,
+                showConfirmButton: false,
+                background: isDark ? '#1e293b' : '#ffffff',
+                color: isDark ? '#ffffff' : '#0f172a',
+                customClass: { popup: 'rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl' },
+                backdrop: isDark ? `rgba(15, 23, 42, 0.7)` : `rgba(241, 245, 249, 0.7)`
+            })
+        }
+    } catch (error: any) {
+        console.error('Link error:', error)
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de Vinculación',
+            text: error.response?.data?.message || 'No se pudo vincular el documento.',
+            background: isDark ? '#1e293b' : '#ffffff',
+            color: isDark ? '#ffffff' : '#0f172a',
+            customClass: { popup: 'rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl' },
+            backdrop: isDark ? `rgba(15, 23, 42, 0.7)` : `rgba(241, 245, 249, 0.7)`
+        })
+    }
 }
 </script>
 
