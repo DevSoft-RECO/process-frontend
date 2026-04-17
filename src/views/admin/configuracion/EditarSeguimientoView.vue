@@ -177,8 +177,36 @@
 
                     <!-- Path Contrato -->
                     <div class="lg:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Path Contrato</label>
-                        <input v-model="formSeguimiento.path_contrato" type="text" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contrato Escaneado (PDF)</label>
+                        <div class="flex flex-col md:flex-row gap-4 items-center bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+                            <div class="flex-1 w-full">
+                                <input 
+                                    type="file" 
+                                    accept=".pdf"
+                                    @change="handleFileChange"
+                                    class="block w-full text-sm text-gray-500 dark:text-gray-400
+                                           file:mr-4 file:py-2 file:px-4
+                                           file:rounded-full file:border-0
+                                           file:text-sm file:font-semibold
+                                           file:bg-verde-cope file:text-white
+                                           hover:file:bg-green-700 transition-all"
+                                >
+                                <p class="mt-1 text-xs text-gray-500">Subir un nuevo archivo reemplazará al actual.</p>
+                            </div>
+                            
+                            <div v-if="formSeguimiento.path_contrato" class="flex-shrink-0">
+                                <button 
+                                    @click="viewCurrentContract"
+                                    type="button"
+                                    class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm"
+                                >
+                                    <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                    Ver Contrato Actual
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                      <!-- Archivado At -->
@@ -220,6 +248,32 @@ const error = ref(null)
 
 const formSeguimiento = ref({})
 const formFechas = ref({})
+const selectedFile = ref(null)
+
+const handleFileChange = (event) => {
+    const file = event.target.files[0]
+    if (file && file.type === 'application/pdf') {
+        selectedFile.value = file
+    } else {
+        selectedFile.value = null
+        if (file) Swal.fire('Error', 'Solo se permiten archivos PDF.', 'error')
+    }
+}
+
+const viewCurrentContract = async () => {
+    if (!expediente.value?.id) return
+    
+    try {
+        Swal.showLoading()
+        const response = await axios.get(`/secretaria-credito/ver-contrato/${expediente.value.id}`)
+        if (response.data.success && response.data.url) {
+            window.open(response.data.url, '_blank')
+            Swal.close()
+        }
+    } catch (e) {
+        Swal.fire('Error', 'No se pudo obtener el archivo.', 'error')
+    }
+}
 
 // Lista de fechas editables
 const dateFields = [
@@ -284,12 +338,27 @@ const saveChanges = async () => {
 
     saving.value = true
     try {
-        await axios.put(`/editar-seguimiento/${expediente.value.id}`, {
-            seguimiento: formSeguimiento.value,
-            fechas: formFechas.value
+        const formData = new FormData()
+        // Laravel PUT workaround for FormData
+        formData.append('_method', 'PUT')
+        
+        formData.append('seguimiento', JSON.stringify(formSeguimiento.value))
+        formData.append('fechas', JSON.stringify(formFechas.value))
+        
+        if (selectedFile.value) {
+            formData.append('file_contrato', selectedFile.value)
+        }
+
+        await axios.post(`/editar-seguimiento/${expediente.value.id}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
         })
 
         await Swal.fire('Guardado', 'La información de seguimiento ha sido actualizada.', 'success')
+        
+        // Reset file selection
+        selectedFile.value = null
+        // Re-search to refresh data
+        handleSearch()
         
     } catch (e) {
         Swal.fire('Error', 'No se pudieron guardar los cambios.', 'error')
