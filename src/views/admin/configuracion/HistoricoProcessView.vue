@@ -252,7 +252,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, watch } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 import Encabezado from '@/components/common/encabezado.vue'
@@ -293,16 +293,16 @@ const editingItem = ref<Expediente | null>(null)
 const locOptions = ['EN ARCHIVO', 'RETIRADO', 'FALTANTE']
 const estadoOptions = ['COMPLETO SADEC', 'INCOMPLETO', 'FALTANTE']
 
-// Form
-const form = reactive({
-    codigo_cliente: null,
+// Typed initial form for resetting
+const getInitialForm = () => ({
+    codigo_cliente: null as number | null,
     agencia: '',
-    fecha_inicio: null,
+    fecha_inicio: null as string | null,
     cta_bw: '',
     numero_documento: '',
     cif: '',
     asociado: '',
-    monto: null,
+    monto: null as number | null,
     tipo_garantia: '',
     datos_garantia: '',
     contrato: '',
@@ -314,6 +314,9 @@ const form = reactive({
     estado: '',
     localizacion: ''
 })
+
+// Form
+const form = reactive(getInitialForm())
 
 // Methods
 const fetchItems = async (url: string | null = null) => {
@@ -370,25 +373,10 @@ const openModal = (item: Expediente | null = null) => {
         Object.assign(form, item)
         // Format date for the input
         if (item.fecha_inicio) {
-            form.fecha_inicio = new Date(item.fecha_inicio).toISOString().split('T')[0]
+            form.fecha_inicio = new Date(item.fecha_inicio).toISOString().split('T')[0] ?? null
         }
     } else {
-        Object.keys(form).forEach(key => form[key] = null)
-        form.agencia = ''
-        form.cta_bw = ''
-        form.numero_documento = ''
-        form.cif = ''
-        form.asociado = ''
-        form.tipo_garantia = ''
-        form.datos_garantia = ''
-        form.contrato = ''
-        form.inscripcion_otros_contratos = ''
-        form.ingreso = ''
-        form.inventario = ''
-        form.salida = ''
-        form.observacion = ''
-        form.estado = ''
-        form.localizacion = ''
+        Object.assign(form, getInitialForm())
     }
     showModal.value = true
 }
