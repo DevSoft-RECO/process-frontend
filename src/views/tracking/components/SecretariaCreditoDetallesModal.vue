@@ -245,6 +245,14 @@
                     Ver Documento
                 </button>
 
+                <!-- Acción: Actualizar Documento (Si existe path_contrato y no está finalizado) -->
+                <button v-if="hasContrato && !isFinalized && !isArchived" @click="actualizarDocumento" class="px-5 py-2.5 text-white bg-amber-500 rounded-lg hover:bg-amber-600 shadow-md transition flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Actualizar Documento
+                </button>
+
                 <!-- Acción: Finalizar Proceso (Si hay contrato) -->
                 <!-- Estado Finalizado -->
                 <span v-if="isFinalized" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
@@ -460,6 +468,65 @@ const adjuntarExpediente = async () => {
         })
         fetchDetalles() // Refresh modal details (to show "Ver Documento")
         emit('refresh') // Refresh parent list
+    }
+}
+
+const actualizarDocumento = async () => {
+    const { value: file } = await Swal.fire({
+        title: 'Actualizar Expediente Escaneado',
+        input: 'file',
+        inputAttributes: {
+            'accept': 'application/pdf',
+            'aria-label': 'Subir nuevo expediente escaneado'
+        },
+        html: `
+            <p class="text-sm text-gray-500 mb-4">Seleccione el nuevo archivo PDF para reemplazar el actual del cliente <b>${props.expediente.codigo_cliente}</b>.</p>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Actualizar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#F59E0B',
+        cancelButtonColor: '#d33',
+        showLoaderOnConfirm: true,
+        preConfirm: async (file) => {
+            if (!file) {
+                Swal.showValidationMessage('Por favor seleccione un archivo')
+                return
+            }
+            
+            const formData = new FormData()
+            formData.append('file', file)
+            formData.append('id', props.expediente.id)
+
+            try {
+                const response = await api.post('/secretaria-credito/guardar-escaneado', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                
+                if (!response.data.success) {
+                    throw new Error(response.data.message || 'Error al actualizar')
+                }
+                
+                return response.data
+            } catch (error: any) {
+                Swal.showValidationMessage(
+                    `Error: ${error.response?.data?.message || 'No se pudo actualizar el archivo'}`
+                )
+            }
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    })
+
+    if (file) {
+        Swal.fire({
+            title: '¡Actualizado!',
+            text: 'El expediente ha sido actualizado correctamente.',
+            icon: 'success'
+        })
+        fetchDetalles() 
+        emit('refresh')
     }
 }
 
