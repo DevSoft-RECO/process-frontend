@@ -664,6 +664,10 @@ const menuItems = computed(() => {
                     label: 'Vincular/Desvincular Garantías',
                     route: '/admin/configuracion/desvincular-garantias',
                     permission: 'ajustes'
+                },
+                {
+                    label: 'Historico Process',
+                    route: '/admin/configuracion/historico-process'
                 }
             ]
         },

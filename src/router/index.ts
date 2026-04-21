@@ -405,6 +405,12 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/admin/configuracion/DesvincularGarantiasView.vue'),
                 meta: { title: 'Desvincular Garantías', permission: 'ajustes' }
             },
+            {
+                path: 'configuracion/historico-process',
+                name: 'admin-historico-process',
+                component: () => import('@/views/admin/configuracion/HistoricoProcessView.vue'),
+                meta: { title: 'Historico Process' }
+            },
 
 
             // ==========================================
