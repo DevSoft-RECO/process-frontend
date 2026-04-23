@@ -1,48 +1,93 @@
 <template>
-  <div class="p-6">
-    <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Editar Seguimiento de Expediente</h2>
+  <div class="p-6 space-y-6">
+    <div class="flex flex-col gap-1">
+      <h2 class="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Editar seguimiento</h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Corrige estado, fechas y adjuntos del expediente de forma controlada.
+      </p>
+    </div>
 
     <!-- Buscador -->
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 mb-8">
-      <div class="flex flex-col md:flex-row gap-4 items-end">
-        <div class="flex-1 w-full">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Buscar Expediente
-          </label>
-          <div class="relative">
-             <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Ingrese ID o Número de Documento"
-              class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-verde-cope focus:border-verde-cope
-                     dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors"
-              @keyup.enter="handleSearch"
-            />
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    <div class="rounded-2xl border border-gray-200/70 dark:border-gray-700 overflow-hidden shadow-sm bg-white dark:bg-gray-800">
+      <div class="px-6 py-5 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-800 border-b border-gray-100 dark:border-gray-700">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h3 class="text-lg font-extrabold text-gray-900 dark:text-white">Buscar expediente</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Ingresa el <span class="font-semibold">ID</span> o el <span class="font-semibold">número de documento</span>.
+              Presiona <span class="font-mono font-semibold">Enter</span> para buscar.
+            </p>
+          </div>
+          <div class="hidden sm:flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="inline-flex items-center gap-1 rounded-full bg-gray-900/5 dark:bg-white/10 px-2.5 py-1 font-semibold">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
               </svg>
-            </div>
+              Ej: 12345 / 1234567-8
+            </span>
           </div>
         </div>
-        <button
-          @click="handleSearch"
-          :disabled="loading"
-          class="px-6 py-2 bg-verde-cope hover:bg-green-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
-        >
-          <svg v-if="loading" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span v-else>Buscar</span>
-        </button>
       </div>
 
-      <div v-if="error" class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg flex items-center gap-2">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        {{ error }}
+      <div class="p-6">
+        <div class="flex flex-col md:flex-row gap-3 md:items-end">
+          <div class="flex-1 w-full">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Parámetro de búsqueda
+            </label>
+            <div class="relative">
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="ID o Número de Documento"
+                class="w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:ring-verde-cope focus:border-verde-cope
+                       dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors shadow-sm"
+                @keyup.enter="handleSearch"
+              />
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+
+              <button
+                v-if="searchQuery"
+                type="button"
+                @click="searchQuery = ''"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                title="Limpiar"
+              >
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              @click="handleSearch"
+              :disabled="loading || !searchQuery"
+              class="px-6 py-3 bg-verde-cope hover:bg-green-700 text-white font-semibold rounded-xl transition-colors flex items-center gap-2 disabled:opacity-50 shadow-sm"
+            >
+              <svg v-if="loading" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span>Buscar</span>
+            </button>
+          </div>
+        </div>
+
+        <div v-if="error" class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl flex items-center gap-2 border border-red-200/70 dark:border-red-900/30">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {{ error }}
+        </div>
       </div>
     </div>
 
@@ -50,48 +95,70 @@
     <div v-if="expediente" class="fade-in space-y-6">
         
         <!-- Header del Expediente -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 border border-gray-100 dark:border-gray-700 flex justify-between items-center">
-            <div>
-                <h3 class="text-xl font-bold text-gray-800 dark:text-white">{{ expediente.numero_documento }}</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400">ID: {{ expediente.id }} | Asesor: {{ expediente.usuario_asesor }}</p>
+        <div class="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-800 rounded-2xl shadow-sm border border-gray-200/70 dark:border-gray-700 overflow-hidden">
+            <div class="p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h3 class="text-xl font-extrabold text-gray-900 dark:text-white truncate">
+                            {{ expediente.numero_documento }}
+                        </h3>
+                        <span class="inline-flex items-center rounded-full bg-gray-900/5 dark:bg-white/10 px-2.5 py-1 text-xs font-semibold text-gray-700 dark:text-gray-200">
+                            ID {{ expediente.id }}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                        <span class="font-semibold">Asesor:</span> {{ expediente.usuario_asesor }}
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button
+                        @click="saveChanges"
+                        :disabled="saving"
+                        class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-sm transition-colors flex items-center gap-2 disabled:opacity-50"
+                    >
+                        <svg v-if="saving" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Guardar Cambios</span>
+                    </button>
+                </div>
             </div>
-            <button 
-                @click="saveChanges" 
-                :disabled="saving"
-                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow transition-colors flex items-center gap-2"
-            >
-                <svg v-if="saving" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span v-else>Guardar Cambios</span>
-            </button>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
             <!-- Panel Seguimiento -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-                    <h3 class="text-lg font-bold text-gray-800 dark:text-white">Estado y Seguimiento</h3>
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200/70 dark:border-gray-700 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-700/30">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-extrabold text-gray-900 dark:text-white">Estado y seguimiento</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Ajusta estados, observaciones y documentos.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="p-6 grid grid-cols-1 gap-4">
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- ID Estado -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">ID Estado Principal</label>
-                        <input v-model.number="formSeguimiento.id_estado" type="number" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                        <input v-model.number="formSeguimiento.id_estado" type="number" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                     </div>
 
                     <!-- ID Estado Secundario -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">ID Estado Secundario</label>
-                        <input v-model.number="formSeguimiento.id_estado_secundario" type="number" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                        <input v-model.number="formSeguimiento.id_estado_secundario" type="number" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                     </div>
 
                     <!-- Enviado a Archivos -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Enviado a Archivos (Si/No)</label>
-                         <select v-model="formSeguimiento.enviado_a_archivos" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                         <select v-model="formSeguimiento.enviado_a_archivos" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                             <option value="Si">Si</option>
                             <option value="No">No</option>
                              <option :value="null">N/A</option>
@@ -101,7 +168,7 @@
                      <!-- Archivo Administrativo -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Archivo Administrativo (Si/No)</label>
-                         <select v-model="formSeguimiento.archivo_administrativo" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                         <select v-model="formSeguimiento.archivo_administrativo" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                             <option value="Si">Si</option>
                             <option value="No">No</option>
                              <option :value="null">N/A</option>
@@ -109,46 +176,46 @@
                     </div>
 
                      <!-- Observación Rechazo -->
-                     <div>
+                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observación Rechazo</label>
-                        <textarea v-model="formSeguimiento.observacion_rechazo" rows="2" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50"></textarea>
+                        <textarea v-model="formSeguimiento.observacion_rechazo" rows="2" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50"></textarea>
                     </div>
 
                     <!-- Observación Legal -->
-                     <div>
+                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observación Legal</label>
-                        <textarea v-model="formSeguimiento.observacion_legal" rows="2" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50"></textarea>
+                        <textarea v-model="formSeguimiento.observacion_legal" rows="2" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50"></textarea>
                     </div>
 
                     <!-- Observación Envio -->
-                     <div>
+                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observación Envío</label>
-                        <textarea v-model="formSeguimiento.observacion_envio" rows="2" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50"></textarea>
+                        <textarea v-model="formSeguimiento.observacion_envio" rows="2" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50"></textarea>
                     </div>
 
 
                     <!-- Es Pagaré -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Es Pagaré (si/no)</label>
-                        <input v-model="formSeguimiento.es_un_pagare" type="text" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                        <input v-model="formSeguimiento.es_un_pagare" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                     </div>
 
                     <!-- Número de Contrato -->
                      <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de Contrato</label>
-                        <input v-model="formSeguimiento.numero_contrato" type="text" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                        <input v-model="formSeguimiento.numero_contrato" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                     </div>
 
                     <!-- Bufete ID -->
                     <div>
                          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bufete ID</label>
-                        <input v-model.number="formSeguimiento.bufete_id" type="number" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                        <input v-model.number="formSeguimiento.bufete_id" type="number" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                     </div>
 
                     <!-- Recibí Pagaré -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Recibí Pagaré</label>
-                         <select v-model="formSeguimiento.recibi_pagare" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                         <select v-model="formSeguimiento.recibi_pagare" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                             <option value="Si">Si</option>
                             <option value="No">No</option>
                              <option :value="null">N/A</option>
@@ -158,7 +225,7 @@
                     <!-- Recibí Garantía Real -->
                      <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Recibí Garantía Real</label>
-                         <select v-model="formSeguimiento.recibi_garantia_real" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                         <select v-model="formSeguimiento.recibi_garantia_real" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                             <option value="Si">Si</option>
                             <option value="No">No</option>
                              <option :value="null">N/A</option>
@@ -168,7 +235,7 @@
                     <!-- Recibí Contrato -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Recibí Contrato</label>
-                         <select v-model="formSeguimiento.recibi_contrato" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                         <select v-model="formSeguimiento.recibi_contrato" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                             <option value="Si">Si</option>
                             <option value="No">No</option>
                              <option :value="null">N/A</option>
@@ -176,7 +243,7 @@
                     </div>
 
                     <!-- Path Contrato -->
-                    <div class="lg:col-span-2">
+                    <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contrato Escaneado (PDF)</label>
                         <div class="flex flex-col md:flex-row gap-4 items-center bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
                             <div class="flex-1 w-full">
@@ -198,7 +265,7 @@
                                 <button 
                                     @click="viewCurrentContract"
                                     type="button"
-                                    class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm"
+                                    class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm"
                                 >
                                     <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -212,16 +279,16 @@
                      <!-- Archivado At -->
                      <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Archivado At (Timestamp)</label>
-                         <input v-model="formSeguimiento.archivado_at" type="datetime-local" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                         <input v-model="formSeguimiento.archivado_at" type="datetime-local" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                     </div>
                 </div>
             </div>
 
             <div class="space-y-6">
                 <!-- Acciones rápidas -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
-                    <div class="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-white">Acciones rápidas</h3>
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200/70 dark:border-gray-700 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-700/30">
+                        <h3 class="text-lg font-extrabold text-gray-900 dark:text-white">Acciones rápidas</h3>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             Precarga campos para correcciones comunes. Luego presiona “Guardar Cambios”.
                         </p>
@@ -230,36 +297,46 @@
                         <button
                             type="button"
                             @click="quickEnviarAArchivos"
-                            class="px-4 py-2 bg-verde-cope hover:bg-green-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                            class="px-4 py-2.5 bg-verde-cope hover:bg-green-700 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm"
                         >
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V7a2 2 0 00-2-2H6a2 2 0 00-2 2v6m16 0l-4 4m4-4l-4-4M4 13l4 4m-4-4l4-4" />
+                            </svg>
                             Enviar a Archivos
                         </button>
                         <button
                             type="button"
                             @click="quickSinGarantiaEnArchivo"
-                            class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                            class="px-4 py-2.5 bg-gray-700 hover:bg-gray-800 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm"
                         >
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728" />
+                            </svg>
                             Sin garantía / en archivo
                         </button>
                         <button
                             type="button"
                             @click="quickCrearAbogado"
-                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 md:col-span-2"
+                            class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 md:col-span-2 shadow-sm"
                         >
-                            Actualizar Bufete
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-4-4h-1m-4 6H2v-2a4 4 0 014-4h1m6 6v-2a4 4 0 00-4-4H7m8-4a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            Reasignar abogado
                         </button>
                     </div>
                 </div>
 
                 <!-- Panel Fechas -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
-                    <div class="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-white">Fechas (Cronología)</h3>
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200/70 dark:border-gray-700 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-700/30">
+                        <h3 class="text-lg font-extrabold text-gray-900 dark:text-white">Fechas (cronología)</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Registra la trazabilidad real del proceso.</p>
                     </div>
-                    <div class="p-6 grid grid-cols-1 gap-4">
+                    <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div v-for="(value, key) in formFechas" :key="key">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">{{ formatLabel(key) }}</label>
-                            <input type="datetime-local" v-model="formFechas[key]" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                            <input type="datetime-local" v-model="formFechas[key]" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                         </div>
                     </div>
                 </div>
@@ -354,7 +431,7 @@ const quickCrearAbogado = async () => {
         }
 
         const { value } = await Swal.fire({
-            title: 'Selecciona un bufete/abogado',
+            title: 'Reasignar bufete/abogado',
             input: 'select',
             inputOptions,
             inputPlaceholder: 'Selecciona...',
