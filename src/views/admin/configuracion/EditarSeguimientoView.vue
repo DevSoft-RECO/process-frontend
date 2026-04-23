@@ -241,6 +241,13 @@
                         >
                             Sin garantía / en archivo
                         </button>
+                        <button
+                            type="button"
+                            @click="quickCrearAbogado"
+                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 md:col-span-2"
+                        >
+                            Actualizar Bufete
+                        </button>
                     </div>
                 </div>
 
@@ -318,6 +325,56 @@ const quickSinGarantiaEnArchivo = () => {
         ...formSeguimiento.value,
         id_estado_secundario: null,
         enviado_a_archivos: 'No'
+    }
+}
+
+const quickCrearAbogado = async () => {
+    if (!expediente.value) return
+
+    try {
+        Swal.showLoading()
+        const res = await axios.get('/bufetes')
+        const bufetes = Array.isArray(res.data) ? res.data : []
+
+        const inputOptions = {}
+        bufetes.forEach((b) => {
+            const labelParts = []
+            if (b?.user?.name) labelParts.push(b.user.name)
+            if (b?.agencia?.nombre) labelParts.push(b.agencia.nombre)
+            if (b?.descripcion) labelParts.push(b.descripcion)
+            const label = labelParts.filter(Boolean).join(' - ') || `Bufete #${b?.id}`
+            inputOptions[String(b.id)] = label
+        })
+
+        Swal.close()
+
+        if (Object.keys(inputOptions).length === 0) {
+            await Swal.fire('Sin datos', 'No hay bufetes disponibles para seleccionar.', 'info')
+            return
+        }
+
+        const { value } = await Swal.fire({
+            title: 'Selecciona un bufete/abogado',
+            input: 'select',
+            inputOptions,
+            inputPlaceholder: 'Selecciona...',
+            showCancelButton: true,
+            confirmButtonText: 'Seleccionar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+            width: 700,
+            inputValidator: (val) => (!val ? 'Debes seleccionar un bufete.' : undefined)
+        })
+
+        if (!value) return
+
+        formSeguimiento.value = {
+            ...formSeguimiento.value,
+            bufete_id: Number(value)
+        }
+    } catch (e) {
+        Swal.close()
+        Swal.fire('Error', 'No se pudo cargar la lista de bufetes.', 'error')
     }
 }
 
