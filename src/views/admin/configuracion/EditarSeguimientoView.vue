@@ -217,15 +217,43 @@
                 </div>
             </div>
 
-            <!-- Panel Fechas -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-                    <h3 class="text-lg font-bold text-gray-800 dark:text-white">Fechas (Cronología)</h3>
+            <div class="space-y-6">
+                <!-- Acciones rápidas -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+                    <div class="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-white">Acciones rápidas</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Precarga campos para correcciones comunes. Luego presiona “Guardar Cambios”.
+                        </p>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <button
+                            type="button"
+                            @click="quickEnviarAArchivos"
+                            class="px-4 py-2 bg-verde-cope hover:bg-green-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                        >
+                            Enviar a Archivos
+                        </button>
+                        <button
+                            type="button"
+                            @click="quickSinGarantiaEnArchivo"
+                            class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                        >
+                            Sin garantía / en archivo
+                        </button>
+                    </div>
                 </div>
-                <div class="p-6 grid grid-cols-1 gap-4">
-                    <div v-for="(value, key) in formFechas" :key="key">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">{{ formatLabel(key) }}</label>
-                        <input type="datetime-local" v-model="formFechas[key]" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+
+                <!-- Panel Fechas -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+                    <div class="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-white">Fechas (Cronología)</h3>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 gap-4">
+                        <div v-for="(value, key) in formFechas" :key="key">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">{{ formatLabel(key) }}</label>
+                            <input type="datetime-local" v-model="formFechas[key]" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -272,6 +300,24 @@ const viewCurrentContract = async () => {
         }
     } catch (e) {
         Swal.fire('Error', 'No se pudo obtener el archivo.', 'error')
+    }
+}
+
+const quickEnviarAArchivos = () => {
+    if (!expediente.value) return
+    formSeguimiento.value = {
+        ...formSeguimiento.value,
+        id_estado_secundario: 4,
+        enviado_a_archivos: 'Si'
+    }
+}
+
+const quickSinGarantiaEnArchivo = () => {
+    if (!expediente.value) return
+    formSeguimiento.value = {
+        ...formSeguimiento.value,
+        id_estado_secundario: null,
+        enviado_a_archivos: 'No'
     }
 }
 
