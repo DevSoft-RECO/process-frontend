@@ -398,12 +398,13 @@ const pageItems = computed<(number | '...')[]>(() => {
 
     const sorted = Array.from(pages).sort((a, b) => a - b)
     const items: (number | '...')[] = []
-    for (let i = 0; i < sorted.length; i++) {
-        const page = sorted[i]
-        const prev = sorted[i - 1]
-        if (i > 0 && page - prev > 1) items.push('...')
+    sorted.forEach((page, i) => {
+        if (i > 0) {
+            const prev = sorted[i - 1]
+            if (prev !== undefined && page - prev > 1) items.push('...')
+        }
         items.push(page)
-    }
+    })
     return items
 })
 </script>
