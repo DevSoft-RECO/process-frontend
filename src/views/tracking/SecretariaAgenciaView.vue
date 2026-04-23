@@ -9,6 +9,17 @@
           indicator-color="bg-purple-600"
         />
         <div class="flex items-center gap-3">
+             <div v-if="activeTab === 'aceptados'" class="relative">
+                  <label class="sr-only">Filtro</label>
+                  <select
+                      v-model="newFilter"
+                      @change="fetchExpedientes(1)"
+                      class="pl-3 pr-10 py-2 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-purple-600 focus:border-purple-600 transition-all shadow-sm"
+                  >
+                      <option value="all">Todos</option>
+                      <option value="only_new">Solo NEW (Aceptado por secretarias)</option>
+                  </select>
+              </div>
              <div class="relative w-64 md:w-80">
                   <input 
                       v-model="searchQuery" 
@@ -155,10 +166,20 @@
                         </td>
 
                         <td class="px-2 py-4 text-center">
-                            <span v-if="exp.seguimientos?.[0]?.estado" 
-                                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800 shadow-sm">
-                                {{ exp.seguimientos[0].estado?.nombre }}
-                            </span>
+                            <div v-if="exp.seguimientos?.[0]?.estado" class="inline-flex items-center gap-2 justify-center">
+                                <span
+                                    class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800 shadow-sm"
+                                >
+                                    {{ exp.seguimientos[0].estado?.nombre }}
+                                </span>
+
+                                <span
+                                    v-if="activeTab === 'aceptados' && exp.seguimientos[0].estado?.nombre === 'Aceptado por secretarias'"
+                                    class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-800 shadow-sm"
+                                >
+                                    NEW
+                                </span>
+                            </div>
                         </td>
 
                         <td class="px-2 py-4 text-center">
@@ -269,6 +290,7 @@ const loading = ref(false)
 const pagination = ref<any>(null)
 const activeTab = ref<'buzon' | 'regresados' | 'aceptados'>('buzon')
 const searchQuery = ref('')
+const newFilter = ref<'all' | 'only_new'>('all')
 
 const tabs = [
     { id: 'buzon', label: 'Buzón (Pendientes)', color: 'verde-cope' },
@@ -292,6 +314,9 @@ const fetchExpedientes = async (page: number = 1) => {
         if (searchQuery.value) {
             params.search = searchQuery.value
         }
+        if (activeTab.value === 'aceptados' && newFilter.value === 'only_new') {
+            params.only_new = true
+        }
 
         const res = await api.get(endpoint, { params })
 
@@ -314,6 +339,9 @@ const fetchExpedientes = async (page: number = 1) => {
 }
 
 watch(activeTab, () => {
+    if (activeTab.value !== 'aceptados') {
+        newFilter.value = 'all'
+    }
     fetchExpedientes(1)
 })
 
