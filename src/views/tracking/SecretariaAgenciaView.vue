@@ -174,7 +174,7 @@
                                 </span>
 
                                 <span
-                                    v-if="activeTab === 'aceptados' && exp.seguimientos[0].estado?.nombre === 'Aceptado por secretarias'"
+                                    v-if="activeTab === 'aceptados' && exp.seguimientos[0].estado?.nombre === 'Aceptado por secretaria Agencia'"
                                     class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-800 shadow-sm"
                                 >
                                     NEW
