@@ -380,23 +380,17 @@ const quickCrearAbogado = async () => {
 
 // Lista de fechas editables
 const dateFields = [
-    'f_recepcion_secretaria',
-    'f_analisis_credito',
-    'f_comite_credito',
-    'f_desembolso',
-    'f_entrega_agencia',
-    'f_envio_abogado',
-    'f_retorno_abogado',
-    'f_enviado_archivos',
-    'f_ingreso_archivo',
-    'f_enviado_secretaria_credito',
-    'f_aceptado_secretaria',
+    'f_enviado_secretaria',
     'f_retorno_asesores',
+    'f_aceptado_secretaria',
+    'f_enviado_archivos',
     'f_enviado_protocolos',
-    'f_ultimo_rechazo',
+    'f_almacenado_admin',
     'f_aceptado_secretaria_credito',
+    'f_enviado_abogado',
     'f_aceptado_abogado',
-    'f_almacenado_admin'
+    'f_enviado_secretaria_credito',
+    'f_ultimo_rechazo'
 ]
 
 const handleSearch = async () => {
