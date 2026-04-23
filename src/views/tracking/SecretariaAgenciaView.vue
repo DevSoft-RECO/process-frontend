@@ -173,11 +173,55 @@
             </table>
         </div>
 
-        <div v-if="nextPageUrl" class="bg-slate-50/50 dark:bg-slate-800/30 px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex justify-center">
-            <button @click="loadMore" :disabled="loading" 
-                class="text-xs text-azul-cope font-bold hover:text-blue-700 transition-colors uppercase tracking-widest">
-                {{ loading ? 'Sincronizando...' : 'Cargar más' }}
-            </button>
+        <div v-if="pagination" class="bg-slate-50/50 dark:bg-slate-800/30 px-6 py-4 border-t border-slate-100 dark:border-slate-700">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div class="text-xs text-slate-500 dark:text-slate-400">
+                    Mostrando
+                    <span class="font-bold text-slate-700 dark:text-slate-200">{{ pagination.from ?? 0 }}</span>
+                    –
+                    <span class="font-bold text-slate-700 dark:text-slate-200">{{ pagination.to ?? 0 }}</span>
+                    de
+                    <span class="font-bold text-slate-700 dark:text-slate-200">{{ pagination.total ?? 0 }}</span>
+                </div>
+
+                <div class="flex items-center justify-center md:justify-end gap-2 flex-wrap">
+                    <button
+                        type="button"
+                        @click="goToPage((pagination.current_page || 1) - 1)"
+                        :disabled="loading || (pagination.current_page || 1) <= 1"
+                        class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/40 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    >
+                        Anterior
+                    </button>
+
+                    <button
+                        v-for="item in pageItems"
+                        :key="String(item)"
+                        type="button"
+                        @click="typeof item === 'number' ? goToPage(item) : null"
+                        :disabled="loading || item === '...'"
+                        :class="[
+                            'min-w-[40px] px-3 py-2 rounded-xl text-xs font-extrabold transition border',
+                            item === '...'
+                                ? 'border-transparent bg-transparent text-slate-400 dark:text-slate-500 cursor-default'
+                                : (item === (pagination.current_page || 1)
+                                    ? 'border-purple-600 bg-purple-600 text-white shadow-sm'
+                                    : 'border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/40 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900')
+                        ]"
+                    >
+                        {{ item }}
+                    </button>
+
+                    <button
+                        type="button"
+                        @click="goToPage((pagination.current_page || 1) + 1)"
+                        :disabled="loading || (pagination.current_page || 1) >= (pagination.last_page || 1)"
+                        class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/40 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    >
+                        Siguiente
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -192,7 +236,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import api from '@/api/axios'
 import SecretariaDetallesModal from './components/SecretariaDetallesModal.vue'
 import Encabezado from '../../components/common/encabezado.vue'
@@ -222,7 +266,7 @@ interface Expediente {
 
 const expedientes = ref<Expediente[]>([])
 const loading = ref(false)
-const nextPageUrl = ref<string | null>(null)
+const pagination = ref<any>(null)
 const activeTab = ref<'buzon' | 'regresados' | 'aceptados'>('buzon')
 const searchQuery = ref('')
 
@@ -236,30 +280,31 @@ const tabs = [
 const showModal = ref(false)
 const selectedExpediente = ref<any>(null)
 
-const fetchExpedientes = async (url: string | null = null) => {
+const fetchExpedientes = async (page: number = 1) => {
     loading.value = true
     try {
-        const endpoint = url || '/seguimiento/buzon-secretaria'
+        const endpoint = '/seguimiento/buzon-secretaria'
         let status = 1;
         if (activeTab.value === 'regresados') status = 2;
         if (activeTab.value === 'aceptados') status = 3;
         
-        const params: any = { status }
+        const params: any = { status, page }
         if (searchQuery.value) {
             params.search = searchQuery.value
         }
 
-        const res = await api.get(endpoint, {
-            params
-        })
+        const res = await api.get(endpoint, { params })
 
         if (res.data.success) {
-            if (!url) {
-                expedientes.value = res.data.data.data
-            } else {
-                expedientes.value = [...expedientes.value, ...res.data.data.data]
+            expedientes.value = res.data.data.data
+            pagination.value = {
+                current_page: res.data.data.current_page,
+                last_page: res.data.data.last_page,
+                total: res.data.data.total,
+                per_page: res.data.data.per_page,
+                from: res.data.data.from,
+                to: res.data.data.to
             }
-            nextPageUrl.value = res.data.data.next_page_url
         }
     } catch (error) {
         console.error(error)
@@ -269,11 +314,14 @@ const fetchExpedientes = async (url: string | null = null) => {
 }
 
 watch(activeTab, () => {
-    fetchExpedientes()
+    fetchExpedientes(1)
 })
 
-const loadMore = () => {
-    if (nextPageUrl.value) fetchExpedientes(nextPageUrl.value)
+const goToPage = (page: number) => {
+    const p = pagination.value
+    const last = p?.last_page || 1
+    const safePage = Math.min(Math.max(1, page), last)
+    fetchExpedientes(safePage)
 }
 
 const openDetalles = (expor: any) => {
@@ -283,16 +331,16 @@ const openDetalles = (expor: any) => {
 
 const handleSearch = () => {
     // When searching, we want to reset pagination
-    fetchExpedientes(null)
+    fetchExpedientes(1)
 }
 
 const resetFetch = () => {
     searchQuery.value = ''
-    fetchExpedientes(null)
+    fetchExpedientes(1)
 }
 
 const handleRefresh = () => {
-    fetchExpedientes()
+    fetchExpedientes(pagination.value?.current_page || 1)
 }
 
 const formatCurrency = (amount: number) => {
@@ -305,6 +353,29 @@ const formatDate = (dateString: string) => {
 }
 
 onMounted(() => {
-    fetchExpedientes()
+    fetchExpedientes(1)
+})
+
+const pageItems = computed<(number | '...')[]>(() => {
+    const p = pagination.value
+    const current = p?.current_page || 1
+    const last = p?.last_page || 1
+    if (last <= 1) return [1]
+
+    const windowSize = 2
+    const pages = new Set<number>([1, last])
+    for (let i = current - windowSize; i <= current + windowSize; i++) {
+        if (i >= 1 && i <= last) pages.add(i)
+    }
+
+    const sorted = Array.from(pages).sort((a, b) => a - b)
+    const items: (number | '...')[] = []
+    for (let i = 0; i < sorted.length; i++) {
+        const page = sorted[i]
+        const prev = sorted[i - 1]
+        if (i > 0 && page - prev > 1) items.push('...')
+        items.push(page)
+    }
+    return items
 })
 </script>
