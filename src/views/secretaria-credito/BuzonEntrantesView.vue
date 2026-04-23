@@ -180,61 +180,56 @@
             </div>
 
              <!-- Paginación -->
-             <div v-if="pagination.total > 0" class="bg-slate-50/50 dark:bg-slate-800/30 px-6 py-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
-                <!-- Mobile pagination -->
-                <div class="flex-1 flex justify-between sm:hidden">
-                    <button 
-                         @click="changePage(pagination.current_page - 1)" 
-                         :disabled="pagination.current_page === 1"
-                         class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Anterior
-                    </button>
-                    <button 
-                         @click="changePage(pagination.current_page + 1)"
-                         :disabled="pagination.current_page === pagination.last_page"
-                         class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Siguiente
-                    </button>
-                </div>
-                 <!-- Desktop pagination -->
-                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">
-                            Mostrando <span class="font-bold text-slate-700 dark:text-slate-300">{{ pagination.from }}</span> a <span class="font-bold text-slate-700 dark:text-slate-300">{{ pagination.to }}</span> de <span class="font-bold text-slate-700 dark:text-slate-300">{{ pagination.total }}</span> resultados
-                        </p>
+             <div v-if="pagination.total > 0" class="bg-slate-50/50 dark:bg-slate-800/30 px-6 py-4 border-t border-slate-100 dark:border-slate-700">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div class="text-xs text-slate-500 dark:text-slate-400">
+                        Mostrando
+                        <span class="font-bold text-slate-700 dark:text-slate-200">{{ pagination.from }}</span>
+                        –
+                        <span class="font-bold text-slate-700 dark:text-slate-200">{{ pagination.to }}</span>
+                        de
+                        <span class="font-bold text-slate-700 dark:text-slate-200">{{ pagination.total }}</span>
                     </div>
-                    <div>
-                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                            <button
-                                @click="changePage(pagination.current_page - 1)"
-                                :disabled="pagination.current_page === 1"
-                                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <span class="sr-only">Anterior</span>
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                            <!-- Simple page counter for brevity -->
-                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200">
-                                {{ pagination.current_page }}
-                            </span>
-                            <button
-                                @click="changePage(pagination.current_page + 1)"
-                                :disabled="pagination.current_page === pagination.last_page"
-                                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <span class="sr-only">Siguiente</span>
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        </nav>
+
+                    <div class="flex items-center justify-center md:justify-end gap-2 flex-wrap">
+                        <button
+                            type="button"
+                            @click="changePage(pagination.current_page - 1)"
+                            :disabled="loading || pagination.current_page === 1"
+                            class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/40 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                        >
+                            Anterior
+                        </button>
+
+                        <button
+                            v-for="item in pageItems"
+                            :key="String(item)"
+                            type="button"
+                            @click="typeof item === 'number' ? changePage(item) : null"
+                            :disabled="loading || item === '...'"
+                            :class="[
+                                'min-w-[40px] px-3 py-2 rounded-xl text-xs font-extrabold transition border',
+                                item === '...'
+                                    ? 'border-transparent bg-transparent text-slate-400 dark:text-slate-500 cursor-default'
+                                    : (item === pagination.current_page
+                                        ? 'border-cyan-600 bg-cyan-600 text-white shadow-sm'
+                                        : 'border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/40 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900')
+                            ]"
+                        >
+                            {{ item }}
+                        </button>
+
+                        <button
+                            type="button"
+                            @click="changePage(pagination.current_page + 1)"
+                            :disabled="loading || pagination.current_page === pagination.last_page"
+                            class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/40 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                        >
+                            Siguiente
+                        </button>
                     </div>
                 </div>
-            </div>
+             </div>
         </div>
 
         <SecretariaCreditoDetallesModal 
@@ -247,7 +242,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 import SecretariaCreditoDetallesModal from '../tracking/components/SecretariaCreditoDetallesModal.vue'
@@ -328,6 +323,28 @@ const changePage = (page: number) => {
         fetchExpedientes()
     }
 }
+
+const pageItems = computed<(number | '...')[]>(() => {
+    const current = pagination.value.current_page || 1
+    const last = pagination.value.last_page || 1
+    if (last <= 1) return [1]
+
+    const windowSize = 2
+    const pages = new Set<number>([1, last])
+    for (let i = current - windowSize; i <= current + windowSize; i++) {
+        if (i >= 1 && i <= last) pages.add(i)
+    }
+
+    const sorted = Array.from(pages).sort((a, b) => a - b)
+    const items: (number | '...')[] = []
+    for (let i = 0; i < sorted.length; i++) {
+        const page = sorted[i]
+        const prev = sorted[i - 1]
+        if (i > 0 && page - prev > 1) items.push('...')
+        items.push(page)
+    }
+    return items
+})
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(amount)
