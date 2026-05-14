@@ -45,7 +45,7 @@
                                 v-model="filtroAsesor"
                                 @keyup.enter="aplicarFiltros"
                                 type="text"
-                                placeholder="Buscar asesor responsable..."
+                                placeholder="Buscar (Asesor, Asociado, Producto)..."
                                 class="block w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
                             />
                         </div>
@@ -225,7 +225,10 @@
                             </td>
 
                             <td class="px-6 py-4 font-medium text-slate-900 dark:text-white">
-                                {{ exp.nombre_asociado }}
+                                <div class="text-slate-900 dark:text-white font-medium">{{ exp.nombre_asociado }}</div>
+                                <div v-if="exp.numero_documento" class="text-[10px] text-indigo-500 font-bold mt-0.5 uppercase italic">
+                                    Prod: #{{ exp.numero_documento }}
+                                </div>
                             </td>
                             
                              <td class="px-6 py-4">
