@@ -473,7 +473,7 @@ router.beforeEach(async (to, _from) => {
         }
 
         const isSuperAdmin = authStore.hasRole('Super Admin');
-        const motherAppUrl = import.meta.env.VITE_MOTHER_APP_URL || '';
+        // const motherAppUrl = import.meta.env.VITE_MOTHER_APP_URL || '';
 
         // 1) Verificamos cadena de permisos anidados (ej. /admin exige 'app_sadec', /ruta_hija exige otro)
         if (!isSuperAdmin) {
@@ -482,7 +482,7 @@ router.beforeEach(async (to, _from) => {
                     const requiredPerm = record.meta.permission as string;
                     const hasPerm = hasRequiredPermission(requiredPerm);
                     if (!hasPerm) {
-                        window.location.href = `${motherAppUrl}/apps`;
+                        //  window.location.href = `${motherAppUrl}/apps`;
                         return false;
                     }
                 }
@@ -492,7 +492,7 @@ router.beforeEach(async (to, _from) => {
                     const requiredRole = record.meta.role as string;
                     const hasR = authStore.hasRole(requiredRole);
                     if (!hasR) {
-                        window.location.href = `${motherAppUrl}/apps`;
+                        // window.location.href = `${motherAppUrl}/apps`;
                         return false;
                     }
                 }
