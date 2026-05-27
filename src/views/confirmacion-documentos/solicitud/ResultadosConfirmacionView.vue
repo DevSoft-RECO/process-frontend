@@ -1,15 +1,35 @@
 <template>
   <div class="h-full flex flex-col space-y-4">
-    <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-4 rounded-lg shadow gap-4">
       <div>
         <h1 class="text-2xl font-bold text-gray-800">Resultados de Confirmación</h1>
         <p class="text-sm text-gray-500">Respuestas a sus solicitudes de confirmación</p>
       </div>
-      <div>
+      <div class="flex items-center gap-2 w-full md:w-auto">
+        <div class="relative flex-1 md:flex-initial">
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            @keyup.enter="handleSearch"
+            placeholder="Buscar ID de confirmación..." 
+            class="pl-9 pr-8 py-2 w-full md:w-64 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+          />
+          <div class="absolute left-3 top-2.5 text-gray-400 text-sm">
+            <i class="fas fa-search"></i>
+          </div>
+          <button 
+            v-if="searchQuery" 
+            @click="clearSearch"
+            class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 focus:outline-none"
+            title="Limpiar búsqueda"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
         <button 
-          @click="loadResults" 
+          @click="loadResults(pagination.current_page)" 
           :disabled="loading"
-          class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+          class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1 text-sm whitespace-nowrap"
         >
           <i :class="['fas fa-sync-alt', loading ? 'fa-spin' : '']"></i> Actualizar
         </button>
@@ -17,8 +37,9 @@
     </div>
 
     <!-- Data Table -->
-    <div class="bg-white rounded-lg shadow overflow-auto flex-1 h-[0px]">
-      <table class="min-w-full divide-y divide-gray-200">
+    <div class="bg-white rounded-lg shadow overflow-hidden flex-1 flex flex-col">
+      <div class="overflow-x-auto flex-1">
+        <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID de confirmacion</th>
@@ -132,13 +153,52 @@
             </td>
           </tr>
         </tbody>
-      </table>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="px-6 py-3 border-t border-gray-200 flex items-center justify-between bg-white">
+        <div class="text-sm text-gray-500">
+          Mostrando <span class="font-medium">{{ pagination.from ?? 0 }}</span> –
+          <span class="font-medium">{{ pagination.to ?? 0 }}</span> de
+          <span class="font-medium">{{ pagination.total ?? 0 }}</span> resultados
+        </div>
+        <div class="flex items-center gap-1">
+          <button
+            @click="changePage(pagination.current_page - 1)"
+            :disabled="!pagination.prev_page_url || loading"
+            class="px-3 py-1 rounded border text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition"
+          >
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button
+            v-for="page in visiblePages"
+            :key="page"
+            @click="changePage(page)"
+            :class="[
+              'px-3 py-1 rounded border text-sm transition',
+              page === pagination.current_page
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'hover:bg-gray-100'
+            ]"
+          >
+            {{ page }}
+          </button>
+          <button
+            @click="changePage(pagination.current_page + 1)"
+            :disabled="!pagination.next_page_url || loading"
+            class="px-3 py-1 rounded border text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition"
+          >
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
 import jsPDF from 'jspdf';
@@ -148,18 +208,70 @@ import { formatDate, formatDateTime, formatCurrency } from '@/utils/formatters';
 
 const results = ref([]);
 const loading = ref(false);
+const searchQuery = ref('');
 
-const loadResults = async () => {
+const pagination = ref({
+  current_page: 1,
+  last_page: 1,
+  prev_page_url: null,
+  next_page_url: null,
+  from: 0,
+  to: 0,
+  total: 0,
+});
+
+// Páginas visibles: máximo 5 alrededor de la actual
+const visiblePages = computed(() => {
+  const total   = pagination.value.last_page;
+  const current = pagination.value.current_page;
+  const delta   = 2;
+  const range   = [];
+  for (let i = Math.max(1, current - delta); i <= Math.min(total, current + delta); i++) {
+    range.push(i);
+  }
+  return range;
+});
+
+const loadResults = async (page = 1) => {
     loading.value = true;
     try {
-        const response = await api.get('/confirmacion-documentos/resultados');
-        results.value = response.data.data;
+        const response = await api.get('/confirmacion-documentos/resultados', { 
+            params: { 
+                page, 
+                search: searchQuery.value 
+            } 
+        });
+        const res = response.data;
+        results.value = res.data;
+        pagination.value = {
+          current_page:   res.current_page,
+          last_page:      res.last_page,
+          prev_page_url:  res.prev_page_url,
+          next_page_url:  res.next_page_url,
+          from:           res.from,
+          to:             res.to,
+          total:          res.total,
+        };
     } catch (error) {
         console.error(error);
         Swal.fire('Error', 'Error al cargar resultados', 'error');
     } finally {
         loading.value = false;
     }
+};
+
+const changePage = (page) => {
+  if (page < 1 || page > pagination.value.last_page) return;
+  loadResults(page);
+};
+
+const handleSearch = () => {
+    loadResults(1);
+};
+
+const clearSearch = () => {
+    searchQuery.value = '';
+    loadResults(1);
 };
 
 // Helper function to load image and return as canvas/dataURL for better compatibility
@@ -284,16 +396,36 @@ const downloadPDF = async (res) => {
         doc.text(resultText, centerX, finalY + 25, { align: 'center' });
 
         // --- Observations ---
+        let currentY = finalY + 45;
+
+        // Document Observation
+        const docObs = res.documento?.observacion || res.observacion;
+        if (docObs) {
+            doc.setTextColor(50, 50, 50);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('OBSERVACIÓN DE LA GARANTÍA:', 20, currentY);
+            
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'italic');
+            const splitTextDoc = doc.splitTextToSize(docObs, pageWidth - 40);
+            doc.text(splitTextDoc, 20, currentY + 7);
+            
+            // Advance currentY based on text lines (approx 4mm per line + spacing)
+            currentY += 7 + (splitTextDoc.length * 4) + 6;
+        }
+
+        // Additional Confirmation Observation
         if (res.observacion_confirmacion) {
             doc.setTextColor(50, 50, 50);
             doc.setFontSize(10);
             doc.setFont('helvetica', 'bold');
-            doc.text('OBSERVACIONES ADICIONALES:', 20, finalY + 55);
+            doc.text('OBSERVACIONES ADICIONALES DE CONFIRMACIÓN:', 20, currentY);
             
             doc.setFontSize(9);
             doc.setFont('helvetica', 'italic');
             const splitText = doc.splitTextToSize(res.observacion_confirmacion, pageWidth - 40);
-            doc.text(splitText, 20, finalY + 62);
+            doc.text(splitText, 20, currentY + 7);
         }
 
         // --- Footer ---
