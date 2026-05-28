@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import AuthService from '../services/AuthService'
 import { getAvatarUrl } from '../utils/imageUtils'
 import { AUTH_KEYS } from '../utils/auth-keys'
+import Echo from 'laravel-echo'
+import Pusher from 'pusher-js'
 
 export interface User {
     [key: string]: any;
@@ -36,6 +38,14 @@ export const useAuthStore = defineStore('auth', () => {
     const token = ref<string | null>(sessionStorage.getItem(AUTH_KEYS.ACCESS_TOKEN) || null)
     const processingSSO = ref<boolean>(false)
     const isReady = ref<boolean>(false)
+
+    // --- VARIABLES REACTIVAS DE SOCKETS Y CONTROL DE INACTIVIDAD ---
+    const echoInstance = ref<any>(null)
+    const showInactivityModal = ref<boolean>(false)
+    const inactivitySessionId = ref<string | null>(null)
+    const inactivityCountdown = ref<number>(300)
+    const isHeartbeatLoading = ref<boolean>(false)
+    let countdownTimerId: any = null
 
     // --- GETTERS ---
     const userAvatar = computed(() => {
@@ -95,6 +105,9 @@ export const useAuthStore = defineStore('auth', () => {
         processingSSO.value = false;
 
         await fetchUser(true); // Forzar descarga de perfil limpio tras login
+
+        // CRÍTICO: Inicializar WebSockets de inmediato tras obtener el token
+        initSessionSocket()
     }
 
     async function handleDirectToken(incomingToken: string, userData: any = null): Promise<void> {
@@ -118,6 +131,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     function logout(): void {
+        disconnectSessionSocket()
         user.value = null
         token.value = null
         isReady.value = false
@@ -172,6 +186,102 @@ export const useAuthStore = defineStore('auth', () => {
         await fetchUser()
     }
 
+    // --- MÉTODOS DE SOCKETS Y CIERRE ---
+    function initSessionSocket(): void {
+        if (!token.value || !user.value) return
+        if (echoInstance.value) return // Evitar conexiones duplicadas
+
+        (window as any).Pusher = Pusher
+
+        echoInstance.value = new Echo({
+            broadcaster: 'reverb',
+            key: import.meta.env.VITE_REVERB_APP_KEY,
+            wsHost: import.meta.env.VITE_REVERB_HOST || 'localhost',
+            wsPort: Number(import.meta.env.VITE_REVERB_PORT) || 8082,
+            wssPort: Number(import.meta.env.VITE_REVERB_PORT) || 8082,
+            forceTLS: false,
+            enabledTransports: ['ws', 'wss'],
+            authEndpoint: `${import.meta.env.VITE_MOTHER_API_URL}/api/broadcasting/auth`,
+            auth: {
+                headers: {
+                    Authorization: `Bearer ${token.value}`,
+                    Accept: 'application/json'
+                }
+            }
+        })
+
+        // Escuchar canal privado del usuario centralizado
+        echoInstance.value.private(`user.${user.value.id}`)
+            .listen('.InactivityExpiringSoon', (e: any) => {
+                inactivitySessionId.value = e.sessionId
+                inactivityCountdown.value = Math.round(e.remainingSeconds) || 300
+                showInactivityModal.value = true
+                startLocalCountdown()
+            })
+            .listen('.SessionForceClosed', () => {
+                stopLocalCountdown()
+                disconnectSessionSocket()
+                AuthService.logoutLocal()
+                const motherAppUrl = import.meta.env.VITE_MOTHER_APP_URL || 'http://localhost:5173'
+                window.location.href = `${motherAppUrl}/login?session_expired=true`
+            })
+    }
+
+    function disconnectSessionSocket(): void {
+        if (echoInstance.value) {
+            echoInstance.value.disconnect()
+            echoInstance.value = null
+        }
+        showInactivityModal.value = false
+        inactivitySessionId.value = null
+        stopLocalCountdown()
+    }
+
+    function startLocalCountdown(): void {
+        if (countdownTimerId) clearInterval(countdownTimerId)
+        countdownTimerId = setInterval(() => {
+            if (inactivityCountdown.value > 0) {
+                inactivityCountdown.value--
+            } else {
+                clearInterval(countdownTimerId)
+                AuthService.logoutLocal()
+                const motherAppUrl = import.meta.env.VITE_MOTHER_APP_URL || 'http://localhost:5173'
+                window.location.href = `${motherAppUrl}/login?session_expired=true`
+            }
+        }, 1000)
+    }
+
+    function stopLocalCountdown(): void {
+        if (countdownTimerId) {
+            clearInterval(countdownTimerId)
+            countdownTimerId = null
+        }
+    }
+
+    async function sendHeartbeatPing(): Promise<void> {
+        if (!inactivitySessionId.value || isHeartbeatLoading.value) return
+        isHeartbeatLoading.value = true
+        try {
+            const motherApiUrl = import.meta.env.VITE_MOTHER_API_URL || 'http://localhost:8000'
+            const { default: axios } = await import('axios')
+            await axios.post(`${motherApiUrl}/api/sso/heartbeat`, {
+                session_id: inactivitySessionId.value
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token.value}`
+                }
+            })
+
+            showInactivityModal.value = false
+            stopLocalCountdown()
+        } catch (err) {
+            console.error('Error al enviar ping de heartbeat a la Madre:', err)
+            logout()
+        } finally {
+            isHeartbeatLoading.value = false
+        }
+    }
+
     return {
         user,
         token,
@@ -185,6 +295,15 @@ export const useAuthStore = defineStore('auth', () => {
         fetchUser,
         checkAuth,
         hasPermission,
-        hasRole
+        hasRole,
+        // Sockets e Inactividad
+        echoInstance,
+        showInactivityModal,
+        inactivitySessionId,
+        inactivityCountdown,
+        isHeartbeatLoading,
+        initSessionSocket,
+        disconnectSessionSocket,
+        sendHeartbeatPing
     }
 })

@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { startSessionGuards } from '@/utils/sessionGuards'
+import InactivityModal from '@/components/shared/InactivityModal.vue'
 
 const authStore = useAuthStore()
 
@@ -13,6 +14,9 @@ onMounted(async () => {
   if (!isCallbackRoute) {
       await authStore.checkAuth() 
       startSessionGuards()
+      
+      // Conectar sockets al iniciar sesión si el usuario ya estaba validado
+      authStore.initSessionSocket()
   }
 
   // Remove preloader with fade-out
@@ -31,4 +35,5 @@ onMounted(async () => {
 
 <template>
   <RouterView />
+  <InactivityModal />
 </template>
