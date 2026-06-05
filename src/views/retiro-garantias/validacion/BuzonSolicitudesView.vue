@@ -3,6 +3,36 @@
     <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Buzón de Solicitudes de Garantías</h1>
 
     <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow flex-1 overflow-hidden flex flex-col">
+      <!-- Filtros / Buscador -->
+      <div class="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row gap-4 items-center justify-between mb-4">
+        <div class="relative w-full sm:w-72">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+            <i class="fas fa-search text-gray-400"></i>
+          </span>
+          <input 
+            v-model="searchId"
+            type="number"
+            placeholder="Buscar por ID Registro..."
+            @keyup.enter="handleSearch"
+            class="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-gray-200"
+          />
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button 
+            @click="handleSearch"
+            class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 transition"
+          >
+            Buscar
+          </button>
+          <button 
+            @click="clearSearch"
+            class="bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md text-sm hover:bg-gray-200 dark:hover:bg-gray-500 transition"
+          >
+            Limpiar
+          </button>
+        </div>
+      </div>
+
       <div class="flex justify-between items-center mb-4">
         <div class="flex space-x-2">
            <button 
@@ -393,16 +423,20 @@ const loadAgencies = async () => {
     }
 };
 
+const searchId = ref('');
+
 const loadRequests = async (page = 1) => {
   loading.value = true;
   try {
-    const response = await api.get('/solicitudes-retiro/archivo', {
-      params: { 
-          estado: filterState.value,
-          id_agencia: selectedAgencyFilter.value || null,
-          page: page
-      }
-    });
+    const params = { 
+        estado: filterState.value,
+        id_agencia: selectedAgencyFilter.value || null,
+        page: page
+    };
+    if (searchId.value) {
+        params.search_id = searchId.value;
+    }
+    const response = await api.get('/solicitudes-retiro/archivo', { params });
     
     // Asignación de Paginación Laravel
     requests.value = response.data.data;
@@ -416,6 +450,15 @@ const loadRequests = async (page = 1) => {
   } finally {
     loading.value = false;
   }
+};
+
+const handleSearch = () => {
+  loadRequests(1);
+};
+
+const clearSearch = () => {
+  searchId.value = '';
+  loadRequests(1);
 };
 
 const deleteRequest = async (req) => {
