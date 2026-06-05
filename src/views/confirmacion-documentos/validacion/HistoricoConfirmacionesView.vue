@@ -16,12 +16,43 @@
       </div>
     </div>
 
+    <!-- Filtros / Buscador -->
+    <div class="bg-white p-4 rounded-lg shadow flex flex-col sm:flex-row gap-4 items-center justify-between">
+      <div class="relative w-full sm:w-72">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+          <i class="fas fa-search text-gray-400"></i>
+        </span>
+        <input 
+          v-model="searchId"
+          type="number"
+          placeholder="Buscar por ID Confirmación..."
+          @keyup.enter="handleSearch"
+          class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
+        />
+      </div>
+      <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+        <button 
+          @click="handleSearch"
+          class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 transition"
+        >
+          Buscar
+        </button>
+        <button 
+          @click="clearSearch"
+          class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md text-sm hover:bg-gray-200 transition"
+        >
+          Limpiar
+        </button>
+      </div>
+    </div>
+
     <!-- Data Table -->
     <div class="bg-white rounded-lg shadow overflow-hidden flex-1 flex flex-col">
       <div class="overflow-x-auto flex-1">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Confirmación</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Identificación</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitante</th>
@@ -33,12 +64,16 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-if="loading" class="animate-pulse">
-                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">Cargando histórico...</td>
+                <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">Cargando histórico...</td>
             </tr>
             <tr v-else-if="history.length === 0">
-                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">No hay documentos en el histórico.</td>
+                <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">No hay documentos en el histórico.</td>
             </tr>
             <tr v-for="item in history" :key="item.id" class="hover:bg-gray-50">
+              <!-- ID Confirmación -->
+              <td class="px-6 py-4 whitespace-nowrap align-top font-mono text-sm text-gray-900 font-semibold">
+                #{{ item.id }}
+              </td>
               <!-- Col 1: Documento -->
               <td class="px-6 py-4 whitespace-nowrap align-top">
                 <div class="text-sm font-bold text-gray-900">No. {{ item.numero }}</div>
@@ -188,10 +223,16 @@ const visiblePages = computed(() => {
   return range;
 });
 
+const searchId = ref('');
+
 const loadHistory = async (page = 1) => {
   loading.value = true;
   try {
-    const response = await api.get('/confirmacion-documentos/historico', { params: { page } });
+    const params = { page };
+    if (searchId.value) {
+      params.search = searchId.value;
+    }
+    const response = await api.get('/confirmacion-documentos/historico', { params });
     const res = response.data;
     history.value    = res.data;
     pagination.value = {
@@ -209,6 +250,15 @@ const loadHistory = async (page = 1) => {
   } finally {
     loading.value = false;
   }
+};
+
+const handleSearch = () => {
+  loadHistory(1);
+};
+
+const clearSearch = () => {
+  searchId.value = '';
+  loadHistory(1);
 };
 
 const changePage = (page) => {
