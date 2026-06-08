@@ -45,7 +45,10 @@
         
         <!-- DIVIDER ITEM -->
         <div v-if="item.isDivider" class="px-3 py-2 mt-4">
-           <div v-show="!layoutStore.isCollapsed" class="text-[9px] font-black text-verde-cope uppercase tracking-widest mb-1 shadow-sm">
+           <div v-show="!layoutStore.isCollapsed" 
+                class="text-[9px] font-black uppercase tracking-widest mb-1 shadow-sm"
+                :class="item.textColorClass || 'text-verde-cope'"
+           >
                {{ item.label }}
            </div>
            <div v-show="layoutStore.isCollapsed" class="h-px bg-white/10 dark:bg-gray-800 my-2"></div>
@@ -63,13 +66,13 @@
             class="flex items-center px-3 py-3 rounded-lg transition-all duration-200 group border-l-4"
             :class="[
                 isActive(item.route || '')
-                ? 'bg-white/10 dark:bg-gray-800 border-verde-cope text-white dark:text-verde-cope shadow-lg'
-                : 'border-transparent text-gray-300 dark:text-gray-400 hover:bg-white/5 dark:hover:bg-gray-800 hover:text-white dark:hover:text-gray-100',
+                ? (item.activeClass || 'bg-white/10 dark:bg-gray-800 border-verde-cope text-white dark:text-verde-cope shadow-lg')
+                : (item.inactiveClass || 'border-transparent text-gray-300 dark:text-gray-400 hover:bg-white/5 dark:hover:bg-gray-800 hover:text-white dark:hover:text-gray-100'),
                 layoutStore.isCollapsed ? 'justify-center pl-0 border-l-0' : ''
             ]"
             >
                 <span class="shrink-0 transition-colors duration-200"
-                      :class="isActive(item.route || '') ? 'text-verde-cope' : 'group-hover:text-verde-cope'">
+                      :class="isActive(item.route || '') ? (item.iconActiveColorClass || 'text-verde-cope') : (item.iconHoverColorClass || 'group-hover:text-verde-cope')">
                     <svg v-html="item.iconSvg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"></svg>
                 </span>
 
@@ -87,16 +90,21 @@
         >
             <button
                 @click="handleGroupClick(item.id || '')"
-                class="w-full flex items-center px-3 py-3 rounded-lg transition-all duration-200 group border-l-4 border-transparent"
+                class="w-full flex items-center px-3 py-3 rounded-lg transition-all duration-200 group border-l-4"
                 :class="[
                     openGroups.includes(item.id || '') && !layoutStore.isCollapsed
-                    ? 'bg-black/20 dark:bg-black/40 text-white dark:text-gray-100'
-                    : 'text-gray-300 dark:text-gray-400 hover:bg-white/5 dark:hover:bg-gray-800 hover:text-white',
+                    ? (item.activeClass || 'bg-black/20 dark:bg-black/40 text-white dark:text-gray-100 border-verde-cope')
+                    : (item.inactiveClass || 'border-transparent text-gray-300 dark:text-gray-400 hover:bg-white/5 dark:hover:bg-gray-800 hover:text-white'),
                     layoutStore.isCollapsed ? 'justify-center pl-0' : 'justify-between'
                 ]"
             >
                 <div class="flex items-center">
-                    <span class="shrink-0 transition-colors" :class="openGroups.includes(item.id || '') ? 'text-verde-cope' : 'group-hover:text-verde-cope'">
+                    <span class="shrink-0 transition-colors" :class="[
+                        openGroups.includes(item.id || '') 
+                          ? (item.iconActiveColorClass || 'text-verde-cope') 
+                          : (item.iconHoverColorClass || 'group-hover:text-verde-cope'),
+                        item.iconColorClass || ''
+                    ]">
                         <svg v-html="item.iconSvg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"></svg>
                     </span>
                     <span v-if="!layoutStore.isCollapsed" class="ml-3 font-medium text-sm truncate">{{ item.label }}</span>
@@ -105,7 +113,7 @@
                 <svg
                     v-if="!layoutStore.isCollapsed"
                     class="w-4 h-4 transition-transform duration-300"
-                    :class="openGroups.includes(item.id || '') ? 'text-verde-cope rotate-180' : 'text-gray-400'"
+                    :class="openGroups.includes(item.id || '') ? (item.arrowColorClass || 'text-verde-cope rotate-180') : 'text-gray-400'"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 >
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -132,14 +140,14 @@
                         @click="handleItemClick"
                         class="relative group/child flex items-center gap-3 px-3 py-2 rounded-r-lg rounded-bl-lg ml-2 text-sm transition-all duration-200"
                         :class="isActive(child.route)
-                            ? 'bg-verde-cope/10 text-verde-cope font-bold translate-x-1'
-                            : 'text-gray-400 hover:text-white hover:bg-white/5 hover:translate-x-1'"
+                            ? (item.childActiveClass || 'bg-verde-cope/10 text-verde-cope font-bold translate-x-1')
+                            : (item.childInactiveClass || 'text-gray-400 hover:text-white hover:bg-white/5 hover:translate-x-1')"
                     >
                          <span
                             class="w-1.5 h-1.5 rounded-full transition-all duration-300 ring-2"
                             :class="isActive(child.route)
-                                ? 'bg-verde-cope ring-verde-cope/30 scale-110'
-                                : 'bg-gray-600 ring-transparent group-hover/child:bg-gray-300'"
+                                ? (item.childBulletActiveClass || 'bg-verde-cope ring-verde-cope/30 scale-110')
+                                : (item.childBulletInactiveClass || 'bg-gray-600 ring-transparent group-hover/child:bg-gray-300')"
                          ></span>
 
                          {{ child.label }}
@@ -439,7 +447,8 @@ const menuItems = computed(() => {
         {
             isDivider: true,
             label: 'Confirmacion Garantias Fisicas',
-            permission: 'confirmar_documentos || archivo'
+            permission: 'confirmar_documentos || archivo',
+            textColorClass: 'text-amber-500 dark:text-amber-400'
         },
         {
             id: 'solicitudes-confirmacion',
@@ -447,6 +456,14 @@ const menuItems = computed(() => {
             // Search Circle Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />',
             permission: 'confirmar_documentos',
+            inactiveClass: 'border-transparent text-sky-200 dark:text-sky-300/80 hover:bg-white/5 hover:text-white dark:hover:bg-gray-800 dark:hover:text-sky-200',
+            activeClass: 'bg-black/20 dark:bg-black/40 text-sky-300 dark:text-sky-300 border-sky-400',
+            iconColorClass: 'text-sky-300/70 dark:text-sky-400/70',
+            iconHoverColorClass: 'group-hover:text-sky-300 dark:group-hover:text-sky-300',
+            iconActiveColorClass: 'text-sky-400 dark:text-sky-300',
+            arrowColorClass: 'text-sky-400 dark:text-sky-300 rotate-180',
+            childActiveClass: 'bg-sky-500/10 text-sky-400 dark:text-sky-300 font-bold translate-x-1',
+            childBulletActiveClass: 'bg-sky-400 ring-sky-400/30 scale-110',
             children: [
                 {
                     label: 'Nueva Solicitud',
@@ -466,6 +483,14 @@ const menuItems = computed(() => {
             // Badge Check Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />',
             permission: 'archivo',
+            inactiveClass: 'border-transparent text-purple-200 dark:text-purple-300/80 hover:bg-white/5 hover:text-white dark:hover:bg-gray-800 dark:hover:text-purple-300',
+            activeClass: 'bg-black/20 dark:bg-black/40 text-purple-300 dark:text-purple-300 border-purple-400',
+            iconColorClass: 'text-purple-300/70 dark:text-purple-400/70',
+            iconHoverColorClass: 'group-hover:text-purple-300 dark:group-hover:text-purple-300',
+            iconActiveColorClass: 'text-purple-400 dark:text-purple-300',
+            arrowColorClass: 'text-purple-400 dark:text-purple-300 rotate-180',
+            childActiveClass: 'bg-purple-500/10 text-purple-400 dark:text-purple-300 font-bold translate-x-1',
+            childBulletActiveClass: 'bg-purple-400 ring-purple-400/30 scale-110',
             children: [
                 {
                     label: 'Buzón Entrantes',
@@ -481,14 +506,23 @@ const menuItems = computed(() => {
         {
             isDivider: true,
             label: 'Retiro de Garantías Fisicas',
-            permission: 'retiro_garantias || archivo'
+            permission: 'retiro_garantias || archivo',
+            textColorClass: 'text-emerald-500 dark:text-emerald-400'
         },
-                {
+        {
             id: 'retiro-garantias',
             label: 'Sol Retiro de Garantías',
             // External Link / Logout Icon (symbolizing removal)
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />',
             permission: 'retiro_garantias',
+            inactiveClass: 'border-transparent text-sky-200 dark:text-sky-300/80 hover:bg-white/5 hover:text-white dark:hover:bg-gray-800 dark:hover:text-sky-200',
+            activeClass: 'bg-black/20 dark:bg-black/40 text-sky-300 dark:text-sky-300 border-sky-400',
+            iconColorClass: 'text-sky-300/70 dark:text-sky-400/70',
+            iconHoverColorClass: 'group-hover:text-sky-300 dark:group-hover:text-sky-300',
+            iconActiveColorClass: 'text-sky-400 dark:text-sky-300',
+            arrowColorClass: 'text-sky-400 dark:text-sky-300 rotate-180',
+            childActiveClass: 'bg-sky-500/10 text-sky-400 dark:text-sky-300 font-bold translate-x-1',
+            childBulletActiveClass: 'bg-sky-400 ring-sky-400/30 scale-110',
             children: [
                 {
                     label: 'Solicitar Retiro',
@@ -514,6 +548,14 @@ const menuItems = computed(() => {
             // Shield Check Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />',
             permission: 'archivo',
+            inactiveClass: 'border-transparent text-purple-200 dark:text-purple-300/80 hover:bg-white/5 hover:text-white dark:hover:bg-gray-800 dark:hover:text-purple-300',
+            activeClass: 'bg-black/20 dark:bg-black/40 text-purple-300 dark:text-purple-300 border-purple-400',
+            iconColorClass: 'text-purple-300/70 dark:text-purple-400/70',
+            iconHoverColorClass: 'group-hover:text-purple-300 dark:group-hover:text-purple-300',
+            iconActiveColorClass: 'text-purple-400 dark:text-purple-300',
+            arrowColorClass: 'text-purple-400 dark:text-purple-300 rotate-180',
+            childActiveClass: 'bg-purple-500/10 text-purple-400 dark:text-purple-300 font-bold translate-x-1',
+            childBulletActiveClass: 'bg-purple-400 ring-purple-400/30 scale-110',
             children: [
                 {
                     label: 'Buzón Archivo',
@@ -529,7 +571,8 @@ const menuItems = computed(() => {
         {
             isDivider: true,
             label: 'Retiro doc Administrativo',
-            permission: 'retiro_doc_administrativo || secretaria_agencia'
+            permission: 'retiro_doc_administrativo || secretaria_agencia',
+            textColorClass: 'text-cyan-500 dark:text-cyan-400'
         },
         {
             id: 'retiro-administrativo-agencia',
@@ -537,6 +580,14 @@ const menuItems = computed(() => {
             // Document Arrow Up Icon
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-3-3v6m-9 1V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2H6a2 2 0 01-2-2z" />',
             permission: 'retiro_doc_administrativo',
+            inactiveClass: 'border-transparent text-sky-200 dark:text-sky-300/80 hover:bg-white/5 hover:text-white dark:hover:bg-gray-800 dark:hover:text-sky-200',
+            activeClass: 'bg-black/20 dark:bg-black/40 text-sky-300 dark:text-sky-300 border-sky-400',
+            iconColorClass: 'text-sky-300/70 dark:text-sky-400/70',
+            iconHoverColorClass: 'group-hover:text-sky-300 dark:group-hover:text-sky-300',
+            iconActiveColorClass: 'text-sky-400 dark:text-sky-300',
+            arrowColorClass: 'text-sky-400 dark:text-sky-300 rotate-180',
+            childActiveClass: 'bg-sky-500/10 text-sky-400 dark:text-sky-300 font-bold translate-x-1',
+            childBulletActiveClass: 'bg-sky-400 ring-sky-400/30 scale-110',
             children: [
                 {
                     label: 'Solicitar Retiro',
@@ -549,6 +600,14 @@ const menuItems = computed(() => {
             label: 'Gestion Doc Admin',
             iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />',
             permission: 'secretaria_agencia',
+            inactiveClass: 'border-transparent text-purple-200 dark:text-purple-300/80 hover:bg-white/5 hover:text-white dark:hover:bg-gray-800 dark:hover:text-purple-300',
+            activeClass: 'bg-black/20 dark:bg-black/40 text-purple-300 dark:text-purple-300 border-purple-400',
+            iconColorClass: 'text-purple-300/70 dark:text-purple-400/70',
+            iconHoverColorClass: 'group-hover:text-purple-300 dark:group-hover:text-purple-300',
+            iconActiveColorClass: 'text-purple-400 dark:text-purple-300',
+            arrowColorClass: 'text-purple-400 dark:text-purple-300 rotate-180',
+            childActiveClass: 'bg-purple-500/10 text-purple-400 dark:text-purple-300 font-bold translate-x-1',
+            childBulletActiveClass: 'bg-purple-400 ring-purple-400/30 scale-110',
             children: [
                 {
                     label: 'Buzón de Solicitudes',
