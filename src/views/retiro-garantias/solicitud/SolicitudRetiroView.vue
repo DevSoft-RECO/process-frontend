@@ -1,28 +1,22 @@
 <template>
-  <div class="h-full flex flex-col space-y-4">
-    <h1 class="text-2xl font-bold text-gray-800">Solicitud de Retiro de Garantías</h1>
-
-    <!-- Search Section -->
-    <div class="bg-white p-4 rounded-lg shadow space-y-4">
-      <h2 class="text-lg font-semibold text-gray-700">Buscar Garantia mediante el # de Producto</h2>
-      <div class="flex space-x-2">
-        <input 
-          v-model="searchTerm" 
-          @keyup.enter="searchDocument"
-          type="text" 
-          placeholder="Ingrese Número de Producto o cuenta BW si el Ex es Antiguo" 
-          class="flex-1 border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
-        >
-        <button 
-          @click="searchDocument" 
-          :disabled="loadingSearch"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-        >
-          <span v-if="loadingSearch">Buscando...</span>
-          <span v-else>Buscar</span>
-        </button>
+  <div class="h-full flex flex-col space-y-6 p-1 md:p-2">
+    <!-- Header Page -->
+    <div class="flex items-center space-x-3">
+      <div class="p-3 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl text-white shadow-lg shadow-blue-500/20">
+        <i class="fas fa-hand-holding-usd text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-2xl font-extrabold text-gray-800 dark:text-white tracking-tight">Solicitud de Retiro de Garantías</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Gestione y solicite retiros de garantías de expedientes.</p>
       </div>
     </div>
+
+    <!-- Search Section -->
+    <BuscarGarantia 
+      v-model="searchTerm"
+      :loading="loadingSearch"
+      @search="searchDocument"
+    />
 
     <!-- Historic Request Form Section -->
     <SolicitudRetiroHistoricoForm
@@ -33,457 +27,68 @@
     />
 
     <!-- Request Form Section (Standard) -->
-    <div v-if="showForm && !isHistorico" class="bg-white p-6 rounded-lg shadow space-y-4 animate-fade-in-down">
-      <div class="flex justify-between items-center">
-        <h2 class="text-lg font-semibold text-gray-700">
-          {{ isManual ? 'Nueva Solicitud (Carga Manual)' : 'Datos del Documento' }}
-        </h2>
-         <span v-if="isManual" class="text-sm text-yellow-600 bg-yellow-100 px-2 py-1 rounded">
-           Documento no encontrado en sistema
-         </span>
-         <span v-else class="text-sm text-green-600 bg-green-100 px-2 py-1 rounded">
-           Documento Validado
-         </span>
-      </div>
-
-      <!-- Lista de Documentos Encontrados -->
-      <div v-if="documentsList.length > 0" class="space-y-4">
-          <div class="bg-blue-50 p-3 rounded border border-blue-200">
-              <h3 class="font-bold text-blue-800">Garantías Asociadas al Expediente</h3>
-              <p class="text-sm text-blue-600">Seleccione la garantía que desea retirar.</p>
-              <p v-if="expedienteActive" class="text-xs text-red-600 font-bold mt-1">
-                  <i class="fas fa-exclamation-circle"></i> Advertencia: El expediente asociado aún se encuentra ACTIVO.
-              </p>
-          </div>
-
-          <div class="grid grid-cols-1 gap-4">
-              <div v-for="doc in documentsList" :key="doc.id" 
-                   class="border rounded-lg p-4 bg-gray-50 hover:bg-white transition-colors relative"
-                   :class="{'border-blue-500 ring-2 ring-blue-200': formData.id_documento === doc.id, 'border-gray-200': formData.id_documento !== doc.id}"
-              >
-                  <div class="flex justify-between items-start">
-                      <div class="flex-1">
-                          <div class="flex items-center space-x-2">
-                              <span class="font-bold text-lg text-gray-800">{{ doc.numero }}</span>
-                              <span v-if="doc.tiene_otros_activos" class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded font-bold cursor-help" title="Amarrado a otros expedientes activos">
-                                  <i class="fas fa-link"></i> Vinculado a otros
-                              </span>
-                              <span v-if="doc.estado_fisico !== 'activo'" class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded font-bold">
-                                  <i class="fas fa-box"></i> Estado Físico: {{ (doc.estado_fisico || 'N/A').toUpperCase() }}
-                              </span>
-                          </div>
-                          <div class="text-sm text-gray-600 mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1">
-                              <p><span class="font-semibold text-gray-700">Tipo:</span> {{ doc.tipo_documento?.nombre || 'N/A' }}</p>
-                              <p><span class="font-semibold text-gray-700">Fecha:</span> {{ formatDate(doc.fecha) }}</p>
-                              <p><span class="font-semibold text-gray-700">Propietario:</span> {{ doc.propietario || 'N/A' }}</p>
-                              <p><span class="font-semibold text-gray-700">Monto:</span> {{ doc.monto_poliza || 'N/A' }}</p>
-                              <p><span class="font-semibold text-gray-700">Autorizador:</span> {{ doc.autorizador || 'N/A' }}</p>
-                              <p><span class="font-semibold text-gray-700">Finca:</span> {{ doc.no_finca || 'N/A' }}</p>
-                              <p><span class="font-semibold text-gray-700">Folio:</span> {{ doc.folio || 'N/A' }}</p>
-                              <p><span class="font-semibold text-gray-700">Libro:</span> {{ doc.libro || 'N/A' }}</p>
-                              <p><span class="font-semibold text-gray-700">Reg. Propiedad:</span> {{ doc.registro_propiedad?.nombre || 'N/A' }}</p>
-                              <p class="sm:col-span-2 lg:col-span-3"><span class="font-semibold text-gray-700">Observación:</span> {{ doc.observacion || 'N/A' }}</p>
-                          </div>
-                      </div>
-                      <div class="flex flex-col space-y-2">
-                           <button 
-                              @click="selectDocument(doc)"
-                              class="text-white px-3 py-1 rounded text-sm transition-colors"
-                              :class="{
-                                  'bg-green-600 hover:bg-green-700': formData.id_documento === doc.id,
-                                  'bg-blue-600 hover:bg-blue-700': formData.id_documento !== doc.id && doc.estado_fisico === 'activo',
-                                  'bg-gray-400 cursor-not-allowed': doc.estado_fisico !== 'activo'
-                              }"
-                              :disabled="doc.estado_fisico !== 'activo'"
-                           >
-                              <i class="fas" :class="formData.id_documento === doc.id ? 'fa-check' : (doc.estado_fisico === 'activo' ? 'fa-hand-pointer' : 'fa-lock')"></i>
-                              {{ formData.id_documento === doc.id ? 'Seleccionado' : (doc.estado_fisico === 'activo' ? 'Seleccionar' : 'No Disponible') }}
-                           </button>
-
-                           <button 
-                              v-if="doc.tiene_otros_activos"
-                              @click="showActiveLinks(doc)"
-                              class="bg-red-50 text-red-600 border border-red-200 px-3 py-1 rounded hover:bg-red-100 text-xs"
-                           >
-                              <i class="fas fa-eye"></i> Ver Vinculados
-                           </button>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-      
-      <!-- Detalle Simple (Solo para Manual o sin lista) -->
-      <div v-if="isManual || (documentInfo && documentsList.length === 0)" class="bg-gray-50 p-4 rounded border border-gray-200 text-sm grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4">
-           <div><span class="font-bold text-gray-700">Tipo:</span> {{ documentInfo?.tipo_documento?.nombre || 'N/A' }}</div>
-           <div><span class="font-bold text-gray-700">Fecha:</span> {{ formatDate(documentInfo?.fecha) }}</div>
-           <div><span class="font-bold text-gray-700">Propietario:</span> {{ documentInfo?.propietario || 'N/A' }}</div>
-           <div><span class="font-bold text-gray-700">Monto:</span> {{ documentInfo?.monto_poliza || 'N/A' }}</div>
-           <div><span class="font-bold text-gray-700">Autorizador:</span> {{ documentInfo?.autorizador || 'N/A' }}</div>
-           <div><span class="font-bold text-gray-700">Finca:</span> {{ documentInfo?.no_finca || 'N/A' }}</div>
-           <div><span class="font-bold text-gray-700">Folio:</span> {{ documentInfo?.folio || 'N/A' }}</div>
-           <div><span class="font-bold text-gray-700">Libro:</span> {{ documentInfo?.libro || 'N/A' }}</div>
-           <div><span class="font-bold text-gray-700">Reg. Propiedad:</span> {{ documentInfo?.registro_propiedad?.nombre || 'N/A' }}</div>
-           <div class="md:col-span-3 xl:col-span-4 block mb-2"><span class="font-bold text-gray-700">Observación:</span> {{ documentInfo?.observacion || 'N/A' }}</div>
-      </div>
-      
-
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Número de Documento</label>
-          <input 
-            v-model="formData.numero_documento" 
-            type="text" 
-            :readonly="!isManual"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-50"
-            :class="{'bg-white': isManual}"
-          >
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Fecha del Documento</label>
-          <input 
-            v-model="formData.fecha_documento" 
-            type="date" 
-            :readonly="!isManual"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-50"
-            :class="{'bg-white': isManual}"
-          >
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Título / Nombre Asociado</label>
-          <input 
-            v-model="formData.titulo_nombre" 
-            type="text" 
-            :readonly="!isManual"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-50"
-            :class="{'bg-white': isManual}"
-          >
-        </div>
-         <div>
-          <label class="block text-sm font-medium text-gray-700">Tipo de Retiro</label>
-          <select 
-            v-model="formData.tipo_retiro" 
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-white disabled:bg-gray-100 disabled:text-gray-500"
-            :disabled="!formData.numero_documento"
-          >
-            <option value="Temporal" :disabled="isTemporalDisabled">Temporal</option>
-            <option value="Definitivo" :disabled="isSelectionLinked">Definitivo</option>
-          </select>
-          <p v-if="isSelectionLinked && !isManual" class="text-xs text-red-600 mt-1">
-             * Retiro definitivo no permitido por vinculaciones activas.
-          </p>
-          <p v-if="isTemporalDisabled && !isManual" class="text-xs text-blue-600 mt-1">
-             * Retiro temporal bloqueado. No posee vinculaciones activas.
-          </p>
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Justificación</label>
-        <textarea 
-          v-model="formData.justificacion" 
-          rows="3" 
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 resize-none"
-          placeholder="Motivo del retiro..."
-        ></textarea>
-      </div>
-
-      <div class="flex justify-end space-x-2 pt-4">
-        <button 
-          @click="resetForm" 
-          class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
-        >
-          Cancelar
-        </button>
-        <button 
-          @click="submitRequest" 
-          :disabled="loadingSubmit"
-          class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:opacity-50"
-        >
-          <span v-if="loadingSubmit">Enviando...</span>
-          <span v-else>Enviar Solicitud</span>
-        </button>
-      </div>
-    </div>
+    <FormularioSolicitud
+      :show="showForm && !isHistorico"
+      :isManual="isManual"
+      :documentsList="documentsList"
+      :documentInfo="documentInfo"
+      :expedienteActive="expedienteActive"
+      :formData="formData"
+      :isSuperAdmin="isSuperAdmin"
+      :loadingSubmit="loadingSubmit"
+      @submit="submitRequest"
+      @cancel="resetForm"
+      @select-document="selectDocument"
+      @show-links="showActiveLinks"
+      @update-field="updateField"
+    />
 
     <!-- History Table -->
-    <div class="bg-white p-4 rounded-lg shadow flex-1 overflow-hidden flex flex-col">
-      <div class="flex justify-between items-center mb-4">
-        <div class="flex space-x-4">
-            <button 
-                @click="activeTab = 'sent'"
-                class="pb-2 text-lg font-semibold border-b-2 transition-colors"
-                :class="activeTab === 'sent' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
-            >
-                Mis Solicitudes
-            </button>
-            <button 
-                @click="activeTab = 'received'"
-                class="pb-2 text-lg font-semibold border-b-2 transition-colors"
-                :class="activeTab === 'received' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
-            >
-                Solicitudes Recibidas
-            </button>
-        </div>
-        
-        <button v-if="activeTab === 'sent'" @click="loadHistory(1)" class="text-blue-600 hover:text-blue-800 text-sm">
-          <i class="fas fa-sync"></i> Actualizar
-        </button>
-        <button v-else @click="loadIncoming(1)" class="text-blue-600 hover:text-blue-800 text-sm">
-          <i class="fas fa-sync"></i> Actualizar
-        </button>
-      </div>
-      
-      <!-- SENT TAB CONTENTS -->
-      <div v-if="activeTab === 'sent'" class="flex-1 overflow-auto flex flex-col">
-        <!-- Sub-tabs for Sent Requests -->
-        <div class="px-4 border-b border-gray-200 bg-gray-50 flex space-x-4">
-             <button 
-                @click="sentFilter = 'all'" 
-                class="py-2 text-sm font-medium border-b-2 transition-colors"
-                :class="sentFilter === 'all' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
-             >
-                Todos
-             </button>
-             <button 
-                @click="sentFilter = 'Temporal'" 
-                class="py-2 text-sm font-medium border-b-2 transition-colors"
-                :class="sentFilter === 'Temporal' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
-             >
-                Enviados Temporales
-             </button>
-             <button 
-                @click="sentFilter = 'Definitivo'" 
-                class="py-2 text-sm font-medium border-b-2 transition-colors"
-                :class="sentFilter === 'Definitivo' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
-             >
-                Enviados Definitivos
-             </button>
-        </div>
-
-        <div class="flex-1 overflow-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50 sticky top-0">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Solicitud</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Despacho</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-if="loadingHistory">
-              <td colspan="7" class="px-6 py-4 text-center text-gray-500">Cargando historial...</td>
-            </tr>
-            <tr v-else-if="filteredHistory.length === 0">
-              <td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay solicitudes registradas con este filtro.</td>
-            </tr>
-            <tr v-for="item in filteredHistory" :key="item.id" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">#{{ item.id }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(item.fecha_solicitud) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <div class="font-medium">{{ item.numero_documento }}</div>
-                <div class="text-xs text-gray-500 mt-1" v-if="item.fecha_documento">
-                    <i class="far fa-calendar-alt"></i> {{ formatDate(item.fecha_documento) }}
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.titulo_nombre }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <span :class="item.tipo_retiro === 'Definitivo' ? 'text-red-600 font-bold' : 'text-blue-600'">
-                  {{ item.tipo_retiro }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <span :class="getStatusClass(item.estado_actual)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                  {{ getStatusLabel(item.estado_actual) }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ item.fecha_envio ? formatDate(item.fecha_envio) : '-' }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination Controls -->
-      <div v-if="lastPage > 1" class="bg-gray-50 px-4 py-3 border-t border-gray-200 flex items-center justify-between sm:px-6">
-          <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                  <p class="text-sm text-gray-700">
-                      Mostrando página <span class="font-medium">{{ currentPage }}</span> de <span class="font-medium">{{ lastPage }}</span>
-                      (<span class="font-medium">{{ totalHistory }}</span> resultados totales)
-                  </p>
-              </div>
-              <div>
-                  <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                      <button 
-                          @click="loadHistory(currentPage - 1)"
-                          :disabled="currentPage === 1"
-                          class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                          <span class="sr-only">Anterior</span>
-                          <i class="fas fa-chevron-left"></i>
-                      </button>
-                      <button 
-                          @click="loadHistory(currentPage + 1)"
-                          :disabled="currentPage === lastPage"
-                          class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                          <span class="sr-only">Siguiente</span>
-                          <i class="fas fa-chevron-right"></i>
-                      </button>
-                  </nav>
-              </div>
-          </div>
-           <!-- Mobile Pagination -->
-           <div class="flex items-center justify-between sm:hidden w-full">
-               <button 
-                  @click="loadHistory(currentPage - 1)"
-                  :disabled="currentPage === 1"
-                  class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              >
-                  Anterior
-              </button>
-              <span class="text-sm text-gray-700">
-                  {{ currentPage }} / {{ lastPage }}
-              </span>
-              <button 
-                  @click="loadHistory(currentPage + 1)"
-                  :disabled="currentPage === lastPage"
-                  class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              >
-                  Siguiente
-              </button>
-           </div>
-      </div>
-      </div>
-    
-    <!-- INCOMING TAB CONTENTS -->
-    <div v-if="activeTab === 'received'" class="bg-white p-4 rounded-lg shadow flex-1 overflow-hidden flex flex-col">
-          <div class="flex-1 overflow-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50 sticky top-0">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Envío</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Origen (Agencia)</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitante</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-if="loadingIncoming">
-                  <td colspan="8" class="px-6 py-4 text-center text-gray-500">Cargando solicitudes recibidas...</td>
-                </tr>
-                <tr v-else-if="incomingRequests.length === 0">
-                  <td colspan="8" class="px-6 py-4 text-center text-gray-500">No ha recibido solicitudes de otras agencias.</td>
-                </tr>
-                <tr v-for="item in incomingRequests" :key="item.id" class="hover:bg-gray-50">
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">#{{ item.id }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(item.fecha_envio) }}</td>
-                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{{ item.agencia?.nombre || 'N/A' }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.solicitante?.name || 'N/A' }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div class="font-medium">{{ item.numero_documento }}</div>
-                    <div class="text-xs text-gray-500 mt-1" v-if="item.fecha_documento">
-                        <i class="far fa-calendar-alt"></i> {{ formatDate(item.fecha_documento) }}
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.titulo_nombre }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    <span :class="getStatusClass(item.estado_actual)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                      <span v-if="item.estado_actual === 2">Recibido Temporal</span>
-                      <span v-else-if="item.estado_actual === 3">Recibido Definitivo</span>
-                      <span v-else>{{ getStatusLabel(item.estado_actual) }}</span>
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <button 
-                        v-if="[2, 3].includes(item.estado_actual)"
-                        @click="confirmReceipt(item)"
-                        class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-xs font-bold border border-green-300 transition-colors"
-                        title="Confirmar Recepción Física"
-                    >
-                        <i class="fas fa-check-circle mr-1"></i> Recibir
-                    </button>
-                    <!-- Return to Archive Action (Only for Temporal and Received) -->
-                    <button 
-                        v-if="item.estado_actual === 4 && item.tipo_retiro === 'Temporal'"
-                        @click="returnToArchive(item)"
-                        class="ml-2 bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1 rounded text-xs font-bold border border-gray-300 transition-colors"
-                        title="Reingresar al Archivo (Devolución)"
-                    >
-                        <i class="fas fa-archive mr-1"></i> Reingresar
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Pagination Controls (Incoming) -->
-          <div v-if="lastPageIncoming > 1" class="bg-gray-50 px-4 py-3 border-t border-gray-200 flex items-center justify-between sm:px-6">
-              <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                  <div>
-                      <p class="text-sm text-gray-700">
-                          Página <span class="font-medium">{{ currentPageIncoming }}</span> de <span class="font-medium">{{ lastPageIncoming }}</span>
-                      </p>
-                  </div>
-                  <div>
-                      <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                          <button 
-                              @click="loadIncoming(currentPageIncoming - 1)"
-                              :disabled="currentPageIncoming === 1"
-                              class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                          >
-                              <i class="fas fa-chevron-left"></i>
-                          </button>
-                          <button 
-                              @click="loadIncoming(currentPageIncoming + 1)"
-                              :disabled="currentPageIncoming === lastPageIncoming"
-                              class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                          >
-                              <i class="fas fa-chevron-right"></i>
-                          </button>
-                      </nav>
-                  </div>
-              </div>
-          </div>
-    </div>
+    <HistorialSolicitudes
+      :activeTab="activeTab"
+      :sentFilter="sentFilter"
+      :history="history"
+      :incomingRequests="incomingRequests"
+      :loadingHistory="loadingHistory"
+      :loadingIncoming="loadingIncoming"
+      :currentPage="currentPage"
+      :lastPage="lastPage"
+      :totalHistory="totalHistory"
+      :currentPageIncoming="currentPageIncoming"
+      :lastPageIncoming="lastPageIncoming"
+      :totalIncoming="totalIncoming"
+      @update-tab="activeTab = $event"
+      @update-sent-filter="sentFilter = $event"
+      @load-history="loadHistory"
+      @load-incoming="loadIncoming"
+      @confirm-receipt="confirmReceipt"
+      @return-archive="returnToArchive"
+    />
   </div>
-</div>
 </template>
 
 <script setup>
 import { ref, onMounted, reactive, computed } from 'vue';
 import api from '@/api/axios';
 import Swal from 'sweetalert2';
-import { useAuthStore } from '@/stores/auth'; // Import auth store
-import { formatDate, formatDateTime, formatCurrency } from '@/utils/formatters';
+import { useAuthStore } from '@/stores/auth';
+import { formatDate } from '@/utils/formatters';
 
 import SolicitudRetiroHistoricoForm from './SolicitudRetiroHistoricoForm.vue';
+import BuscarGarantia from './components/BuscarGarantia.vue';
+import FormularioSolicitud from './components/FormularioSolicitud.vue';
+import HistorialSolicitudes from './components/HistorialSolicitudes.vue';
 
-const authStore = useAuthStore(); // Use auth store
+const authStore = useAuthStore();
 
 // State
 const activeTab = ref('sent');
-const sentFilter = ref('all'); // 'all' | 'Temporal' | 'Definitivo'
+const sentFilter = ref('all');
 const searchTerm = ref('');
 const loadingSearch = ref(false);
 const showForm = ref(false);
 const isManual = ref(false);
-const isHistorico = ref(false); // Nuevo estado
+const isHistorico = ref(false);
 const loadingSubmit = ref(false);
 
 // Sent History State
@@ -500,7 +105,7 @@ const currentPageIncoming = ref(1);
 const lastPageIncoming = ref(1);
 const totalIncoming = ref(0);
 
-const documentInfo = ref(null); // Nuevo estado para la info del documento
+const documentInfo = ref(null);
 const documentsList = ref([]);
 const expedienteActive = ref(false);
 
@@ -520,12 +125,11 @@ const formData = reactive({
   es_manual: false
 });
 
-const filteredHistory = computed(() => {
-    if (sentFilter.value === 'all') return history.value;
-    return history.value.filter(item => item.tipo_retiro === sentFilter.value);
-});
-
 // Methods
+const updateField = ({ field, value }) => {
+  formData[field] = value;
+};
+
 const searchDocument = async () => {
   if (!searchTerm.value.trim()) {
     Swal.fire('Error', 'Ingrese un término de búsqueda', 'warning');
@@ -534,7 +138,7 @@ const searchDocument = async () => {
 
   loadingSearch.value = true;
   showForm.value = false;
-  documentInfo.value = null; // Reset info
+  documentInfo.value = null;
   documentsList.value = [];
   expedienteActive.value = false;
   resetFormData();
@@ -545,7 +149,6 @@ const searchDocument = async () => {
     });
 
     if (response.data.error) {
-       // Bloqueado (Solo Casos críticos como sin seguimiento)
        Swal.fire({
          icon: 'error',
          title: 'Operación Bloqueada',
@@ -555,34 +158,28 @@ const searchDocument = async () => {
     }
 
     if (response.data.found) {
-      // START: Historic Handling
       if (response.data.source === 'historico') {
           isHistorico.value = true;
           isManual.value = false;
-          // Set document info for the historic component
           documentInfo.value = response.data.data;
           showForm.value = true;
           return;
       }
-      // END: Historic Handling
 
       isManual.value = false;
       isHistorico.value = false;
-      // Pre-fill expediente data
       formData.id_expediente = response.data.data.id_expediente;
       formData.id_expediente_historico = response.data.data.id_expediente_historico || null;
       formData.codigo_cliente = response.data.data.codigo_cliente || null;
       formData.numero_producto = response.data.data.numero_producto || null;
-      formData.titulo_nombre = response.data.data.titulo_nombre; // Keep existing title if any
+      formData.titulo_nombre = response.data.data.titulo_nombre;
       formData.es_manual = false;
       
-      // Load documents list
       documentsList.value = response.data.data.documentos || [];
       expedienteActive.value = response.data.data.expediente_activo;
       
       showForm.value = true;
     } else {
-      // Documento NO encontrado
       showForm.value = false;
       documentInfo.value = null;
       documentsList.value = [];
@@ -608,18 +205,6 @@ const selectedDoc = computed(() => {
     return documentsList.value.find(d => d.id === formData.id_documento);
 });
 
-const isSelectionLinked = computed(() => {
-    if (isSuperAdmin.value) return false;
-    if (!formData.id_documento || isManual.value) return false;
-    return selectedDoc.value ? !selectedDoc.value.permite_definitivo : false;
-});
-
-const isTemporalDisabled = computed(() => {
-    if (isSuperAdmin.value) return false;
-    if (!formData.id_documento || isManual.value) return false;
-    return selectedDoc.value ? !selectedDoc.value.permite_temporal : false;
-});
-
 const selectDocument = (doc) => {
     if (doc.estado_fisico !== 'activo') {
         Swal.fire('No Disponible', `El documento actualmente se encuentra prestando estado '${doc.estado_fisico}' y no puede ser solicitado.`, 'warning');
@@ -630,7 +215,6 @@ const selectDocument = (doc) => {
     formData.numero_documento = doc.numero;
     formData.fecha_documento = doc.fecha ? new Date(doc.fecha).toISOString().split('T')[0] : null;
     
-    // Auto-select valid type based on pivot permissions
     if (doc.permite_temporal && !doc.permite_definitivo) {
         formData.tipo_retiro = 'Temporal';
         Swal.fire({
@@ -645,7 +229,7 @@ const selectDocument = (doc) => {
     } else if (doc.permite_definitivo && !doc.permite_temporal) {
         formData.tipo_retiro = 'Definitivo';
     } else {
-        formData.tipo_retiro = 'Temporal'; // Si por alguna razón permite ambos, asume Temporal de forma predeterminada
+        formData.tipo_retiro = 'Temporal';
     }
 };
 
@@ -684,7 +268,6 @@ const submitRequest = async () => {
     return;
   }
 
-  // Get agency ID from auth store
   const agencyId = authStore.user?.id_agencia || authStore.user?.agencia_id || authStore.user?.agencia?.id;
 
   if (!agencyId) {
@@ -692,7 +275,6 @@ const submitRequest = async () => {
       return;
   }
 
-  // Add agency ID to payload
   const payload = {
       ...formData,
       id_agencia: agencyId
@@ -703,8 +285,6 @@ const submitRequest = async () => {
   try {
     await api.post('/solicitudes-retiro', payload);
     
-    Swal.fire('Éxito', 'Solicitud enviada correctamente', 'success');
-    resetForm();
     Swal.fire('Éxito', 'Solicitud enviada correctamente', 'success');
     resetForm();
     loadHistory(1);
@@ -771,6 +351,7 @@ const resetFormData = () => {
   formData.codigo_cliente = null;
   formData.numero_producto = null;
   formData.id_documento = null;
+  formData.fecha_documento = null;
   formData.titulo_nombre = '';
   formData.tipo_retiro = 'Temporal';
   formData.justificacion = '';
@@ -778,7 +359,6 @@ const resetFormData = () => {
 };
 
 const handleSuccess = () => {
-    resetForm();
     resetForm();
     loadHistory(1);
 };
@@ -788,35 +368,7 @@ const resetForm = () => {
   searchTerm.value = '';
   resetFormData();
   documentsList.value = [];
-  isHistorico.value = false; // Reset historic flag
-};
-
-// Removed local formatDate to use global from @utils/formatters
-
-const getStatusLabel = (status) => {
-  switch (Number(status)) {
-    case 0: return 'Archivado';
-    case 1: return 'Solicitado';
-    case 2: return 'Enviado Temporal';
-    case 3: return 'Enviado Definitivo';
-    case 4: return 'Recibido en Agencia';
-    case 5: return 'Entregado a Asociado';
-    case 6: return 'En Retorno a Archivo';
-    default: return `Desconocido (${status})`;
-  }
-};
-
-const getStatusClass = (status) => {
-  switch (Number(status)) {
-    case 0: return 'bg-gray-100 text-gray-800';
-    case 1: return 'bg-yellow-100 text-yellow-800';
-    case 2: return 'bg-blue-100 text-blue-800';
-    case 3: return 'bg-red-100 text-red-800';
-    case 4: return 'bg-indigo-100 text-indigo-800'; // Received
-    case 5: return 'bg-green-100 text-green-800'; // Delivered
-    case 6: return 'bg-purple-100 text-purple-800'; // Returning
-    default: return 'bg-gray-100 text-gray-800';
-  }
+  isHistorico.value = false;
 };
 
 const confirmReceipt = async (item) => {
@@ -857,17 +409,14 @@ const returnToArchive = async (item) => {
         cancelButtonColor: '#6B7280'
     });
 
-    if (observacion !== undefined) { // Check if confirmed (even if empty string)
+    if (observacion !== undefined) {
         try {
             await api.post(`/solicitudes-retiro/${item.id}/return-archive`, {
                 observacion: observacion
             });
             Swal.fire('Éxito', 'Solicitud de devolución enviada. El archivo deberá confirmar la recepción.', 'success');
-            
-            // Reload BOTH lists to keep everything in sync
             loadHistory(currentPage.value);
             loadIncoming(currentPageIncoming.value);
-            
         } catch (error) {
             console.error(error);
             Swal.fire('Error', error.response?.data?.message || 'Error al solicitar devolución.', 'error');
@@ -876,7 +425,7 @@ const returnToArchive = async (item) => {
 };
 
 onMounted(() => {
-  loadHistory(1); // Force page 1
+  loadHistory(1);
   loadIncoming(1);
 });
 </script>
