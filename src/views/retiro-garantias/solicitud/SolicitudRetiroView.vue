@@ -269,6 +269,7 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50 sticky top-0">
             <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Solicitud</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
@@ -279,12 +280,13 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-if="loadingHistory">
-              <td colspan="6" class="px-6 py-4 text-center text-gray-500">Cargando historial...</td>
+              <td colspan="7" class="px-6 py-4 text-center text-gray-500">Cargando historial...</td>
             </tr>
             <tr v-else-if="filteredHistory.length === 0">
-              <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay solicitudes registradas con este filtro.</td>
+              <td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay solicitudes registradas con este filtro.</td>
             </tr>
             <tr v-for="item in filteredHistory" :key="item.id" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">#{{ item.id }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(item.fecha_solicitud) }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 <div class="font-medium">{{ item.numero_documento }}</div>
@@ -370,6 +372,7 @@
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50 sticky top-0">
                 <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Envío</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Origen (Agencia)</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitante</th>
@@ -381,12 +384,13 @@
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
                 <tr v-if="loadingIncoming">
-                  <td colspan="7" class="px-6 py-4 text-center text-gray-500">Cargando solicitudes recibidas...</td>
+                  <td colspan="8" class="px-6 py-4 text-center text-gray-500">Cargando solicitudes recibidas...</td>
                 </tr>
                 <tr v-else-if="incomingRequests.length === 0">
-                  <td colspan="7" class="px-6 py-4 text-center text-gray-500">No ha recibido solicitudes de otras agencias.</td>
+                  <td colspan="8" class="px-6 py-4 text-center text-gray-500">No ha recibido solicitudes de otras agencias.</td>
                 </tr>
                 <tr v-for="item in incomingRequests" :key="item.id" class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">#{{ item.id }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(item.fecha_envio) }}</td>
                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{{ item.agencia?.nombre || 'N/A' }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.solicitante?.name || 'N/A' }}</td>
