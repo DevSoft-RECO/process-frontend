@@ -24,14 +24,14 @@
         Consultar Expediente
       </h2>
       <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">
-        Ingrese el Número de Producto (Crédito) o el Código de Cliente del expediente.
+        Ingrese el Número de Producto (Crédito) o el Código de Cliente.
       </p>
       <div class="flex space-x-3">
         <input 
           v-model="searchTerm" 
           @keyup.enter="handleSearch"
           type="text" 
-          placeholder="Ej: ESC-2023-001 o 10023456" 
+          placeholder="Ej: 1260000 o 123456" 
           class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none text-slate-800 dark:text-slate-100 placeholder-slate-400 transition-all shadow-inner"
           :disabled="loading"
         >

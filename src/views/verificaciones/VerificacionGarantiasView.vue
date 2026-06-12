@@ -39,7 +39,7 @@
 
         <!-- Fecha Field -->
         <div class="space-y-1.5">
-          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Fecha de Emisión</label>
+          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Fecha de Garantía</label>
           <input 
             v-model="searchFields.fecha" 
             @keyup.enter="handleSearch"
@@ -126,7 +126,7 @@
             </p>
           </div>
           <div class="text-left md:text-right bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2 rounded-xl">
-            <span class="block text-[10px] font-bold text-slate-400 uppercase">Fecha de Emisión</span>
+            <span class="block text-[10px] font-bold text-slate-400 uppercase">Fecha de Garantía</span>
             <span class="font-bold text-slate-700 dark:text-slate-300 text-sm">{{ formatDate(result.garantia.fecha) }}</span>
           </div>
         </div>
@@ -203,7 +203,7 @@
         </div>
         <h3 class="text-xl font-black text-slate-700 dark:text-slate-300">Consulta de Relaciones</h3>
         <p class="text-slate-500 dark:text-slate-400 max-w-md text-center mt-2 text-sm leading-relaxed">
-          Ingrese el número y la fecha de emisión de una garantía para validar si cuenta con productos o expedientes asignados en la base de datos de control.
+          Ingrese el número y la fecha de garantía para validar si cuenta con productos o expedientes asignados en la base de datos de control.
         </p>
       </div>
     </Transition>
