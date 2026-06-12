@@ -746,6 +746,10 @@ const menuItems = computed(() => {
                 {
                     label: 'Verificación Garantías',
                     route: '/admin/verificaciones/garantias'
+                },
+                {
+                    label: 'Verificación Expedientes',
+                    route: '/admin/verificaciones/expedientes'
                 }
             ]
         },
