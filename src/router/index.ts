@@ -414,6 +414,16 @@ const routes: RouteRecordRaw[] = [
 
 
             // ==========================================
+            // MÓDULO: VERIFICACIONES
+            // ==========================================
+            {
+                path: 'verificaciones/garantias',
+                name: 'admin-verificacion-garantias',
+                component: () => import('@/views/verificaciones/VerificacionGarantiasView.vue'),
+                meta: { title: 'Verificación Garantías', role: 'Super Admin' }
+            },
+
+            // ==========================================
             // MÓDULO: REPORTES
             // ==========================================
             {

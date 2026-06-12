@@ -733,6 +733,25 @@ const menuItems = computed(() => {
 
         {
             isDivider: true,
+            label: 'Verificaciones',
+            role: 'Super Admin',
+            textColorClass: 'text-amber-500 dark:text-amber-400'
+        },
+        {
+            id: 'verificaciones-grupo',
+            label: 'Verificaciones',
+            iconSvg: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />',
+            role: 'Super Admin',
+            children: [
+                {
+                    label: 'Verificación Garantías',
+                    route: '/admin/verificaciones/garantias'
+                }
+            ]
+        },
+
+        {
+            isDivider: true,
             label: 'Reportes y Analítica',
             permission: 'rep_seguimiento_principal || rep_consolidado_agencias || rep_rendimiento_personal || rep_estado_garantías_reales || rep_archivos_administrativos || rep_retiro_garantías_fisica || rep_confirmación_fisica',
         },
@@ -787,6 +806,11 @@ const menuItems = computed(() => {
 
         return item;
     }).filter(item => {
+        // Validación de rol personalizado (ej. Super Admin exclusivo)
+        if (item.role && !authStore.hasRole(item.role)) {
+            return false;
+        }
+
         if (isSuperAdmin || item.id === 'home') return true;
 
         // Los divisores se muestran si se tiene el permiso respectivo
