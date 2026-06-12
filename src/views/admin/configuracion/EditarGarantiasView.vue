@@ -4,16 +4,35 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
         <Encabezado
-          title="Editar Garantías"
-          subtitle="Busca y edita información de documentos por número y fecha."
+          title="Garantías / Documentos"
+          :subtitle="isCreating ? 'Registra una nueva garantía en el sistema.' : 'Busca y edita información de documentos por número y fecha.'"
           labelIndicator="Configuración"
           indicator-color="bg-verde-cope"
         />
       </div>
+      <div>
+        <button 
+          v-if="!isCreating"
+          @click="startCreation"
+          class="px-4 py-2.5 bg-verde-cope hover:bg-green-700 text-white rounded-xl transition flex items-center justify-center gap-2 text-sm font-bold shadow-md active:scale-95"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Nueva Garantía
+        </button>
+        <button 
+          v-else
+          @click="cancelCreation"
+          class="px-4 py-2.5 bg-gray-500 hover:bg-gray-600 text-white rounded-xl transition flex items-center justify-center gap-2 text-sm font-bold shadow-md active:scale-95"
+        >
+          Volver a Buscar
+        </button>
+      </div>
     </div>
 
-    <!-- Búsqueda -->
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+    <!-- Búsqueda (solo si no estamos creando) -->
+    <div v-if="!isCreating && !selectedDocument" class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-gray-200 dark:border-gray-700 transition-all duration-300">
       <form @submit.prevent="searchDocuments" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Número de Documento</label>
@@ -51,7 +70,7 @@
     </div>
 
     <!-- Resultados para Selección (si hay más de uno) -->
-    <div v-if="results.length > 1 && !selectedDocument" class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div v-if="!isCreating && results.length > 1 && !selectedDocument" class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
       <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
         <h3 class="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase">Se encontraron múltiples coincidencias. Seleccione una:</h3>
       </div>
@@ -85,8 +104,104 @@
       </div>
     </div>
 
+    <!-- Formulario de Creación -->
+    <div v-if="isCreating" class="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden animate-fade-in">
+      <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
+        <h3 class="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase flex items-center gap-2">
+          <span>Registrar Nueva Garantía</span>
+        </h3>
+        <button @click="cancelCreation" class="text-gray-500 hover:text-red-500 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <div class="p-6">
+        <form @submit.prevent="createDocument" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Número</label>
+            <input v-model="createForm.numero" type="text" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fecha</label>
+            <input v-model="createForm.fecha" type="date" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Documento</label>
+            <select v-model="createForm.tipo_documento_id" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" required>
+                <option value="" disabled>Seleccione un tipo</option>
+                <option v-for="t in tipoDocumentos" :key="t.id" :value="t.id">{{ t.nombre }}</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Propietario</label>
+            <input v-model="createForm.propietario" type="text" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Registro de Propiedad</label>
+            <select v-model="createForm.registro_propiedad_id" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white">
+                <option :value="null">N/A</option>
+                <option v-for="r in registrosPropiedad" :key="r.id" :value="r.id">{{ r.nombre }}</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No. Finca</label>
+            <input v-model="createForm.no_finca" type="text" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Folio</label>
+            <input v-model="createForm.folio" type="text" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Libro</label>
+            <input v-model="createForm.libro" type="text" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Estado</label>
+            <select v-model="createForm.estado" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" required>
+                <option value="activo">activo</option>
+                <option value="temporal">temporal</option>
+                <option value="definitivo">definitivo</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Autorizador</label>
+            <input v-model="createForm.autorizador" type="text" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No. Dominio</label>
+            <input v-model="createForm.no_dominio" type="text" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Referencia</label>
+            <input v-model="createForm.referencia" type="text" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monto Póliza</label>
+            <input v-model="createForm.monto_poliza" type="number" step="0.01" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" />
+          </div>
+
+          <div class="lg:col-span-3">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Observación</label>
+            <textarea v-model="createForm.observacion" rows="2" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white"></textarea>
+          </div>
+
+          <div class="lg:col-span-3 flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+             <button type="button" @click="cancelCreation" class="px-6 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium">
+                 Cancelar
+             </button>
+             <button type="submit" :disabled="saving" class="px-8 py-2 bg-verde-cope text-white rounded-lg hover:bg-green-700 transition font-bold shadow-md disabled:opacity-50 flex items-center gap-2">
+                 <span v-if="saving" class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+                 {{ saving ? 'Creando...' : 'Crear Garantía' }}
+             </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Formulario de Edición -->
-    <div v-if="selectedDocument" class="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden animate-fade-in">
+    <div v-if="selectedDocument && !isCreating" class="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden animate-fade-in">
       <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
         <h3 class="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase flex items-center gap-2">
           <span>Editando Documento: {{ selectedDocument.numero }}</span>
@@ -148,6 +263,23 @@
                 <option value="definitivo">definitivo</option>
             </select>
           </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Autorizador</label>
+            <input v-model="editForm.autorizador" type="text" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">No. Dominio</label>
+            <input v-model="editForm.no_dominio" type="text" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Referencia</label>
+            <input v-model="editForm.referencia" type="text" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monto Póliza</label>
+            <input v-model="editForm.monto_poliza" type="number" step="0.01" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white" />
+          </div>
+
           <div class="lg:col-span-3">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Observación</label>
             <textarea v-model="editForm.observacion" rows="2" class="w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-white"></textarea>
@@ -178,7 +310,7 @@
     </div>
 
     <!-- Empty State -->
-    <div v-if="searched && results.length === 0 && !loading" class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
+    <div v-if="!isCreating && searched && results.length === 0 && !loading" class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto text-gray-400 mb-4">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
         </svg>
@@ -204,6 +336,7 @@ const searched = ref(false)
 const selectedDocument = ref<any>(null)
 const saving = ref(false)
 const deleting = ref(false)
+const isCreating = ref(false)
 
 const tipoDocumentos = ref<any[]>([])
 const registrosPropiedad = ref<any[]>([])
@@ -219,7 +352,28 @@ const editForm = reactive({
   observacion: '',
   estado: '',
   tipo_documento_id: '',
-  registro_propiedad_id: null as number | null
+  registro_propiedad_id: null as number | null,
+  autorizador: '',
+  no_dominio: '',
+  referencia: '',
+  monto_poliza: null as number | null
+})
+
+const createForm = reactive({
+  numero: '',
+  fecha: '',
+  propietario: '',
+  no_finca: '',
+  folio: '',
+  libro: '',
+  observacion: '',
+  estado: 'activo',
+  tipo_documento_id: '',
+  registro_propiedad_id: null as number | null,
+  autorizador: '',
+  no_dominio: '',
+  referencia: '',
+  monto_poliza: null as number | null
 })
 
 const fetchCatalogs = async () => {
@@ -268,6 +422,10 @@ const selectDocument = (doc: any) => {
   editForm.estado = doc.estado
   editForm.tipo_documento_id = doc.tipo_documento_id
   editForm.registro_propiedad_id = doc.registro_propiedad_id
+  editForm.autorizador = doc.autorizador || ''
+  editForm.no_dominio = doc.no_dominio || ''
+  editForm.referencia = doc.referencia || ''
+  editForm.monto_poliza = doc.monto_poliza || null
 }
 
 const updateDocument = async () => {
@@ -283,6 +441,47 @@ const updateDocument = async () => {
   } finally {
     saving.value = false
   }
+}
+
+const createDocument = async () => {
+  saving.value = true
+  try {
+    await api.post('/documentos-edicion', createForm)
+    Swal.fire('¡Éxito!', 'La nueva garantía ha sido registrada en el sistema.', 'success')
+    cancelCreation()
+    resetSearch()
+  } catch (error: any) {
+    console.error(error)
+    const msg = error.response?.data?.message || 'Error al registrar la garantía'
+    Swal.fire('Error', msg, 'error')
+  } finally {
+    saving.value = false
+  }
+}
+
+const startCreation = () => {
+  isCreating.value = true
+  selectedDocument.value = null
+  
+  // Reset createForm
+  createForm.numero = ''
+  createForm.fecha = ''
+  createForm.propietario = ''
+  createForm.no_finca = ''
+  createForm.folio = ''
+  createForm.libro = ''
+  createForm.observacion = ''
+  createForm.estado = 'activo'
+  createForm.tipo_documento_id = ''
+  createForm.registro_propiedad_id = null
+  createForm.autorizador = ''
+  createForm.no_dominio = ''
+  createForm.referencia = ''
+  createForm.monto_poliza = null
+}
+
+const cancelCreation = () => {
+  isCreating.value = false
 }
 
 const confirmDelete = () => {
