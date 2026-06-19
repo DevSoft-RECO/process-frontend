@@ -54,24 +54,15 @@
               <td class="px-6 py-4 text-slate-600 dark:text-slate-400 text-sm">
                 {{ lote.usuario?.name || 'Desconocido' }}
               </td>
-              <td class="px-6 py-4 text-right space-x-2">
+              <td class="px-6 py-4 text-right">
                 <button 
                   @click="previewLote(lote)"
                   class="p-2 text-slate-400 hover:text-verde-cope transition-colors rounded-lg hover:bg-verde-cope/10"
-                  title="Ver registros"
+                  title="Ver registros y opciones"
                 >
                   <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                </button>
-                <button 
-                  @click="confirmDelete(lote)"
-                  class="p-2 text-slate-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-500/10"
-                  title="Eliminar lote"
-                >
-                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </button>
               </td>
@@ -87,9 +78,12 @@
         <!-- Modal Header -->
         <div class="px-8 py-6 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
           <div>
-            <h2 class="text-xl font-bold dark:text-white flex items-center gap-3">
+            <h2 class="text-xl font-bold dark:text-white flex flex-wrap items-center gap-3">
               <span class="text-verde-cope font-mono">#{{ selectedLotePreview.id }}</span>
-              Vista Previa de Registros
+              <span>Vista Previa de Registros</span>
+              <span v-if="hasRecordsWithTracking" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50 animate-pulse">
+                ⚠️ Lote con seguimientos activos
+              </span>
             </h2>
             <p class="text-sm text-slate-500 mt-1">Mostrando hasta 500 registros del archivo: {{ selectedLotePreview.nombre_archivo }}</p>
           </div>
@@ -99,30 +93,55 @@
         </div>
 
         <!-- Modal Content -->
-        <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+        <div class="flex-1 overflow-y-auto p-6 custom-scrollbar">
           <div v-if="loadingPreview" class="p-12 flex flex-col items-center justify-center space-y-4">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-verde-cope"></div>
             <p class="text-slate-500">Obteniendo registros...</p>
           </div>
-          <div v-else class="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800">
-             <table class="w-full text-left text-sm border-collapse">
-               <thead>
-                 <tr class="bg-slate-50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800">
-                   <th class="px-4 py-3 font-bold text-slate-500 uppercase tracking-tighter">Cód. Cliente</th>
-                   <th class="px-4 py-3 font-bold text-slate-500 uppercase tracking-tighter">Nombre Asociado</th>
-                   <th class="px-4 py-3 font-bold text-slate-500 uppercase tracking-tighter">Núm. Documento</th>
-                   <th class="px-4 py-3 font-bold text-slate-500 uppercase tracking-tighter">Fecha Registro</th>
-                 </tr>
-               </thead>
-               <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
-                 <tr v-for="record in previewRecords" :key="record.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/20">
-                   <td class="px-4 py-2 font-mono text-verde-cope">{{ record.codigo_cliente }}</td>
-                   <td class="px-4 py-2 uppercase truncate max-w-[200px]">{{ record.nombre_asociado }}</td>
-                   <td class="px-4 py-2 text-slate-500">{{ record.numero_documento }}</td>
-                   <td class="px-4 py-2 text-xs text-slate-400">{{ formatDateTime(record.created_at) }}</td>
-                 </tr>
-               </tbody>
-             </table>
+          <div v-else class="space-y-4">
+            <!-- Warning banner if any record has tracking -->
+            <div v-if="hasRecordsWithTracking" class="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-2xl flex items-start gap-3">
+              <svg class="w-6 h-6 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.268 17c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <h4 class="font-bold text-amber-800 dark:text-amber-400 text-sm">Advertencia: Lote con expedientes en seguimiento</h4>
+                <p class="text-xs text-amber-700 dark:text-amber-500 mt-1">
+                  Este lote contiene expedientes que ya cuentan con un historial de seguimiento (marcados con <span class="font-bold text-green-600 dark:text-green-455 font-mono">✓</span>). 
+                  Si eliminas este lote, se eliminarán sus expedientes pero el historial de seguimiento podría quedar huérfano. ¡Procede con extrema precaución!
+                </p>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800">
+               <table class="w-full text-left text-sm border-collapse">
+                 <thead>
+                   <tr class="bg-slate-50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800">
+                     <th class="px-4 py-3 font-bold text-slate-500 uppercase tracking-tighter">Cód. Cliente</th>
+                     <th class="px-4 py-3 font-bold text-slate-500 uppercase tracking-tighter">Nombre Asociado</th>
+                     <th class="px-4 py-3 font-bold text-slate-500 uppercase tracking-tighter">Núm. Documento</th>
+                     <th class="px-4 py-3 font-bold text-slate-500 uppercase tracking-tighter">Fecha Registro</th>
+                     <th class="px-4 py-3 font-bold text-slate-500 uppercase tracking-tighter text-center">Seguimiento</th>
+                   </tr>
+                 </thead>
+                 <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
+                   <tr v-for="record in previewRecords" :key="record.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/20">
+                     <td class="px-4 py-2 font-mono text-verde-cope">{{ record.codigo_cliente }}</td>
+                     <td class="px-4 py-2 uppercase truncate max-w-[200px]">{{ record.nombre_asociado }}</td>
+                     <td class="px-4 py-2 text-slate-500">{{ record.numero_documento }}</td>
+                     <td class="px-4 py-2 text-xs text-slate-400">{{ formatDateTime(record.created_at) }}</td>
+                     <td class="px-4 py-2 text-center">
+                       <span v-if="record.seguimientos_exists" class="inline-flex items-center justify-center p-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full" title="Tiene Seguimiento">
+                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                         </svg>
+                       </span>
+                       <span v-else class="text-slate-400 font-mono">-</span>
+                     </td>
+                   </tr>
+                 </tbody>
+               </table>
+            </div>
           </div>
         </div>
 
@@ -204,7 +223,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 
@@ -229,6 +248,7 @@ interface RecordPreview {
   nombre_asociado: string;
   numero_documento: string;
   created_at: string;
+  seguimientos_exists: boolean;
 }
 
 // State
@@ -240,6 +260,10 @@ const loadingPreview = ref(false)
 const loteToDelete = ref<Lote | null>(null)
 const deleteConfirmationText = ref('')
 const isDeleting = ref(false)
+
+const hasRecordsWithTracking = computed(() => {
+  return previewRecords.value.some(r => r.seguimientos_exists)
+})
 
 // Methods
 const fetchLotes = async () => {
