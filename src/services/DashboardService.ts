@@ -138,5 +138,17 @@ export default {
 
         const res = await api.get(url)
         return res.data
+    },
+    async getWithoutTracking(month?: string, agencyIds?: number[] | null): Promise<{ numero_documento: string }[]> {
+        let url = '/dashboard/without-tracking'
+        let params = new URLSearchParams()
+        if (month) params.append('month', month)
+        if (agencyIds && agencyIds.length > 0) {
+            agencyIds.forEach(id => params.append('agency_id[]', id.toString()))
+        }
+        if (params.toString()) url += `?${params.toString()}`
+
+        const res = await api.get(url)
+        return res.data
     }
 }

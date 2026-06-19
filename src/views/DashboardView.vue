@@ -91,7 +91,11 @@
             </template>
             <template v-else>
                 <!-- Active Cases -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border-l-4 border-blue-500 hover:shadow-md transition-shadow">
+                <div 
+                    @click="openWithoutTrackingModal"
+                    class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border-l-4 border-blue-500 hover:shadow-md transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                    title="Ver expedientes sin seguimiento"
+                >
                     <div class="flex justify-between items-start">
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Con Seguimiento</p>
@@ -474,6 +478,66 @@
             </div>
         </template>
     </div>
+
+    <!-- Modal: Expedientes Sin Seguimiento -->
+    <Transition
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="opacity-0 scale-95"
+        enter-to-class="opacity-100 scale-100"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-95"
+    >
+        <div v-if="isWithoutTrackingModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div class="relative w-full max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col max-h-[85vh]">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Sin Seguimiento</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Expedientes de este mes que aún no tienen seguimiento.</p>
+                    </div>
+                    <button @click="isWithoutTrackingModalOpen = false" class="text-gray-400 hover:text-gray-650 dark:hover:text-white transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 overflow-y-auto flex-1 space-y-4">
+                    <div v-if="loadingWithoutTracking" class="flex justify-center py-12">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                    </div>
+                    <div v-else>
+                        <div v-if="withoutTrackingList.length === 0" class="text-center py-12 text-gray-500 dark:text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-green-500 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            ¡Excelente! Todos los expedientes de este mes tienen seguimiento.
+                        </div>
+                        <div v-else class="divide-y divide-gray-100 dark:divide-gray-700 border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden">
+                            <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                Número Producto
+                            </div>
+                            <div v-for="(exp, index) in withoutTrackingList" :key="index" class="px-4 py-3 text-sm font-medium text-gray-800 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                                {{ exp.numero_documento }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="p-6 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+                    <button 
+                        @click="isWithoutTrackingModalOpen = false" 
+                        class="px-5 py-2.5 text-sm font-bold text-gray-750 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 rounded-xl transition-all"
+                    >
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </Transition>
 </template>
 
 <script setup lang="ts">
@@ -503,6 +567,22 @@ const selectedAgencies = ref<number[]>([])
 const isAgencyDropdownOpen = ref(false)
 const selectedMonth = ref(new Date().toISOString().slice(0, 7))
 const activeAdvisorId = ref<string | null>(null)
+
+const isWithoutTrackingModalOpen = ref(false)
+const withoutTrackingList = ref<{ numero_documento: string }[]>([])
+const loadingWithoutTracking = ref(false)
+
+const openWithoutTrackingModal = async () => {
+    isWithoutTrackingModalOpen.value = true
+    loadingWithoutTracking.value = true
+    try {
+        withoutTrackingList.value = await DashboardService.getWithoutTracking(selectedMonth.value, selectedAgencies.value)
+    } catch (e) {
+        console.error("Error loading expedientes without tracking", e)
+    } finally {
+        loadingWithoutTracking.value = false
+    }
+}
 
 const toggleAdvisorLabel = (id: string) => {
     console.log('Toggling label for:', id)
