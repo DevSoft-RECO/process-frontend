@@ -148,20 +148,43 @@
     <!-- Confirm Dialog -->
     <div v-if="loteToDelete" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
       <div class="bg-white dark:bg-slate-900 w-full max-w-md p-8 rounded-3xl shadow-2xl border border-red-100 dark:border-red-900/20 scale-in-center">
-        <div class="flex items-center justify-center w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full mb-6 mx-auto">
+        <div class="flex items-center justify-center w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full mb-4 mx-auto">
           <svg class="w-10 h-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.268 17c-.77 1.333.192 3 1.732 3z" />
           </svg>
         </div>
         <h3 class="text-xl font-bold text-center text-slate-900 dark:text-white mb-2">¿Confirmar eliminación?</h3>
-        <p class="text-center text-slate-500 dark:text-slate-400 mb-8">
+        
+        <!-- Large date verification display -->
+        <div class="my-4 p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-2xl text-center">
+          <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Fecha de Carga a Eliminar</p>
+          <p class="text-xl font-black text-red-600 dark:text-red-400 mt-1">
+            {{ formatDateTime(loteToDelete.created_at) }}
+          </p>
+        </div>
+
+        <p class="text-center text-sm text-slate-500 dark:text-slate-400 mb-6">
           Estás a punto de eliminar el lote <span class="font-bold text-red-500">#{{ loteToDelete.id }}</span>. 
-          Esta acción borrará <span class="font-bold underline">{{ loteToDelete.registros_totales }} registros</span> de la tabla de nuevos expedientes de forma permanente.
+          Esta acción borrará <span class="font-bold underline">{{ loteToDelete.registros_totales }} registros</span> de forma permanente.
         </p>
+
+        <!-- Confirmation text input -->
+        <div class="mb-6">
+          <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 text-center">
+            Escribe <span class="font-black text-red-500">confirmar</span> para proceder:
+          </label>
+          <input 
+            type="text" 
+            v-model="deleteConfirmationText" 
+            placeholder="confirmar" 
+            class="w-full px-4 py-3 text-center font-bold text-slate-800 dark:text-white bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-red-500 dark:focus:border-red-500 transition-colors"
+          />
+        </div>
+
         <div class="flex flex-col gap-3">
           <button 
             @click="handleDelete" 
-            :disabled="isDeleting"
+            :disabled="isDeleting || deleteConfirmationText.toLowerCase() !== 'confirmar'"
             class="w-full py-3 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2"
           >
             <span v-if="isDeleting" class="animate-spin border-2 border-white/30 border-t-white rounded-full w-4 h-4"></span>
@@ -215,6 +238,7 @@ const selectedLotePreview = ref<Lote | null>(null)
 const previewRecords = ref<RecordPreview[]>([])
 const loadingPreview = ref(false)
 const loteToDelete = ref<Lote | null>(null)
+const deleteConfirmationText = ref('')
 const isDeleting = ref(false)
 
 // Methods
@@ -250,6 +274,7 @@ const previewLote = async (lote: Lote) => {
 
 const confirmDelete = (lote: Lote) => {
   loteToDelete.value = lote
+  deleteConfirmationText.value = ''
 }
 
 const handleDelete = async () => {
