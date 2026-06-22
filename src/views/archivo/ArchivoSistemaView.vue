@@ -10,9 +10,57 @@
                 />
             </div>
 
-             <!-- Filtros -->
-             <!-- Placeholder for future filters if needed -->
-        </div>
+              <!-- Filtros -->
+              <div class="flex flex-col sm:flex-row items-end gap-3 bg-white/50 dark:bg-slate-900/50 p-4 rounded-xl border border-white/20 dark:border-slate-700/30">
+                  <div class="w-full sm:w-auto flex-1 max-w-xs">
+                      <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Código Cliente</label>
+                      <div class="relative">
+                          <input 
+                              v-model="searchCodigoCliente" 
+                              @keyup.enter="handleSearch"
+                              type="text" 
+                              placeholder="Ej. 2784879..." 
+                              class="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none w-full transition-all"
+                          />
+                          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                              </svg>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="w-full sm:w-auto flex-1 max-w-xs">
+                      <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">No. Documento / Producto</label>
+                      <div class="relative">
+                          <input 
+                              v-model="searchNumeroDocumento" 
+                              @keyup.enter="handleSearch"
+                              type="text" 
+                              placeholder="Ej. 1260000007843..." 
+                              class="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none w-full transition-all"
+                          />
+                          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div class="flex items-center gap-2 w-full sm:w-auto">
+                      <button @click="handleSearch" class="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition flex items-center justify-center gap-2 text-sm shadow-sm font-medium">
+                          Buscar
+                      </button>
+                      <button @click="resetSearch" title="Limpiar filtros" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex items-center justify-center gap-2 text-sm shadow-sm font-medium dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                          </svg>
+                          Limpiar
+                      </button>
+                  </div>
+              </div>
+         </div>
 
         <!-- Table Card -->
         <div class="bg-white/90 dark:bg-slate-900/80 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden border border-white/20 dark:border-slate-700/50">
@@ -228,12 +276,32 @@ const pagination = ref({
 const showModal = ref(false)
 const selectedId = ref<number | null>(null)
 
+// Search filters
+const searchCodigoCliente = ref('')
+const searchNumeroDocumento = ref('')
+
+const handleSearch = () => {
+    fetchExpedientes(1)
+}
+
+const resetSearch = () => {
+    searchCodigoCliente.value = ''
+    searchNumeroDocumento.value = ''
+    fetchExpedientes(1)
+}
+
 const fetchExpedientes = async (page: number = 1) => {
     loading.value = true
     try {
-        const response = await api.get('/archivo/sistema', {
-            params: { page }
-        })
+        const params: any = { page }
+        if (searchCodigoCliente.value) {
+            params.codigo_cliente = searchCodigoCliente.value
+        }
+        if (searchNumeroDocumento.value) {
+            params.numero_documento = searchNumeroDocumento.value
+        }
+
+        const response = await api.get('/archivo/sistema', { params })
 
         if (response.data.success) {
             const resData = response.data.data
