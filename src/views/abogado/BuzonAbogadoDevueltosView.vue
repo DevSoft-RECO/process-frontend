@@ -11,7 +11,7 @@
                     <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
                         Devueltos a Secretaría
                         <span class="px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 text-sm font-medium dark:bg-gray-700 dark:text-gray-300">
-                            {{ filteredExpedientes.length }}
+                            {{ pagination.total }}
                         </span>
                     </h1>
                      <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-2xl">
@@ -37,7 +37,7 @@
                         >
                     </div>
                     <button 
-                        @click="fetchExpedientes"
+                        @click="filterByDate"
                         class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center"
                         title="Filtrar por fechas"
                     >
@@ -59,6 +59,7 @@
                         </div>
                         <input 
                             v-model="search" 
+                            @input="debouncedSearch"
                             type="text" 
                             placeholder="Buscar expediente..." 
                             class="pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 w-full sm:w-64 transition-all shadow-sm group-hover:shadow-md"
@@ -140,6 +141,58 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Paginación -->
+        <div v-if="pagination.total > 0" class="bg-gray-50/50 dark:bg-gray-800/30 px-6 py-4 border-t border-gray-100 dark:border-gray-700/50">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div class="text-xs text-gray-500 dark:text-gray-400">
+                    Mostrando
+                    <span class="font-bold text-gray-700 dark:text-gray-200">{{ pagination.from }}</span>
+                    –
+                    <span class="font-bold text-gray-700 dark:text-gray-200">{{ pagination.to }}</span>
+                    de
+                    <span class="font-bold text-gray-700 dark:text-gray-200">{{ pagination.total }}</span>
+                </div>
+
+                <div class="flex items-center justify-center md:justify-end gap-2 flex-wrap">
+                    <button
+                        type="button"
+                        @click="changePage(pagination.current_page - 1)"
+                        :disabled="loading || pagination.current_page === 1"
+                        class="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-755 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    >
+                        Anterior
+                    </button>
+
+                    <button
+                        v-for="item in pageItems"
+                        :key="String(item)"
+                        type="button"
+                        @click="typeof item === 'number' ? changePage(item) : null"
+                        :disabled="loading || item === '...'"
+                        :class="[
+                            'min-w-[40px] px-3 py-2 rounded-xl text-xs font-extrabold transition border',
+                            item === '...'
+                                ? 'border-transparent bg-transparent text-gray-400 dark:text-gray-500 cursor-default'
+                                : (item === pagination.current_page
+                                    ? 'border-emerald-600 bg-emerald-600 text-white shadow-sm'
+                                    : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-755')
+                        ]"
+                    >
+                        {{ item }}
+                    </button>
+
+                    <button
+                        type="button"
+                        @click="changePage(pagination.current_page + 1)"
+                        :disabled="loading || pagination.current_page === pagination.last_page"
+                        class="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-755 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    >
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -156,6 +209,28 @@ const search = ref('')
 const startDate = ref('')
 const endDate = ref('')
 
+const pagination = ref({
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+    from: 0,
+    to: 0
+})
+
+let timeout: any = null
+const debouncedSearch = () => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => {
+        pagination.value.current_page = 1
+        fetchExpedientes()
+    }, 500)
+}
+
+const filterByDate = () => {
+    pagination.value.current_page = 1
+    fetchExpedientes()
+}
+
 onMounted(() => {
     fetchExpedientes()
 })
@@ -165,17 +240,33 @@ const fetchExpedientes = async () => {
     try {
         const res = await api.get('/abogado/devueltos', {
             params: {
+                page: pagination.value.current_page,
+                search: search.value,
                 fecha_inicio: startDate.value,
                 fecha_fin: endDate.value
             }
         })
         
-        // Verificar si la respuesta es paginada (res.data.data.data) o un arreglo directo (res.data.data)
-        if (res.data && res.data.data) {
-            if (res.data.data.data && Array.isArray(res.data.data.data)) {
-                expedientes.value = res.data.data.data
-            } else if (Array.isArray(res.data.data)) {
+        // La respuesta directa de Laravel paginator
+        if (res.data) {
+            if (res.data.data && Array.isArray(res.data.data)) {
                 expedientes.value = res.data.data
+                pagination.value = {
+                    current_page: res.data.current_page,
+                    last_page: res.data.last_page,
+                    total: res.data.total,
+                    from: res.data.from,
+                    to: res.data.to
+                }
+            } else if (Array.isArray(res.data)) {
+                expedientes.value = res.data
+                pagination.value = {
+                    current_page: 1,
+                    last_page: 1,
+                    total: res.data.length,
+                    from: res.data.length ? 1 : 0,
+                    to: res.data.length
+                }
             } else {
                 expedientes.value = []
             }
@@ -189,6 +280,36 @@ const fetchExpedientes = async () => {
         loading.value = false
     }
 }
+
+const changePage = (page: number) => {
+    if (page > 0 && page <= pagination.value.last_page) {
+        pagination.value.current_page = page
+        fetchExpedientes()
+    }
+}
+
+const pageItems = computed<(number | '...')[]>(() => {
+    const current = pagination.value.current_page || 1
+    const last = pagination.value.last_page || 1
+    if (last <= 1) return [1]
+
+    const windowSize = 2
+    const pages = new Set<number>([1, last])
+    for (let i = current - windowSize; i <= current + windowSize; i++) {
+        if (i >= 1 && i <= last) pages.add(i)
+    }
+
+    const sorted = Array.from(pages).sort((a, b) => a - b)
+    const items: (number | '...')[] = []
+    sorted.forEach((page, i) => {
+        if (i > 0) {
+            const prev = sorted[i - 1]
+            if (prev !== undefined && page - prev > 1) items.push('...')
+        }
+        items.push(page)
+    })
+    return items
+})
 
 const downloadCSV = async () => {
     try {
@@ -213,13 +334,7 @@ const downloadCSV = async () => {
 }
 
 const filteredExpedientes = computed(() => {
-    if (!Array.isArray(expedientes.value)) return []
-    if (!search.value) return expedientes.value
-    const s = search.value.toLowerCase()
-    return expedientes.value.filter(e => 
-        (e?.id?.toString().includes(s)) || 
-        (e?.nombre_asociado?.toLowerCase().includes(s))
-    )
+    return expedientes.value
 })
 
 const formatDate = (dateString: string) => {

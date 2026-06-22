@@ -11,7 +11,7 @@
                     <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
                         Bandeja de Abogado
                         <span class="px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 text-sm font-medium dark:bg-gray-700 dark:text-gray-300">
-                            {{ filteredExpedientes.length }}
+                            {{ pagination.total }}
                         </span>
                     </h1>
                      <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-2xl">
@@ -28,6 +28,7 @@
                         </div>
                         <input 
                             v-model="search" 
+                            @input="debouncedSearch"
                             type="text" 
                             placeholder="Buscar expediente..." 
                             class="pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-full sm:w-64 transition-all shadow-sm group-hover:shadow-md"
@@ -37,10 +38,11 @@
                     <div class="relative group">
                         <select 
                             v-model="selectedAgencia"
+                            @change="debouncedSearch"
                             class="pl-4 pr-10 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-full sm:w-64 transition-all shadow-sm group-hover:shadow-md appearance-none"
                         >
                             <option value="">Todas las Agencias</option>
-                            <option v-for="ag in agenciasUnicas" :key="ag.id" :value="ag.id">
+                            <option v-for="ag in agencias" :key="ag.id" :value="ag.id">
                                 {{ ag.nombre }}
                             </option>
                         </select>
@@ -131,6 +133,58 @@
             </table>
         </div>
 
+        <!-- Paginación -->
+        <div v-if="pagination.total > 0" class="bg-gray-50/50 dark:bg-gray-800/30 px-6 py-4 border-t border-gray-100 dark:border-gray-700/50">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div class="text-xs text-gray-500 dark:text-gray-400">
+                    Mostrando
+                    <span class="font-bold text-gray-700 dark:text-gray-200">{{ pagination.from }}</span>
+                    –
+                    <span class="font-bold text-gray-700 dark:text-gray-200">{{ pagination.to }}</span>
+                    de
+                    <span class="font-bold text-gray-700 dark:text-gray-200">{{ pagination.total }}</span>
+                </div>
+
+                <div class="flex items-center justify-center md:justify-end gap-2 flex-wrap">
+                    <button
+                        type="button"
+                        @click="changePage(pagination.current_page - 1)"
+                        :disabled="loading || pagination.current_page === 1"
+                        class="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-750 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    >
+                        Anterior
+                    </button>
+
+                    <button
+                        v-for="item in pageItems"
+                        :key="String(item)"
+                        type="button"
+                        @click="typeof item === 'number' ? changePage(item) : null"
+                        :disabled="loading || item === '...'"
+                        :class="[
+                            'min-w-[40px] px-3 py-2 rounded-xl text-xs font-extrabold transition border',
+                            item === '...'
+                                ? 'border-transparent bg-transparent text-gray-400 dark:text-gray-500 cursor-default'
+                                : (item === pagination.current_page
+                                    ? 'border-indigo-600 bg-indigo-600 text-white shadow-sm'
+                                    : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-750')
+                        ]"
+                    >
+                        {{ item }}
+                    </button>
+
+                    <button
+                        type="button"
+                        @click="changePage(pagination.current_page + 1)"
+                        :disabled="loading || pagination.current_page === pagination.last_page"
+                        class="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-750 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    >
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <AbogadoDetallesModal 
             :show="showModal" 
             :expediente="selectedExpediente" 
@@ -152,19 +206,63 @@ const expedientes = ref<any[]>([])
 const loading = ref(true)
 const search = ref('')
 const selectedAgencia = ref('')
+const agencias = ref<any[]>([])
 const showModal = ref(false)
 const selectedExpediente = ref<any>(null)
 
+const pagination = ref({
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+    from: 0,
+    to: 0
+})
+
+let timeout: any = null
+const debouncedSearch = () => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => {
+        pagination.value.current_page = 1
+        fetchExpedientes()
+    }, 500)
+}
+
 onMounted(() => {
+    fetchAgencias()
     fetchExpedientes()
 })
+
+const fetchAgencias = async () => {
+    try {
+        const res = await api.get('/agencias', { params: { all: 1 } })
+        if (Array.isArray(res.data)) {
+            agencias.value = res.data
+        } else if (res.data.data && Array.isArray(res.data.data)) {
+            agencias.value = res.data.data
+        }
+    } catch (error) {
+        console.error('Error al cargar agencias:', error)
+    }
+}
 
 const fetchExpedientes = async () => {
     loading.value = true
     try {
-        const res = await api.get('/abogado/buzon')
+        const params = {
+            page: pagination.value.current_page,
+            search: search.value,
+            id_agencia: selectedAgencia.value
+        }
+        const res = await api.get('/abogado/buzon', { params })
         if (res.data.success) {
-            expedientes.value = res.data.data
+            expedientes.value = res.data.data.data
+            pagination.value = {
+                current_page: res.data.data.current_page,
+                last_page: res.data.data.last_page,
+                total: res.data.data.total,
+                from: res.data.data.from,
+                to: res.data.data.to
+            }
         }
     } catch (error) {
         console.error(error)
@@ -173,34 +271,38 @@ const fetchExpedientes = async () => {
     }
 }
 
-const agenciasUnicas = computed(() => {
-    const agencias = new Map()
-    expedientes.value.forEach(e => {
-        if (e.agencia && e.agencia.id) {
-            agencias.set(e.agencia.id, e.agencia)
+const changePage = (page: number) => {
+    if (page > 0 && page <= pagination.value.last_page) {
+        pagination.value.current_page = page
+        fetchExpedientes()
+    }
+}
+
+const pageItems = computed<(number | '...')[]>(() => {
+    const current = pagination.value.current_page || 1
+    const last = pagination.value.last_page || 1
+    if (last <= 1) return [1]
+
+    const windowSize = 2
+    const pages = new Set<number>([1, last])
+    for (let i = current - windowSize; i <= current + windowSize; i++) {
+        if (i >= 1 && i <= last) pages.add(i)
+    }
+
+    const sorted = Array.from(pages).sort((a, b) => a - b)
+    const items: (number | '...')[] = []
+    sorted.forEach((page, i) => {
+        if (i > 0) {
+            const prev = sorted[i - 1]
+            if (prev !== undefined && page - prev > 1) items.push('...')
         }
+        items.push(page)
     })
-    return Array.from(agencias.values())
+    return items
 })
 
 const filteredExpedientes = computed(() => {
-    let result = expedientes.value
-
-    if (selectedAgencia.value) {
-        result = result.filter(e => e.agencia && e.agencia.id === selectedAgencia.value)
-    }
-
-    if (search.value) {
-        const s = search.value.toLowerCase()
-        result = result.filter(e => 
-            e.codigo_cliente.toString().includes(s) || 
-            e.nombre_asociado?.toLowerCase().includes(s) ||
-            e.agencia?.nombre?.toLowerCase().includes(s) ||
-            e.seguimientos?.[0]?.numero_contrato?.toLowerCase().includes(s)
-        )
-    }
-
-    return result
+    return expedientes.value
 })
 
 const formatDate = (dateString: string) => {
