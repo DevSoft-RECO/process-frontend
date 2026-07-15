@@ -172,7 +172,7 @@ const fetchExpedientes = async () => {
     try {
         const res = await api.get('/abogado/buzon')
         if (res.data.success) {
-            expedientes.value = res.data.data
+            expedientes.value = Array.isArray(res.data.data) ? res.data.data : (res.data.data.data || [])
         }
     } catch (error) {
         console.error(error)
