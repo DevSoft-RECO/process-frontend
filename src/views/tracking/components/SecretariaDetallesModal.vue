@@ -441,15 +441,21 @@ const handleAction = async (action: 'aceptar' | 'rechazar' | 'adjuntar-contrato'
             title: 'Enviar a Archivo',
             html:
                 '<div class="text-left space-y-4">' +
-                '<p class="text-sm font-medium text-gray-900">¿El expediente tiene garantía real?</p>' +
+                '<p class="text-sm font-medium text-gray-900">¿El expediente tiene garantía real y se va a enviar fisicamente?</p>' +
                 '<div class="flex flex-col gap-2">' +
-                '  <label class="flex items-center space-x-2 cursor-pointer p-2 rounded hover:bg-gray-50">' +
-                '      <input type="radio" name="swal-garantia" value="si" class="h-4 w-4 text-verde-cope focus:ring-verde-cope border-gray-300">' +
-                '      <span class="text-gray-900">Sí (Registrar envío físico)</span>' +
+                '  <label class="flex flex-col p-2 rounded hover:bg-gray-50 cursor-pointer">' +
+                '      <div class="flex items-center space-x-2">' +
+                '          <input type="radio" name="swal-garantia" value="si" class="h-4 w-4 text-verde-cope focus:ring-verde-cope border-gray-300">' +
+                '          <span class="text-gray-900 font-bold">Sí (Registrar envío físico)</span>' +
+                '      </div>' +
+                '      <span class="text-xs text-gray-500 ml-6 mt-1">Marque esta opción si va a enviar algún documento físico a archivo y razone en la observación de envío.</span>' +
                 '  </label>' +
-                '  <label class="flex items-center space-x-2 cursor-pointer p-2 rounded hover:bg-gray-50">' +
-                '      <input type="radio" name="swal-garantia" value="no" class="h-4 w-4 text-red-600 focus:ring-red-600 border-gray-300" checked>' +
-                '      <span class="text-gray-900">No (Solo registrar razon)</span>' +
+                '  <label class="flex flex-col p-2 rounded hover:bg-gray-50 cursor-pointer">' +
+                '      <div class="flex items-center space-x-2">' +
+                '          <input type="radio" name="swal-garantia" value="no" class="h-4 w-4 text-red-600 focus:ring-red-600 border-gray-300" checked>' +
+                '          <span class="text-gray-900 font-bold">No (Solo registrar razón)</span>' +
+                '      </div>' +
+                '      <span class="text-xs text-gray-500 ml-6 mt-1">Marque esta opción si la garantía ya se encuentra en archivo pero se va a usar para este expediente, o cuando no aplica, razone en el campo observación de envío.</span>' +
                 '  </label>' +
                 '</div>' +
                 '<label class="block text-sm font-medium text-gray-700 mt-2">Observación de Envío *</label>' +
@@ -473,6 +479,19 @@ const handleAction = async (action: 'aceptar' | 'rechazar' | 'adjuntar-contrato'
         })
 
         if (formValues) {
+            const confirmResult = await Swal.fire({
+                title: '¿Reviso Correctamente?',
+                text: 'Si comete algún error, solo podrá corregirlo enviando un correo a informática. ¿Desea continuar?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#10B981',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, proceder',
+                cancelButtonText: 'Cancelar'
+            })
+
+            if (!confirmResult.isConfirmed) return;
+
             try {
                 const res = await api.post('/seguimiento/enviar-archivo', {
                     expediente_id: props.expediente.id,
