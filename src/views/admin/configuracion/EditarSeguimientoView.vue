@@ -194,10 +194,15 @@
                     </div>
 
 
-                    <!-- Es Pagaré -->
+                    <!-- Tipo de Contrato -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Es Pagaré (si/no)</label>
-                        <input v-model="formSeguimiento.es_un_pagare" type="text" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Contrato</label>
+                        <select v-model="formSeguimiento.tipo_contrato" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
+                            <option :value="null">N/A</option>
+                            <option value="Escritura Pública">Escritura Pública</option>
+                            <option value="Documento Privado">Documento Privado</option>
+                            <option value="Pagaré">Pagaré</option>
+                        </select>
                     </div>
 
                     <!-- Número de Contrato -->
@@ -212,34 +217,16 @@
                         <input v-model.number="formSeguimiento.bufete_id" type="number" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                     </div>
 
-                    <!-- Recibí Pagaré -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Recibí Pagaré</label>
-                         <select v-model="formSeguimiento.recibi_pagare" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
-                            <option value="Si">Si</option>
-                            <option value="No">No</option>
-                             <option :value="null">N/A</option>
-                        </select>
-                    </div>
-
                     <!-- Recibí Garantía Real -->
                      <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Recibí Garantía Real</label>
-                         <select v-model="formSeguimiento.recibi_garantia_real" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
-                            <option value="Si">Si</option>
-                            <option value="No">No</option>
-                             <option :value="null">N/A</option>
-                        </select>
+                        <input v-model="formSeguimiento.recibi_garantia_real" type="text" placeholder="Ej: Si - DD/MM/AAAA HH:MM o No" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                     </div>
 
                     <!-- Recibí Contrato -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Recibí Contrato</label>
-                         <select v-model="formSeguimiento.recibi_contrato" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
-                            <option value="Si">Si</option>
-                            <option value="No">No</option>
-                             <option :value="null">N/A</option>
-                        </select>
+                        <input v-model="formSeguimiento.recibi_contrato" type="text" placeholder="Ej: Si - DD/MM/AAAA HH:MM o No" class="mt-1 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-verde-cope focus:ring focus:ring-verde-cope focus:ring-opacity-50">
                     </div>
 
                     <!-- Path Contrato -->
