@@ -28,9 +28,6 @@
         <div>
           <h3 class="font-bold text-blue-900 dark:text-blue-300 text-sm">Garantías Asociadas al Expediente</h3>
           <p class="text-xs text-blue-700/80 dark:text-blue-400/80 mt-0.5">Seleccione la garantía que desea retirar de la lista a continuación.</p>
-          <div v-if="expedienteActive" class="text-xs text-rose-600 dark:text-rose-400 font-bold mt-2 flex items-center">
-            <i class="fas fa-exclamation-circle mr-1.5"></i> Advertencia: El expediente asociado aún se encuentra ACTIVO.
-          </div>
         </div>
       </div>
 
@@ -170,8 +167,9 @@
           <option value="Temporal" :disabled="isTemporalDisabled">Temporal</option>
           <option value="Definitivo" :disabled="isSelectionLinked">Definitivo</option>
         </select>
-        <p v-if="isSelectionLinked && !isManual" class="text-[11px] text-rose-500 font-semibold mt-1.5 flex items-center">
-          <i class="fas fa-exclamation-triangle mr-1"></i> Retiro definitivo no permitido por vinculaciones activas.
+        <p v-if="isSelectionLinked && !isManual" class="text-[11px] text-rose-500 font-semibold mt-1.5 flex flex-col gap-0.5">
+          <span class="flex items-center"><i class="fas fa-exclamation-triangle mr-1"></i> Advertencia: El expediente asociado aún se encuentra ACTIVO.</span>
+          <span class="ml-3.5 opacity-90">Solicite la cancelación del producto en SADEC para realizar el retiro definitivo.</span>
         </p>
         <p v-if="isTemporalDisabled && !isManual" class="text-[11px] text-blue-500 font-semibold mt-1.5 flex items-center">
           <i class="fas fa-info-circle mr-1"></i> Retiro temporal bloqueado. No posee vinculaciones activas.
@@ -263,13 +261,11 @@ const selectedDoc = computed(() => {
 });
 
 const isSelectionLinked = computed(() => {
-  if (props.isSuperAdmin) return false;
   if (!props.formData.id_documento || props.isManual) return false;
   return selectedDoc.value ? !selectedDoc.value.permite_definitivo : false;
 });
 
 const isTemporalDisabled = computed(() => {
-  if (props.isSuperAdmin) return false;
   if (!props.formData.id_documento || props.isManual) return false;
   return selectedDoc.value ? !selectedDoc.value.permite_temporal : false;
 });

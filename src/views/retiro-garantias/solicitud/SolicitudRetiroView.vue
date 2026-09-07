@@ -220,7 +220,7 @@ const selectDocument = (doc) => {
         Swal.fire({
             icon: 'warning',
             title: 'Advertencia',
-            text: 'Esta garantía está vinculada a uno o más expedientes activos. Solo se permite retiro TEMPORAL.',
+            text: 'El expediente asociado aún se encuentra ACTIVO. Solo se permite retiro TEMPORAL.',
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
