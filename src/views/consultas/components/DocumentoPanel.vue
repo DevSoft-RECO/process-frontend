@@ -146,7 +146,7 @@
                                 <h3 class="font-bold text-amber-800 dark:text-amber-300">Modo Lectura</h3>
                                 <p class="text-sm mt-1 text-amber-700 dark:text-amber-400">
                                     Edición restringida. 
-                                    <span v-if="selectedDocCount > 1">El documento está vinculado a otros expedientes Contactese con la secretaria Agencia o creditos si su ususario es secretaria de agencia.</span>
+                                    <span v-if="isShared">El documento está vinculado a otros expedientes Contactese con la secretaria Agencia o creditos si su ususario es secretaria de agencia.</span>
                                     <span v-else>El expediente no está en estado editable.</span>
                                 </p>
                             </div>
@@ -338,6 +338,12 @@ const docForm = reactive({
     observacion: ''
 })
 
+const isShared = computed(() => {
+    // If already linked (isDuplicate), count must be > 1 to be shared. 
+    // If not linked yet, count must be > 0 to be shared.
+    return isDuplicate.value ? selectedDocCount.value > 1 : selectedDocCount.value > 0
+})
+
 // Validation Logic for Editing
 const isEditable = computed(() => {
     // If it's a new document (not found in system), it's always editable
@@ -348,9 +354,8 @@ const isEditable = computed(() => {
     // We try to get state from prop OR from expediente object if available
     const state = props.currentState || props.expediente?.id_estado || props.expediente?.seguimientos?.[0]?.id_estado || 0
     
-    // 2. Check Unique Link: Count must be <= 1 (Only this expediente or none)
-    // If count > 1, it means it's shared, so editing is restricted to avoid domino effect
-    const isUnique = selectedDocCount.value <= 1
+    // 2. Check Unique Link
+    const isUnique = !isShared.value
     
     // Allow if Retornado (2) OR No Tracking/Initial (0)
     return (state === 2 || state === 0 || !props.expediente?.seguimientos?.length) && isUnique
