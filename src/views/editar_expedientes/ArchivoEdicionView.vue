@@ -95,8 +95,14 @@
                                         <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{ g.nombre }}</h4>
                                         <span class="text-xs text-gray-500">ID: {{ g.id }}</span>
                                     </div>
-                                    <!-- Edición de garantías deshabilitada para Archivo -->
-                                    <div class="hidden"></div>
+                                    <div class="flex gap-2">
+                                        <button @click="openEditGarantia(g)" class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md text-sm font-medium hover:bg-blue-200 transition">
+                                            Editar Detalles
+                                        </button>
+                                        <button @click="openChangeType(g)" class="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-md text-sm font-medium hover:bg-orange-200 transition">
+                                            Cambiar Tipo
+                                        </button>
+                                    </div>
                                 </div>
                                 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-100 dark:border-gray-600" v-if="g.pivot">
@@ -203,7 +209,23 @@
         </div>
 
         <!-- Modals -->
+        <EditGarantiaModal 
+            v-if="showEditGarantia"
+            :show="showEditGarantia"
+            :expedienteId="currentExpedienteId"
+            :garantia="selectedGarantia"
+            @close="showEditGarantia = false"
+            @refresh="search"
+        />
 
+        <ChangeGarantiaTypeModal
+            v-if="showChangeType"
+            :show="showChangeType"
+            :expedienteId="currentExpedienteId"
+            :garantia="selectedGarantia"
+            @close="showChangeType = false"
+            @refresh="search"
+        />
 
         <CorrectDocumentModal
             v-if="showCorrectDocumento"
@@ -218,10 +240,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+
 import api from '@/api/axios'
 import Swal from 'sweetalert2'
 import CorrectDocumentModal from '../tracking/components/CorrectDocumentModal.vue'
+import EditGarantiaModal from '../tracking/components/EditGarantiaModal.vue'
+import ChangeGarantiaTypeModal from '../tracking/components/ChangeGarantiaTypeModal.vue'
 
 const searchQuery = ref('')
 const searching = ref(false)
@@ -230,7 +254,10 @@ const detallesData = ref<any>(null)
 
 // Modals State
 const showCorrectDocumento = ref(false)
+const showEditGarantia = ref(false)
+const showChangeType = ref(false)
 const selectedDocumento = ref<any>(null)
+const selectedGarantia = ref<any>(null)
 const currentExpedienteId = ref<string | null>(null)
 
 const search = async () => {
@@ -246,22 +273,7 @@ const search = async () => {
         })
 
         if (res.data.success) {
-            const exp = res.data.data.expediente
-            const userStore = useAuthStore()
-
-            // Validación de estado para Archivo: 
-            // Se permite editar si id_estado es 4 O id_estado_secundario es 4.
-            const isEditable = (exp.id_estado === 4 || exp.id_estado_secundario === 4)
-
-            if (!isEditable && !userStore.hasRole('Super Admin')) {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Expediente Fuera de Etapa',
-                    text: 'El expediente no se encuentra en la etapa de Archivo (Estado 4 o Secundario 4). Cualquier cambio debe solicitarlo a Informática.',
-                    confirmButtonText: 'Entendido'
-                })
-                return
-            }
+            // Validación eliminada: Archivo tiene acceso irrestricto en esta vista
 
             // Seteamos detallesData y los modales ya tendrán qué listar y editar
             detallesData.value = res.data.data
@@ -286,19 +298,17 @@ const search = async () => {
 
 
 
-const openCorrectDocumento = (doc: any) => {
-    // Las correcciones suelen requerir el mismo permiso de anulación si es compartido
-    const canOverride = useAuthStore().hasPermission('editar_documentos_restringidos')
+const openEditGarantia = (g: any) => {
+    selectedGarantia.value = g
+    showEditGarantia.value = true
+}
 
-    if (doc.expedientes_asociados_count > 0 && !canOverride) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Corrección Restringida',
-            text: 'Este documento compartido requiere autorización de Informática para ser corregido masivamente.',
-            confirmButtonText: 'Entendido'
-        })
-        return
-    }
+const openChangeType = (g: any) => {
+    selectedGarantia.value = g
+    showChangeType.value = true
+}
+
+const openCorrectDocumento = (doc: any) => {
     selectedDocumento.value = doc
     showCorrectDocumento.value = true
 }
