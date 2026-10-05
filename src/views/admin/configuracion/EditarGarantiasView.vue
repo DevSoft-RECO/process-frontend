@@ -510,8 +510,31 @@ const deleteDocument = async () => {
     resetSearch()
   } catch (error: any) {
     console.error(error)
-    const msg = error.response?.data?.message || 'Error al eliminar el documento'
-    Swal.fire('Error', msg, 'error')
+    const data = error.response?.data
+    const msg = data?.message || 'Error al eliminar el documento'
+
+    if (data?.detalles && Array.isArray(data.detalles) && data.detalles.length > 0) {
+      const items = data.detalles.map((d: string) => `<li class="py-1">📌 ${d}</li>`).join('')
+      const sugerencia = data.sugerencia ? `<p class="mt-3 text-xs text-gray-500 dark:text-gray-400 text-left border-t border-gray-200 dark:border-gray-700 pt-2">${data.sugerencia}</p>` : ''
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'No se puede eliminar la garantía',
+        html: `
+          <div class="text-left">
+            <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">${msg}</p>
+            <ul class="text-xs bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 p-3 rounded-lg border border-amber-200 dark:border-amber-800 space-y-1">
+              ${items}
+            </ul>
+            ${sugerencia}
+          </div>
+        `,
+        confirmButtonColor: '#059669',
+        confirmButtonText: 'Entendido'
+      })
+    } else {
+      Swal.fire('Error', msg, 'error')
+    }
   } finally {
     deleting.value = false
   }
