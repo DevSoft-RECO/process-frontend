@@ -199,6 +199,12 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/editar_expedientes/ArchivoEdicionView.vue'),
                 meta: { title: 'Edición de Expedientes', permission: 'archivo' }
             },
+            {
+                path: 'archivo/historico-process',
+                name: 'archivo-historico-process',
+                component: () => import('@/views/admin/configuracion/HistoricoProcessView.vue'),
+                meta: { title: 'Historico Process', permission: 'historico_process' }
+            },
 
             // ==========================================
             // MÓDULO: CONFIRMACIÓN DOCUMENTOS 

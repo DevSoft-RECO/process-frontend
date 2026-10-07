@@ -437,6 +437,11 @@ const menuItems = computed(() => {
                 {
                     label: 'Edición de Expedientes',
                     route: '/admin/archivo/edicion'
+                },
+                {
+                    label: 'Historico Process',
+                    route: '/admin/archivo/historico-process',
+                    permission: 'historico_process'
                 }
             ]
         },
@@ -798,9 +803,9 @@ const menuItems = computed(() => {
 
         if (item.children) {
             const visibleChildren = item.children.filter((child: any) => {
-                // Si el hijo exige un permiso propio específico evaluamos eso, o si el papá tiene el acceso general
+                // Si el hijo exige un permiso propio específico, debe cumplirlo
                 if (child.permission) {
-                    return hasRequiredPermission(child.permission) || hasParentPerm;
+                    return hasRequiredPermission(child.permission);
                 }
                 // Si el hijo NO tiene permiso explícito, se rige si el usuario tiene el permiso general del papá
                 return hasParentPerm;
